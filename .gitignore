@@ -6,3 +6,5 @@ __pycache__/
 !.env.example
 graphify-out/
 .vercel
+.venv/
+.env.local

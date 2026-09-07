@@ -1,0 +1,76 @@
+@import "tailwindcss";
+
+/* Dark-only by design: this is an event product used in one sitting, and a single
+   committed palette is easier to keep AA-contrast-correct than two half-tuned ones. */
+@theme {
+  --color-base: #08090c;
+  --color-surface: #101218;
+  --color-surface-2: #171a22;
+  --color-line: #232734;
+  --color-ink: #e9ebf2;
+  --color-muted: #8b92a4;
+  --color-accent: #ffc447;
+  --color-accent-ink: #1a1300;
+  --color-ok: #4ade80;
+  --color-warn: #fb923c;
+  --color-danger: #f87171;
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+html {
+  color-scheme: dark;
+}
+
+body {
+  background: var(--color-base);
+  color: var(--color-ink);
+  font-family: var(--font-sans), system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Faint grid. Fixed attachment so it never repaints during scroll. */
+.arena-grid::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: -1;
+  background-image:
+    linear-gradient(to right, #ffffff08 1px, transparent 1px),
+    linear-gradient(to bottom, #ffffff08 1px, transparent 1px);
+  background-size: 56px 56px;
+  mask-image: radial-gradient(ellipse 90% 60% at 50% 0%, #000 40%, transparent 100%);
+}
+
+*:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Transform + opacity only — nothing here triggers layout. */
+.rise {
+  animation: rise 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+}

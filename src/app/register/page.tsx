@@ -1,0 +1,282 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { api, ApiError, type College, type Me } from "@/lib/api";
+
+const YEARS = [1, 2, 3, 4, 5];
+
+export default function Register() {
+  const router = useRouter();
+  const [me, setMe] = useState<Me | null>(null);
+  const [colleges, setColleges] = useState<College[]>([]);
+  const [loadError, setLoadError] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [saving, setSaving] = useState(false);
+  const [done, setDone] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const [profile, list] = await Promise.all([
+          api<Me>("/me"),
+          api<College[]>("/colleges"),
+        ]);
+        if (cancelled) return;
+        setMe(profile);
+        setColleges(list);
+        if (profile.profile.registered) setDone(true);
+      } catch (e) {
+        if (!cancelled) {
+          setLoadError(
+            e instanceof ApiError && e.status === 401
+              ? "Your session expired. Please sign in again."
+              : "We could not load your details. Check your connection and reload.",
+          );
+        }
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  async function submit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setSaving(true);
+    setError(null);
+
+    const form = new FormData(event.currentTarget);
+    const collegeName = String(form.get("college") ?? "").trim();
+    // If the typed name exactly matches a known college, bind to its id so the
+    // analytics group cleanly instead of creating a near-duplicate row.
+    const match = colleges.find(
+      (c) => c.name.toLowerCase() === collegeName.toLowerCase(),
+    );
+
+    try {
+      await api("/register", {
+        method: "POST",
+        json: {
+          phone: form.get("phone"),
+          college_id: match?.id ?? null,
+          college_name: match ? null : collegeName,
+          course: form.get("course"),
+          academic_year: Number(form.get("academic_year")),
+          student_id: form.get("student_id"),
+        },
+      });
+      setDone(true);
+    } catch (e) {
+      setError(
+        e instanceof ApiError
+          ? e.message
+          : "Could not save your registration. Please try again.",
+      );
+      setSaving(false);
+    }
+  }
+
+  if (loadError) {
+    return (
+      <Shell>
+        <p role="alert" className="text-sm text-danger">
+          {loadError}
+        </p>
+        <button
+          onClick={() => router.refresh()}
+          className="mt-4 rounded-xl border border-line bg-surface-2 px-5 py-2.5 text-sm font-medium"
+        >
+          Reload
+        </button>
+      </Shell>
+    );
+  }
+
+  if (!me) {
+    return (
+      <Shell>
+        <div className="space-y-3" aria-busy="true" aria-label="Loading your details">
+          {[...Array(4)].map((_, i) => (
+            <div key={i} className="h-11 animate-pulse rounded-xl bg-surface-2" />
+          ))}
+        </div>
+      </Shell>
+    );
+  }
+
+  if (done) {
+    return (
+      <Shell>
+        <div className="rise text-center">
+          <p className="mb-3 font-mono text-xs tracking-widest text-ok">REGISTERED</p>
+          <h1 className="mb-2 text-2xl font-semibold">You&rsquo;re in, {me.profile.name.split(" ")[0]}</h1>
+          <p className="text-sm text-muted">
+            Your details are saved. Domain selection opens next.
+          </p>
+        </div>
+      </Shell>
+    );
+  }
+
+  const p = me.profile;
+
+  return (
+    <Shell>
+      <div className="mb-8">
+        <p className="mb-2 font-mono text-xs tracking-widest text-accent">STEP 2 / 4</p>
+        <h1 className="text-2xl font-semibold">Complete your registration</h1>
+        <p className="mt-1 text-sm text-muted">
+          This appears on your certificate, so check it carefully.
+        </p>
+      </div>
+
+      <form onSubmit={submit} className="space-y-5">
+        <Locked label="Name" value={p.name} />
+        <Locked label="Email" value={p.email} />
+
+        <Field label="Phone number" name="phone" required>
+          <input
+            id="phone"
+            name="phone"
+            type="tel"
+            inputMode="tel"
+            autoComplete="tel"
+            required
+            defaultValue={p.phone ?? ""}
+            placeholder="98765 43210"
+            className={inputClass}
+          />
+        </Field>
+
+        <Field label="College" name="college" required hint="Start typing to find yours, or enter a new one.">
+          <input
+            id="college"
+            name="college"
+            list="college-options"
+            required
+            maxLength={160}
+            defaultValue={p.college_name ?? ""}
+            autoComplete="organization"
+            className={inputClass}
+          />
+          <datalist id="college-options">
+            {colleges.map((c) => (
+              <option key={c.id} value={c.name} />
+            ))}
+          </datalist>
+        </Field>
+
+        <Field label="Course / Branch" name="course" required>
+          <input
+            id="course"
+            name="course"
+            required
+            minLength={2}
+            maxLength={120}
+            defaultValue={p.course ?? ""}
+            placeholder="Computer Science"
+            className={inputClass}
+          />
+        </Field>
+
+        <Field label="Academic year" name="academic_year" required>
+          <select
+            id="academic_year"
+            name="academic_year"
+            required
+            defaultValue={p.academic_year ?? ""}
+            className={inputClass}
+          >
+            <option value="" disabled>
+              Select year
+            </option>
+            {YEARS.map((y) => (
+              <option key={y} value={y}>
+                Year {y}
+              </option>
+            ))}
+          </select>
+        </Field>
+
+        <Field label="Student ID / Register number" name="student_id" required>
+          <input
+            id="student_id"
+            name="student_id"
+            required
+            maxLength={60}
+            defaultValue={p.student_id ?? ""}
+            placeholder="CS21001"
+            className={inputClass}
+          />
+        </Field>
+
+        {error && (
+          <p role="alert" className="text-sm text-danger">
+            {error}
+          </p>
+        )}
+
+        <button
+          type="submit"
+          disabled={saving}
+          className="w-full rounded-xl bg-accent px-6 py-4 font-semibold text-accent-ink transition-transform duration-150 hover:-translate-y-0.5 active:translate-y-0 disabled:cursor-wait disabled:opacity-60 disabled:hover:translate-y-0"
+        >
+          {saving ? "Saving…" : "Continue"}
+        </button>
+      </form>
+    </Shell>
+  );
+}
+
+const inputClass =
+  "w-full rounded-xl border border-line bg-surface-2 px-4 py-3 text-ink placeholder:text-muted/60 focus:border-accent";
+
+function Shell({ children }: { children: React.ReactNode }) {
+  return (
+    <main className="flex flex-1 justify-center px-6 py-12">
+      <div className="w-full max-w-md">{children}</div>
+    </main>
+  );
+}
+
+function Field({
+  label,
+  name,
+  required,
+  hint,
+  children,
+}: {
+  label: string;
+  name: string;
+  required?: boolean;
+  hint?: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <div>
+      <label htmlFor={name} className="mb-1.5 block text-sm font-medium">
+        {label}
+        {required && <span className="ml-1 text-accent">*</span>}
+      </label>
+      {children}
+      {hint && <p className="mt-1.5 text-xs text-muted">{hint}</p>}
+    </div>
+  );
+}
+
+/** Identity from Google. Shown so the student can check it, not edit it. */
+function Locked({ label, value }: { label: string; value: string }) {
+  return (
+    <div>
+      <span className="mb-1.5 block text-sm font-medium">{label}</span>
+      <div className="flex items-center justify-between rounded-xl border border-line bg-surface px-4 py-3 text-muted">
+        <span className="truncate">{value}</span>
+        <span className="ml-3 shrink-0 font-mono text-[10px] tracking-widest text-ok">
+          VERIFIED
+        </span>
+      </div>
+    </div>
+  );
+}
