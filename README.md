@@ -32,7 +32,8 @@ cp .env.example .env.local     # then fill it in
 2. `DATABASE_URL` must be the **transaction pooler** URI (port 6543), not the
    direct 5432 one — serverless instances against a direct port exhaust
    Postgres connections.
-3. Apply the schema: `pnpm db:push`
+3. Apply the schema: `pnpm db:push` (uses `MIGRATION_DATABASE_URL`, the
+   direct 5432 connection — transaction-mode pooling does not reliably run DDL)
 4. Authentication → Sign In / Providers → **Google**: paste your Google OAuth
    client ID and secret, and add the callback Supabase shows you to the Google
    client's authorised redirect URIs.
@@ -48,10 +49,17 @@ Drive puts you in the slow review queue. See spec §10.
 
 ```bash
 pnpm dev          # Next.js only — /api/v1/* will 404
-vercel dev        # full stack: Next.js + the Python function + the rewrite
+pnpm dev:full     # vercel dev: Next.js + the Python function + the rewrite
 ```
 
-Use `vercel dev` for anything that touches the API.
+Use `pnpm dev:full` for anything that touches the API.
+
+Two local-only gotchas, both already handled in this repo:
+
+- `vercel dev` reads `.env.local` for Next.js but only passes **`.env`** to the
+  Python function. Keep both; `.env` is what the API sees locally.
+- The Vercel Python runtime needs **3.12+**. `.python-version` pins 3.13 for
+  both the deploy and your local `uv`/pyenv.
 
 ## Tests
 

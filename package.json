@@ -9,7 +9,8 @@
     "lint": "eslint",
     "db:test": "supabase/test/run.sh",
     "api:test": ".venv/bin/pytest server -q",
-    "db:push": "psql \"$DATABASE_URL\" -v ON_ERROR_STOP=1 -f supabase/migrations/0001_init.sql -f supabase/migrations/0002_seed.sql"
+    "db:push": "psql \"$MIGRATION_DATABASE_URL\" -v ON_ERROR_STOP=1 -f supabase/migrations/0001_init.sql -f supabase/migrations/0002_seed.sql",
+    "dev:full": "vercel dev"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.6",

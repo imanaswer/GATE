@@ -1,9 +1,7 @@
 {
   "functions": {
     "api/index.py": {
-      "runtime": "@vercel/python@5.0.2",
-      "includeFiles": "server/**",
-      "maxDuration": 30
+      "includeFiles": "server/**"
     }
   },
   "rewrites": [

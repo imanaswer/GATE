@@ -145,6 +145,11 @@ def register(payload: RegistrationIn, identity: CurrentIdentity):
                 raise HTTPException(status.HTTP_422_UNPROCESSABLE_ENTITY, "unknown college")
             college_id = row["id"]
         else:
+            # Trust-boundary write: free-text college names let an authenticated
+            # student insert rows into a permanent analytics dimension, and this
+            # endpoint is callable repeatedly until their attempt starts.
+            # Bounded by the exam-started freeze below; a per-user rate limit
+            # lands with the rest of them in Phase 7.
             name = " ".join(payload.college_name.split())
             cur.execute(
                 """
