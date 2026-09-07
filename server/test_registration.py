@@ -6,64 +6,9 @@ Covers the thing Phase 1 exists to prove: a Google account can register once,
 and the *database* — not application logic, not the browser — is what stops a
 second attempt.
 """
-import os
 import subprocess
-import uuid
 
-import jwt
-import pytest
-
-SECRET = "test-secret-not-used-anywhere-real"
-DB = f"tech_arena_api_test_{os.getpid()}"
-
-
-def _psql(*args):
-    subprocess.run(["psql", "-q", "-v", "ON_ERROR_STOP=1", "-d", DB, *args], check=True)
-
-
-@pytest.fixture(scope="module", autouse=True)
-def database():
-    subprocess.run(["dropdb", "--if-exists", DB], check=False)
-    subprocess.run(["createdb", DB], check=True)
-    _psql("-c", "create extension if not exists pgcrypto;")
-    _psql("-f", "supabase/test/00_auth_shim.sql")
-    for name in sorted(os.listdir("supabase/migrations")):
-        _psql("-f", f"supabase/migrations/{name}")
-    os.environ.update(
-        DATABASE_URL=f"postgresql:///{DB}",
-        SUPABASE_URL="https://example.supabase.co",
-        SUPABASE_JWT_SECRET=SECRET,
-        EVENT_SLUG="tech-arena-2026",
-    )
-    yield
-    subprocess.run(["dropdb", "--if-exists", DB], check=False)
-
-
-@pytest.fixture(scope="module")
-def client(database):
-    from fastapi.testclient import TestClient
-
-    from server.main import app
-
-    with TestClient(app) as c:
-        yield c
-
-
-def make_student(email: str, name: str) -> str:
-    """Create the auth.users row Supabase would have created, return a bearer token."""
-    sub = str(uuid.uuid4())
-    subprocess.run(
-        ["psql", "-q", "-v", "ON_ERROR_STOP=1", "-d", DB, "-c",
-         f"insert into auth.users (id, email) values ('{sub}', '{email}')"],
-        check=True,
-    )
-    token = jwt.encode(
-        {"sub": sub, "email": email, "aud": "authenticated",
-         "user_metadata": {"full_name": name}, "exp": 9999999999},
-        SECRET, algorithm="HS256",
-    )
-    return f"Bearer {token}"
-
+from server.conftest import DB, make_student, scalar
 
 REG = {
     "phone": "+91 98765 43210",
@@ -84,6 +29,7 @@ def test_rejects_unauthenticated(client):
 
 
 def test_rejects_forged_token(client):
+    import jwt, uuid
     bad = jwt.encode({"sub": str(uuid.uuid4()), "email": "x@y.z", "aud": "authenticated"},
                      "wrong-secret", algorithm="HS256")
     r = client.get("/api/v1/me", headers={"Authorization": f"Bearer {bad}"})
@@ -141,12 +87,9 @@ def test_duplicate_student_id_is_flagged_not_blocked(client):
     assert r.json()["flagged_duplicate_student_id"] is True
     assert r.json()["profile"]["registered"] is True
 
-    out = subprocess.run(
-        ["psql", "-tA", "-d", DB, "-c",
-         "select count(*) from suspicious_activity where type='duplicate_student_id'"],
-        capture_output=True, text=True, check=True,
-    )
-    assert int(out.stdout.strip()) >= 1                  # and an admin can see it
+    assert int(scalar(
+        "select count(*) from suspicious_activity where type='duplicate_student_id'"
+    )) >= 1                                              # and an admin can see it
 
 
 def test_colleges_are_deduplicated_by_name(client):
@@ -156,12 +99,7 @@ def test_colleges_are_deduplicated_by_name(client):
         json={**REG, "college_name": "  abc college OF engineering ", "student_id": "CS21500"},
         headers={"Authorization": auth},
     )
-    out = subprocess.run(
-        ["psql", "-tA", "-d", DB, "-c",
-         "select count(*) from colleges where lower(name) like 'abc college%'"],
-        capture_output=True, text=True, check=True,
-    )
-    assert out.stdout.strip() == "1"
+    assert scalar("select count(*) from colleges where lower(name) like 'abc college%'") == "1"
 
 
 def test_domains_listed(client):
