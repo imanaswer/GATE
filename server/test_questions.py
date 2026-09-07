@@ -188,3 +188,22 @@ def test_import_keeps_exactly_one_correct_option(conn):
             """
         )
         assert [r["position"] for r in cur.fetchall()] == [3]
+
+
+def test_lopsided_answer_key_rejected():
+    """A bank where the answer is nearly always A is solvable without knowing
+    anything, and the per-attempt shuffle hides the problem rather than fixing
+    the filler distractors it produces."""
+    rows = [GOOD.replace("AIML-001", f"AIML-{i:03d}") for i in range(25)]
+    r = parse_csv(sheet(*rows), DOMAINS)
+    assert not r.ok
+    assert "lopsided" in r.errors[-1]
+
+
+def test_spread_answer_key_accepted():
+    rows = []
+    for i in range(28):
+        letter = "ABCD"[i % 4]
+        rows.append(GOOD.replace("AIML-001", f"AIML-{i:03d}").replace(",A,", f",{letter},"))
+    r = parse_csv(sheet(*rows), DOMAINS)
+    assert r.ok, r.errors

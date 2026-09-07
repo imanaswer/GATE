@@ -148,6 +148,25 @@ def parse_csv(text: str, known_domains: set[str]) -> ImportReport:
 
     if not report.rows and not report.errors:
         report.errors.append("file contains no data rows")
+
+    # A bank where the answer is nearly always option A is solvable without
+    # knowing anything. Per-attempt shuffling hides it at exam time, which is
+    # exactly why it goes unnoticed while it quietly degrades every distractor:
+    # options nobody expects to be correct get written as filler.
+    if len(report.rows) >= 20:
+        counts: dict[str, int] = {}
+        for row in report.rows:
+            letter = LETTERS[row.correct_index]
+            counts[letter] = counts.get(letter, 0) + 1
+        letter, n = max(counts.items(), key=lambda kv: kv[1])
+        share = n / len(report.rows)
+        if share > 0.40:
+            report.errors.append(
+                f"answer key is lopsided: {letter} is correct for {n} of "
+                f"{len(report.rows)} questions ({share:.0%}). Spread the correct "
+                f"answer across positions — no letter above 40%."
+            )
+
     return report
 
 
