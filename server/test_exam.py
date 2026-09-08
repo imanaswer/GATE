@@ -667,3 +667,52 @@ def test_the_pdf_renders_and_carries_the_certificate_id(client):
     assert r.headers["content-type"] == "application/pdf"
     assert r.content.startswith(b"%PDF-")
     assert len(r.content) > 1000  # a QR and text, not an empty page
+
+
+@pytest.mark.parametrize("given,expected", [
+    ("TA-2026-K7M2QX9VBT", "TA-2026-K7M2QX9VBT"),
+    ("ta-2026-k7m2qx9vbt", "TA-2026-K7M2QX9VBT"),   # pasted lowercase
+    ("TA2026K7M2QX9VBT", "TA-2026-K7M2QX9VBT"),     # dashes dropped
+    (" TA-2026-K7M2QX9VBT ", "TA-2026-K7M2QX9VBT"), # copied with whitespace
+    ("TA-2026-K7M2QX9VB", None),                    # too short
+    ("TA-2026-K7M2QX9VB0", None),                   # 0 is not in the alphabet
+    ("XX-2026-K7M2QX9VBT", None),
+    ("nonsense", None),
+])
+def test_ids_are_canonicalised_rather_than_matched_loosely(given, expected):
+    """Rebuilding the canonical form is what lets the lookup use the unique index.
+    Matching on `replace(certificate_id, '-', '')` instead would make the one
+    unauthenticated endpoint in the app a sequential scan per request."""
+    from server.certificates import canonical
+
+    assert canonical(given) == expected
+
+
+def test_the_verify_url_trusts_the_forwarded_scheme_not_the_socket():
+    """Vercel terminates TLS at the edge, so the scheme the function sees is
+    http. That would be printed into a QR code that outlives the page."""
+    from starlette.requests import Request
+
+    from server.certificates import _site_url
+
+    def req(headers):
+        return Request({
+            "type": "http", "scheme": "http", "server": ("10.0.0.1", 80),
+            "path": "/", "query_string": b"", "headers": [
+                (k.encode(), v.encode()) for k, v in headers.items()
+            ],
+        })
+
+    assert _site_url(req({
+        "x-forwarded-proto": "https", "x-forwarded-host": "arena.example.com",
+        "host": "internal.vercel.internal",
+    })) == "https://arena.example.com"
+    assert _site_url(req({"host": "localhost:3000"})) == "http://localhost:3000"
+
+
+def test_the_certificate_year_comes_from_the_event_not_the_clock():
+    """The cron sweep finalising the last abandoned attempts can run after
+    midnight on New Year. TA-2027 on a 2026 certificate is wrong on paper."""
+    from server.certificates import _event_year
+
+    assert _event_year() == "2026"  # EVENT_SLUG=tech-arena-2026

@@ -32,6 +32,10 @@ class Settings:
         self.event_slug = os.environ.get("EVENT_SLUG", "tech-arena-2026")
         self.db_pool_max = int(os.environ.get("DB_POOL_MAX", "2"))
         self.cron_secret = os.environ.get("CRON_SECRET") or None
+        # Certificates are printed. Without this a preview deployment would stamp
+        # its own throwaway domain into a QR code that outlives it, so set it in
+        # production; the forwarded headers are only the fallback.
+        self.site_url = os.environ.get("SITE_URL", "").rstrip("/")
 
 
 settings = Settings()

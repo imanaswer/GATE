@@ -6,12 +6,14 @@ is drawn on demand from that row, because most students never download theirs
 and provisioning a render fleet for the ones who don't is how event day breaks.
 """
 import hashlib
+import re
 import secrets
 from datetime import date
 
 from fastapi import APIRouter, HTTPException, Request, Response, status
 
 from server import db
+from server.settings import settings
 
 router = APIRouter()
 
@@ -21,9 +23,17 @@ ALPHABET = "23456789ABCDEFGHJKMNPQRSTVWXYZ"
 ID_LENGTH = 10
 
 
+def _event_year() -> str:
+    """From the event slug, not the wall clock: the cron sweep that finalises the
+    last abandoned attempts can easily run after midnight on New Year, and
+    "TA-2027-" on a 2026 certificate is wrong on paper forever."""
+    match = re.search(r"(20\d{2})", settings.event_slug)
+    return match.group(1) if match else str(date.today().year)
+
+
 def _new_id() -> str:
     body = "".join(secrets.choice(ALPHABET) for _ in range(ID_LENGTH))
-    return f"TA-{date.today().year}-{body}"
+    return f"TA-{_event_year()}-{body}"
 
 
 def _hash(certificate_id: str, attempt_id) -> str:
@@ -34,10 +44,21 @@ def _hash(certificate_id: str, attempt_id) -> str:
     return hashlib.sha256(f"{certificate_id}{attempt_id}".encode()).hexdigest()
 
 
-def normalise(certificate_id: str) -> str:
+def canonical(certificate_id: str) -> str | None:
     """A pasted ID arrives lowercased, with stray spaces, or with the dashes
-    dropped. All three are the same certificate."""
-    return "".join(certificate_id.upper().split()).replace("-", "")
+    dropped — all three name the same certificate. Rebuilding the canonical form
+    (rather than matching on `replace(certificate_id, '-', '')`) keeps the unique
+    index usable: that column expression cannot use it, which would make the one
+    unauthenticated endpoint in the app a sequential scan per request.
+
+    None for anything the wrong shape, so a malformed ID never reaches the
+    database at all."""
+    stripped = "".join(certificate_id.upper().split()).replace("-", "")
+    if len(stripped) != 6 + ID_LENGTH or not stripped.startswith("TA"):
+        return None
+    if not stripped[2:6].isdigit() or any(c not in ALPHABET for c in stripped[6:]):
+        return None
+    return f"TA-{stripped[2:6]}-{stripped[6:]}"
 
 
 def issue(cur, attempt_id) -> str:
@@ -67,8 +88,8 @@ def _lookup(certificate_id: str) -> dict:
     """The public face of the platform, and the only endpoint with no identity
     behind it. Every column is named literally: a `select a.*` here would publish
     scores and email addresses to anyone holding a certificate number."""
-    wanted = normalise(certificate_id)
-    row = db.fetch_one(
+    wanted = canonical(certificate_id)
+    row = wanted and db.fetch_one(
         """
         select c.certificate_id, c.verify_hash, c.issued_at,
                u.name as student_name, co.name as college_name,
@@ -78,7 +99,7 @@ def _lookup(certificate_id: str) -> dict:
         join users u on u.id = a.user_id
         join domains d on d.id = a.domain_id
         left join colleges co on co.id = u.college_id
-        where replace(c.certificate_id, '-', '') = %s
+        where c.certificate_id = %s
         """,
         (wanted,),
     )
@@ -106,11 +127,22 @@ def show(certificate_id: str):
     return _public(_lookup(certificate_id))
 
 
+def _site_url(request: Request) -> str:
+    """Vercel terminates TLS at the edge, so the scheme the function sees is the
+    internal one — printing `http://` into a QR that outlives the page. Prefer
+    the configured URL, then the forwarded headers, and only then the socket."""
+    if settings.site_url:
+        return settings.site_url
+    proto = request.headers.get("x-forwarded-proto", request.url.scheme)
+    host = request.headers.get("x-forwarded-host") or request.headers.get("host", "")
+    return f"{proto}://{host}" if host else str(request.base_url).rstrip("/")
+
+
 @router.get("/certificates/{certificate_id}/pdf")
 def pdf(certificate_id: str, request: Request):
     row = _lookup(certificate_id)
     cert = _public(row)
-    verify_url = f"{str(request.base_url).rstrip('/')}/verify/{cert['certificate_id']}"
+    verify_url = f"{_site_url(request)}/verify/{cert['certificate_id']}"
     # ponytail: renders per download (~20ms of CPU). The pdf_path/pdf_generated_at
     # columns are left NULL — cache to Supabase Storage if download volume ever
     # shows up in the CPU numbers.
@@ -119,7 +151,7 @@ def pdf(certificate_id: str, request: Request):
         media_type="application/pdf",
         headers={
             "Content-Disposition":
-                f'inline; filename="{cert["certificate_id"]}.pdf"',
+                f'attachment; filename="{cert["certificate_id"]}.pdf"',
             "Cache-Control": "public, max-age=86400",
         },
     )

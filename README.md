@@ -53,6 +53,11 @@ cp .env.example .env.local     # then fill it in
 5. Authentication → URL Configuration → add `https://<your-domain>/auth/callback`
    and `http://localhost:3000/auth/callback` to the redirect allow-list.
 
+**Set `SITE_URL` in production** (e.g. `https://arena.example.com`). It is the
+origin printed into every certificate QR code. Without it the URL is rebuilt
+from the forwarded headers, which is right in most cases but would let a preview
+deployment stamp its own throwaway domain onto a certificate that outlives it.
+
 **Google OAuth — start this first, it has lead time.** An unverified OAuth app
 is capped at 100 users for the lifetime of the project and the cap cannot be
 reset. Request only `openid`, `email`, and `profile`; anything touching Gmail or
