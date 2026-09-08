@@ -14,10 +14,15 @@ string. `vercel.json` owns that rewrite.
 
 ## Status
 
-**Phases 1–3 complete** — auth, registration, the one-attempt constraint, the
-question bank, and the exam engine (blueprint selection, server-authoritative
-timer, autosave, resume, idempotent submit, backend scoring). Phases 4–7
-(student UI, certificates, admin, hardening) are in the spec's build order.
+**Phases 1–4 complete** — auth, registration, the one-attempt constraint, the
+question bank, the exam engine (blueprint selection, server-authoritative
+timer, autosave, resume, idempotent submit, backend scoring), and the student
+UI end to end. Phases 5–7 (certificates, admin, hardening) are in the spec's
+build order.
+
+The arena is the screen that matters most and it sits behind Google sign-in, so
+`/preview` renders it with fixture data — every question type, save state and
+timer threshold, no API calls. It 404s in production.
 
 ⚠️ **The seed bank is LLM-authored and has not been reviewed by a subject
 expert.** `bank:check` verifies quantity and distribution, not correctness.

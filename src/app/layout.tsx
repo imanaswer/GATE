@@ -16,7 +16,13 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="en" className={`${geistSans.variable} ${geistMono.variable} h-full`}>
+    <html
+      lang="en"
+      className={`${geistSans.variable} ${geistMono.variable} h-full`}
+      // Browser extensions mutate <html> attributes before React hydrates,
+      // which otherwise reports a mismatch that is not ours.
+      suppressHydrationWarning
+    >
       <body className="arena-grid min-h-full flex flex-col">{children}</body>
     </html>
   );

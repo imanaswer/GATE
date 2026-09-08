@@ -13,7 +13,6 @@ export default function Register() {
   const [loadError, setLoadError] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
-  const [done, setDone] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -26,7 +25,7 @@ export default function Register() {
         if (cancelled) return;
         setMe(profile);
         setColleges(list);
-        if (profile.profile.registered) setDone(true);
+        if (profile.profile.registered) return router.replace("/domains");
       } catch (e) {
         if (!cancelled) {
           setLoadError(
@@ -40,7 +39,7 @@ export default function Register() {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [router]);
 
   async function submit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -67,7 +66,8 @@ export default function Register() {
           student_id: form.get("student_id"),
         },
       });
-      setDone(true);
+      router.replace("/domains");
+      return;
     } catch (e) {
       setError(
         e instanceof ApiError
@@ -101,20 +101,6 @@ export default function Register() {
           {[...Array(4)].map((_, i) => (
             <div key={i} className="h-11 animate-pulse rounded-xl bg-surface-2" />
           ))}
-        </div>
-      </Shell>
-    );
-  }
-
-  if (done) {
-    return (
-      <Shell>
-        <div className="rise text-center">
-          <p className="mb-3 font-mono text-xs tracking-widest text-ok">REGISTERED</p>
-          <h1 className="mb-2 text-2xl font-semibold">You&rsquo;re in, {me.profile.name.split(" ")[0]}</h1>
-          <p className="text-sm text-muted">
-            Your details are saved. Domain selection opens next.
-          </p>
         </div>
       </Shell>
     );
