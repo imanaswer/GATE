@@ -1,0 +1,5 @@
+# Local development and tests. NOT installed on Vercel — requirements.txt is
+# what the deployed function gets, and test tooling has no business in it.
+-r requirements.txt
+pytest==9.1.1
+uvicorn==0.52.4

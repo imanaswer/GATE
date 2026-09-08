@@ -12,6 +12,11 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Not source. The Python virtualenv is gitignored but ESLint does not read
+    // .gitignore, and packages like playwright vendor multi-megabyte bundled JS
+    // into it — enough to crash the formatter outright.
+    ".venv/**",
+    "graphify-out/**",
   ]),
 ]);
 

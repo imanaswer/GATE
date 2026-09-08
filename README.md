@@ -62,21 +62,147 @@ is capped at 100 users for the lifetime of the project and the cap cannot be
 reset. Request only `openid`, `email`, and `profile`; anything touching Gmail or
 Drive puts you in the slow review queue. See spec §10.
 
-## Running
+## Running it, step by step
+
+From a fresh clone to a certificate in your hand. Every command below was run in
+this order against an empty database.
+
+### 0. Prerequisites
+
+Node 20+ with `pnpm`, Python 3.13 (`.python-version` pins it), and `psql` on your
+PATH. A Supabase project — the student flow is Google sign-in, so there is no
+fully offline mode for it. (The exception: `/preview` renders the exam arena from
+fixture data with no API and no login, if all you want is to see the screen.)
+
+### 1. Install
 
 ```bash
-pnpm dev          # Next.js only — /api/v1/* will 404
-pnpm dev:full     # vercel dev: Next.js + the Python function + the rewrite
+pnpm install
+python3 -m venv .venv && .venv/bin/pip install -r requirements-dev.txt
 ```
 
-Use `pnpm dev:full` for anything that touches the API.
+`requirements-dev.txt` pulls in `requirements.txt` and adds pytest and uvicorn.
+Vercel installs only `requirements.txt`, so test tooling never ships.
 
-Two local-only gotchas, both already handled in this repo:
+### 2. Environment
 
-- `vercel dev` reads `.env.local` for Next.js but only passes **`.env`** to the
-  Python function. Keep both; `.env` is what the API sees locally.
-- The Vercel Python runtime needs **3.12+**. `.python-version` pins 3.13 for
-  both the deploy and your local `uv`/pyenv.
+```bash
+cp .env.example .env.local
+cp .env.local .env          # yes, both — see the gotcha below
+```
+
+Fill in the Supabase values (§ Setup above). **Keep `.env` and `.env.local` in
+sync:** `vercel dev` reads `.env.local` for Next.js but passes only **`.env`** to
+the Python function, so a value in just one of them produces an API that behaves
+differently from the site in front of it.
+
+Minimum to get running locally: `NEXT_PUBLIC_SUPABASE_URL`,
+`NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_URL`, `DATABASE_URL`,
+`MIGRATION_DATABASE_URL`, `ADMIN_SECRET`, `CRON_SECRET`, `SITE_URL`.
+The API logs a warning at boot for each optional one you left blank, so check the
+first lines of its output rather than guessing.
+
+### 3. Create the schema
+
+```bash
+pnpm db:push
+```
+
+Applies every file in `supabase/migrations/` in order and prints each one. Run it
+against a **fresh** database — these are plain DDL with no migration ledger, so
+re-running on a populated database will stop at the first `create table` that
+already exists.
+
+### 4. Seed the question bank
+
+```bash
+pnpm bank:import          # all of data/questions/*.csv — 1,000 questions
+pnpm bank:check           # can every domain serve the blueprint?
+```
+
+`bank:check` must end with *"every domain can serve the blueprint with room to
+randomise"*. If it doesn't, exam start will fail for that domain with a 503, by
+design — silent degradation here means an unfair exam.
+
+⚠️ These seed questions are **public in this repository, answers included**.
+Replace them with reviewed questions before a real event: put your CSV in
+`data/questions/` and re-run `pnpm bank:import`, or use **Import CSV** in the
+admin panel. Import is all-or-nothing, so one bad row imports nothing.
+
+### 5. Create an admin account
+
+```bash
+pnpm admin:create you@example.com --role admin    # prompts for a password
+pnpm admin:list
+```
+
+There is no self-service signup. This needs `DATABASE_URL` in your shell or in
+`.env`.
+
+### 6. Start it
+
+```bash
+pnpm dev:full     # vercel dev — Next.js + the Python function + the rewrite
+```
+
+Use this, not `pnpm dev`, for anything touching the API: `pnpm dev` runs Next.js
+alone and every `/api/v1/*` call 404s.
+
+### 7. Walk the flow
+
+| # | Go to | What should happen |
+|---|---|---|
+| 1 | `/` | Google sign-in |
+| 2 | `/register` | Name and email prefilled and read-only; you fill in phone, college, course, year, student ID |
+| 3 | `/domains` | Pick one of the five |
+| 4 | `/briefing/<slug>` | Rules and timer, then start |
+| 5 | `/arena` | 15 questions, 20 minutes. **Refresh mid-exam** — same paper, same answers, timer still counting down from the server |
+| 6 | `/complete` | Score, then **Download certificate** |
+| 7 | `/verify/<id>` | Public page — open it in a private window to prove it needs no account |
+| 8 | `/admin` | Sign in with the account from step 5 |
+
+The one thing worth trying deliberately: **sign in as the same student and start a
+second exam.** It is refused by a database constraint, not by app logic.
+
+### 8. Cron jobs, locally
+
+Vercel runs these on a schedule; nothing triggers them on your machine, so the
+overview counters read zero and abandoned attempts sit unscored until you call
+them yourself:
+
+```bash
+for job in expire-attempts refresh-overview scan-integrity; do
+  curl -s -X POST localhost:3000/api/v1/cron/$job \
+    -H "Authorization: Bearer $CRON_SECRET"; echo
+done
+```
+
+## Tests
+
+```bash
+pnpm api:test     # 144 tests: exam engine, certificates, admin, hardening
+pnpm db:test      # constraints and RLS, asserted against real Postgres
+pnpm lint && pnpm exec tsc --noEmit && pnpm build
+```
+
+`api:test` and `db:test` create and drop their own scratch database, so they need
+`psql`, `createdb` and `dropdb` — not your Supabase credentials, and they never
+touch your development data. `db:test` is the one that proves the one-attempt
+rule and row level security are enforced by the database rather than by
+application code.
+
+## Deploying
+
+```bash
+vercel link
+vercel env add ADMIN_SECRET production      # and the rest of .env.example
+vercel --prod
+```
+
+`vercel.json` owns the `/api/v1/*` rewrite and the three cron schedules; they
+start running on the first production deploy. Set `SITE_URL` to your real domain
+**before** anyone sits an exam — it is the origin printed into every certificate
+QR code, and a certificate outlives the deployment that issued it.
 
 ## Certificates
 
@@ -265,24 +391,16 @@ Author new questions in the `~~`-delimited staging format and convert with
 `scripts/psv2csv.py`, which handles CSV quoting. Editing the CSV directly is
 fine too — the validator will catch a mis-quoted row.
 
-## Tests
-
-```bash
-pnpm db:test      # schema constraints, against a scratch Postgres
-pnpm api:test     # registration flow end to end
-```
-
-Both create and drop their own database; they need a local `psql` that can
-`createdb`. `db:test` is the one that proves the one-attempt rule is enforced by
-the database rather than by application code.
-
 ## Layout
 
 ```
-src/app/          Next.js routes
-src/lib/          Supabase clients, API client
-server/           FastAPI application (the real backend)
-api/index.py      Vercel entrypoint; imports server/
-supabase/         migrations + schema tests
-docs/             design spec
+src/app/            Next.js routes (student flow, /admin, /verify)
+src/lib/            Supabase clients, API client, exam hook
+server/             FastAPI application (the real backend) + its tests
+api/index.py        Vercel entrypoint; imports server/
+supabase/           migrations + schema tests
+scripts/            bank import/export, admin accounts, soak
+scripts/loadtest/   k6 load tests
+data/questions/     the seed question bank (CSV)
+docs/               design spec
 ```

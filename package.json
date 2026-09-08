@@ -9,7 +9,7 @@
     "lint": "eslint",
     "db:test": "supabase/test/run.sh",
     "api:test": ".venv/bin/pytest server -q",
-    "db:push": "psql \"$MIGRATION_DATABASE_URL\" -v ON_ERROR_STOP=1 -f supabase/migrations/0001_init.sql -f supabase/migrations/0002_seed.sql",
+    "db:push": "for f in supabase/migrations/*.sql; do echo \"\u2192 $f\"; psql \"$MIGRATION_DATABASE_URL\" -v ON_ERROR_STOP=1 -f \"$f\" || exit 1; done",
     "dev:full": "vercel dev",
     "bank:import": ".venv/bin/python scripts/questions.py import",
     "bank:check": ".venv/bin/python scripts/questions.py check",
