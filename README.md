@@ -14,9 +14,14 @@ string. `vercel.json` owns that rewrite.
 
 ## Status
 
-**Phase 1 complete** — auth, registration, and the one-attempt constraint.
-Phases 2–7 (question bank, exam engine, student UI, certificates, admin,
-hardening) are in the spec's build order.
+**Phases 1–2 complete** — auth, registration, the one-attempt constraint, and
+the question bank with a 1,000-question seed. Phases 3–7 (exam engine, student
+UI, certificates, admin, hardening) are in the spec's build order.
+
+⚠️ **The seed bank is LLM-authored and has not been reviewed by a subject
+expert.** `bank:check` verifies quantity and distribution, not correctness.
+Have SMEs review it before the event and replace it with `pnpm bank:import` —
+that path is exactly what the seed exists to exercise.
 
 ## Setup
 
@@ -60,6 +65,28 @@ Two local-only gotchas, both already handled in this repo:
   Python function. Keep both; `.env` is what the API sees locally.
 - The Vercel Python runtime needs **3.12+**. `.python-version` pins 3.13 for
   both the deploy and your local `uv`/pyenv.
+
+## Question bank
+
+```bash
+pnpm bank:check                          # can each domain serve the blueprint?
+pnpm bank:import data/questions/*.csv    # all-or-nothing per file
+pnpm bank:export ai-ml > ai-ml.csv       # round-trips back into import
+```
+
+Import validates before it writes: a file with one bad row imports nothing, so
+you fix the spreadsheet rather than hunting for which half landed. It rejects
+the failures that silently mis-score students — two identical options, a
+correct letter past the end of the options, a missing explanation, a duplicate
+`external_id` — and any file where one letter holds more than 40% of the
+answers. `scripts/balance_answers.py` fixes that last one by rotating options.
+
+`external_id` is the idempotency key: re-importing an edited sheet updates in
+place instead of duplicating the bank.
+
+Author new questions in the `~~`-delimited staging format and convert with
+`scripts/psv2csv.py`, which handles CSV quoting. Editing the CSV directly is
+fine too — the validator will catch a mis-quoted row.
 
 ## Tests
 

@@ -76,6 +76,19 @@ def cmd_check() -> int:
             problems += 1
         problems += sum(1 for t in domain["tiers"] if t["status"] == "thin")
 
+    # The question people actually mean by "is the bank big enough": how many
+    # questions do two students in the same domain expect to share? For a draw of
+    # k from a tier of n, expected overlap is k^2/n.
+    print()
+    for domain in coverage:
+        if not domain["can_serve_blueprint"]:
+            continue
+        overlap = sum(
+            t["needed"] ** 2 / t["have"] for t in domain["tiers"] if t["have"]
+        )
+        print(f"  {domain['name']:<24} two students expect to share "
+              f"{overlap:.1f} of {total_needed} questions")
+
     print()
     if any(not d["can_serve_blueprint"] for d in coverage):
         print("✗ at least one domain CANNOT serve the blueprint — exam start would fail")
