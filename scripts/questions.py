@@ -130,7 +130,10 @@ def cmd_export(domain_slug: str) -> int:
         options = list(r["options"]) + [""] * (len(OPTION_COLUMNS) - len(r["options"]))
         writer.writerow(
             [r["external_id"], r["domain"], r["type"], r["topic"], r["difficulty"],
-             r["question"], r["code"] or "", r["language"] or "", *options,
+             r["question"],
+             # Re-escape so the file matches the authoring format and stays one
+             # row per line; parse_csv unescapes it on the way back in.
+             (r["code"] or "").replace("\n", "\\n"), r["language"] or "", *options,
              LETTERS[r["correct_pos"] - 1], r["explanation"], r["status"]]
         )
     return 0

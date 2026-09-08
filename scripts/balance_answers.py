@@ -11,8 +11,9 @@ It does NOT fix the deeper version of that problem — a correct option written
 with more care than the distractors around it, so it reads as right without
 any knowledge. Only authoring fixes that one.
 
-The rotation is derived from the external_id, so re-running is stable and
-diffs stay clean.
+The rotation is derived from the external_id, so it is deterministic for a
+given input file. It is a rotation, not a normalisation: running it twice
+rotates twice. Run it once on a file that bank:check rejects, then leave it.
 """
 import csv
 import hashlib

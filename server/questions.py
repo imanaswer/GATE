@@ -13,6 +13,7 @@ from dataclasses import dataclass, field
 
 TYPES = {"mcq", "code_output", "debug", "scenario", "logic"}
 DIFFICULTIES = {"easy", "medium", "hard"}
+STATUSES = {"draft", "active", "retired"}
 OPTION_COLUMNS = ["option_a", "option_b", "option_c", "option_d", "option_e"]
 LETTERS = "ABCDE"
 
@@ -35,6 +36,7 @@ class Row:
     explanation: str
     options: list[str]
     correct_index: int
+    status: str | None = None
 
 
 @dataclass
@@ -84,6 +86,11 @@ def parse_csv(text: str, known_domains: set[str]) -> ImportReport:
         question = _clean(row.get("question"))
         explanation = _clean(row.get("explanation"))
         correct = _clean(row.get("correct")).upper()
+        # Optional. Present in exported files, so a round trip must not silently
+        # resurrect a retired question by defaulting it back to active.
+        status = _clean(row.get("status")).lower() or None
+        if status and status not in STATUSES:
+            errors.append(f"status must be one of {sorted(STATUSES)}")
 
         if not external_id:
             errors.append("external_id is required")
@@ -143,6 +150,7 @@ def parse_csv(text: str, known_domains: set[str]) -> ImportReport:
                 explanation=explanation,
                 options=options,
                 correct_index=correct_index,
+                status=status,
             )
         )
 
@@ -173,7 +181,10 @@ def parse_csv(text: str, known_domains: set[str]) -> ImportReport:
 def apply(report: ImportReport, cur, status: str = "active") -> ImportReport:
     """Write validated rows in one transaction. Options are replaced wholesale on
     update — editing a question's options in place would leave stale answer rows
-    pointing at options that no longer belong to it."""
+    pointing at options that no longer belong to it.
+
+    `status` is the default for rows that do not carry one of their own; a row's
+    own status always wins, so exporting and re-importing preserves it."""
     cur.execute("select id, slug from domains")
     domain_ids = {r["slug"]: r["id"] for r in cur.fetchall()}
 
@@ -195,7 +206,8 @@ def apply(report: ImportReport, cur, status: str = "active") -> ImportReport:
             returning id, (xmax = 0) as inserted
             """,
             (domain_id, row.external_id, row.type, row.question, row.code,
-             row.language, row.topic, row.difficulty, row.explanation, status),
+             row.language, row.topic, row.difficulty, row.explanation,
+             row.status or status),
         )
         result = cur.fetchone()
         question_id = result["id"]

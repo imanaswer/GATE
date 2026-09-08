@@ -207,3 +207,34 @@ def test_spread_answer_key_accepted():
         rows.append(GOOD.replace("AIML-001", f"AIML-{i:03d}").replace(",A,", f",{letter},"))
     r = parse_csv(sheet(*rows), DOMAINS)
     assert r.ok, r.errors
+
+
+def test_status_survives_a_round_trip():
+    """Exported files carry a status column. Ignoring it would silently
+    resurrect retired questions on the next import."""
+    row = GOOD.replace("AIML-001", "AIML-900")
+    r = parse_csv(sheet(row) .replace(HEADER, HEADER + ",status")
+                  .replace(row, row + ",retired"), DOMAINS)
+    assert r.ok, r.errors
+    assert r.rows[0].status == "retired"
+
+
+def test_bad_status_rejected():
+    row = GOOD.replace("AIML-001", "AIML-901")
+    r = parse_csv(sheet(row).replace(HEADER, HEADER + ",status")
+                  .replace(row, row + ",archived"), DOMAINS)
+    assert not r.ok
+    assert "status must be one of" in r.errors[0]
+
+
+def test_row_status_beats_the_import_default(conn):
+    from server.questions import apply
+
+    with conn.cursor() as cur:
+        row = GOOD.replace("AIML-001", "AIML-902")
+        r = parse_csv(sheet(row).replace(HEADER, HEADER + ",status")
+                      .replace(row, row + ",retired"), {"ai-ml", "full-stack"})
+        apply(r, cur, status="active")          # default says active…
+        conn.commit()
+        cur.execute("select status from questions where external_id = 'AIML-902'")
+        assert cur.fetchone()["status"] == "retired"   # …the row wins

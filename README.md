@@ -82,7 +82,9 @@ correct letter past the end of the options, a missing explanation, a duplicate
 answers. `scripts/balance_answers.py` fixes that last one by rotating options.
 
 `external_id` is the idempotency key: re-importing an edited sheet updates in
-place instead of duplicating the bank.
+place instead of duplicating the bank. Export and import round-trip exactly —
+answer keys, question status and multi-line code snippets all survive, which is
+verified rather than assumed.
 
 Author new questions in the `~~`-delimited staging format and convert with
 `scripts/psv2csv.py`, which handles CSV quoting. Editing the CSV directly is
