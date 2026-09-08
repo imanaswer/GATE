@@ -4,7 +4,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI, Request, status
 from fastapi.responses import JSONResponse
 
-from server import attempts, db, students
+from server import attempts, certificates, db, students
 
 logging.basicConfig(level=logging.INFO)
 log = logging.getLogger("tech-arena")
@@ -46,3 +46,6 @@ def health():
 
 app.include_router(students.router, prefix="/api/v1")
 app.include_router(attempts.router, prefix="/api/v1")
+# Public: no identity. Verification has to work for an employer
+# holding a printed certificate and no account.
+app.include_router(certificates.router, prefix="/api/v1")

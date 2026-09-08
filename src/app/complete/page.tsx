@@ -88,8 +88,26 @@ export default function Complete() {
 
         <div className="rounded-2xl border border-line bg-surface p-6">
           <p className="font-mono text-[10px] tracking-widest text-muted">CERTIFICATE</p>
-          <p className="mt-2 text-sm text-muted">
-            Your certificate is being prepared. It will appear here shortly.
+          <p className="mt-2 text-sm text-ok">\u2713 Issued and valid</p>
+          <p className="mt-3 break-all font-mono text-sm">{result.certificate_id}</p>
+          <div className="mt-5 flex flex-col gap-2 sm:flex-row">
+            {/* A plain link, not a fetch-and-blob: the browser already knows how
+                to download a PDF, and this one works with the tab closed. */}
+            <a
+              href={`/api/v1/certificates/${result.certificate_id}/pdf`}
+              className="flex-1 rounded-xl bg-accent px-4 py-2.5 text-sm font-semibold text-black"
+            >
+              Download certificate
+            </a>
+            <a
+              href={`/verify/${result.certificate_id}`}
+              className="flex-1 rounded-xl border border-line px-4 py-2.5 text-sm font-semibold"
+            >
+              Verify
+            </a>
+          </div>
+          <p className="mt-4 text-xs text-muted">
+            Keep this ID. Anyone can confirm your certificate at the verify link.
           </p>
         </div>
 

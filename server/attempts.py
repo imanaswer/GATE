@@ -6,7 +6,7 @@ import logging
 from fastapi import APIRouter, Header, HTTPException, Request, Response, status
 from pydantic import BaseModel, Field
 
-from server import db, exam
+from server import certificates, db, exam
 from server.auth import CurrentIdentity
 from server.settings import settings
 from server.students import ensure_user
@@ -284,6 +284,9 @@ def result(attempt_id: str, identity: CurrentIdentity):
 
 
 def _result(cur, attempt_id) -> dict:
+    # Idempotent, and it also back-fills attempts that were scored before
+    # certificates existed. Every caller of _result is inside a transaction.
+    certificate_id = certificates.issue(cur, attempt_id)
     cur.execute(
         """
         select a.id, a.status, a.score, a.correct_count, a.wrong_count, a.skipped_count,
@@ -310,6 +313,7 @@ def _result(cur, attempt_id) -> dict:
         "skipped": r["skipped_count"],
         "duration_seconds": r["duration_seconds"],
         "submitted_at": r["submitted_at"].isoformat() if r["submitted_at"] else None,
+        "certificate_id": certificate_id,
     }
 
 

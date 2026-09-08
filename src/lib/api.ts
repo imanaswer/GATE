@@ -122,6 +122,7 @@ export type Result = {
   skipped: number;
   duration_seconds: number | null;
   submitted_at: string | null;
+  certificate_id: string;
 };
 
 export type Domain = {
@@ -130,4 +131,14 @@ export type Domain = {
   name: string;
   icon: string | null;
   description: string | null;
+};
+
+export type Certificate = {
+  valid: true;
+  certificate_id: string;
+  student_name: string;
+  college_name: string | null;
+  domain_name: string;
+  issued_at: string;
+  verify_code: string;
 };

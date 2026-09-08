@@ -2,3 +2,5 @@ fastapi==0.121.2
 pydantic==2.12.3
 psycopg[binary,pool]==3.2.10
 pyjwt[crypto]==2.10.1
+fpdf2==2.8.4
+segno==1.6.6

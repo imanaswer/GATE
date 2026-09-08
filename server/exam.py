@@ -14,6 +14,8 @@ from collections import defaultdict
 
 from fastapi import HTTPException, status
 
+from server import certificates
+
 GRACE_SECONDS = 30
 """Absorbs network lag on a final answer. Thirty seconds cannot be gamed into a
 meaningful advantage on a twenty-minute exam, and without it a student on a slow
@@ -230,4 +232,8 @@ def score(cur, attempt_id, final_status: str = "submitted") -> dict:
         """,
         (final_status, attempt_id, attempt_id, attempt_id, attempt_id),
     )
-    return cur.fetchone()
+    scored = cur.fetchone()
+    # Every finalisation — submit, lazy expiry, cron sweep — routes through
+    # here, so this is the one place a certificate can be issued from.
+    certificates.issue(cur, attempt_id)
+    return scored

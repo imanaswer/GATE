@@ -581,3 +581,89 @@ def test_one_takeover_row_per_switch_not_per_answer(client):
     assert int(scalar(f"""select count(*) from suspicious_activity
                           where attempt_id = '{attempt['id']}'
                             and type = 'session_takeover'""")) == 2
+
+
+# ------------------------------------------------------------------ certificates
+
+def test_every_submitted_attempt_gets_one_stable_certificate(client):
+    """Participation, so the row exists the moment the attempt is finalised —
+    and a double-click must not mint a second certificate number."""
+    auth = register(client, "cert@example.edu", "Certified Student", "CS39001")
+    attempt = start(client, auth).json()["attempt"]
+    h = {"Authorization": auth}
+
+    first = client.post(f"/api/v1/attempts/{attempt['id']}/submit", headers=h).json()
+    again = client.post(f"/api/v1/attempts/{attempt['id']}/submit", headers=h).json()
+    read = client.get(f"/api/v1/attempts/{attempt['id']}/result", headers=h).json()
+
+    assert first["certificate_id"].startswith("TA-")
+    assert first["certificate_id"] == again["certificate_id"] == read["certificate_id"]
+    assert scalar(f"select count(*) from certificates where attempt_id = '{attempt['id']}'") == "1"
+
+
+def test_an_abandoned_attempt_is_still_certificated(client):
+    """A student whose laptop died never submits. The cron sweep scores them, and
+    they have earned the same participation certificate as everyone else."""
+    auth = register(client, "certsweep@example.edu", "Swept Student", "CS39002")
+    attempt = start(client, auth).json()["attempt"]
+    psql("-c", f"update exam_attempts set expires_at = now() - interval '1 hour' "
+               f"where id = '{attempt['id']}'")
+
+    client.post("/api/v1/cron/expire-attempts",
+                headers={"Authorization": "Bearer test-cron-secret"})
+
+    assert scalar(f"select count(*) from certificates where attempt_id = '{attempt['id']}'") == "1"
+
+
+def test_public_verification_shows_the_minimum_and_leaks_nothing(client):
+    """The only endpoint with no identity behind it. Score, email and phone must
+    not be reachable by anyone holding a certificate number."""
+    auth = register(client, "verify@example.edu", "Verified Student", "CS39003")
+    attempt = start(client, auth).json()["attempt"]
+    cert_id = client.post(f"/api/v1/attempts/{attempt['id']}/submit",
+                          headers={"Authorization": auth}).json()["certificate_id"]
+
+    r = client.get(f"/api/v1/certificates/{cert_id}")
+    assert r.status_code == 200
+    body = r.json()
+    assert body["valid"] is True
+    assert body["student_name"] == "Verified Student"
+    assert body["college_name"] == REG["college_name"]
+    assert body["domain_name"]
+
+    leaked = keys_anywhere(body) & {"score", "email", "phone", "student_id", "correct"}
+    assert not leaked, f"verification leaked: {leaked}"
+    assert "verify@example.edu" not in r.text
+
+
+def test_a_pasted_certificate_id_still_resolves(client):
+    """Lowercased, with the dashes dropped — how a student actually pastes it."""
+    auth = register(client, "paste@example.edu", "Paste Student", "CS39004")
+    attempt = start(client, auth).json()["attempt"]
+    cert_id = client.post(f"/api/v1/attempts/{attempt['id']}/submit",
+                          headers={"Authorization": auth}).json()["certificate_id"]
+
+    mangled = cert_id.replace("-", "").lower()
+    assert client.get(f"/api/v1/certificates/{mangled}").json()["certificate_id"] == cert_id
+
+
+@pytest.mark.parametrize("bad", ["TA-2026-NOTREAL99", "nonsense", "TA-2026-0OIL111111"])
+def test_unknown_certificate_ids_are_all_the_same_404(client, bad):
+    """Malformed and merely-absent must be indistinguishable, or the endpoint
+    becomes an oracle for walking the student roster."""
+    r = client.get(f"/api/v1/certificates/{bad}")
+    assert r.status_code == 404
+    assert r.json()["detail"] == "No certificate with that ID."
+
+
+def test_the_pdf_renders_and_carries_the_certificate_id(client):
+    auth = register(client, "pdf@example.edu", "Pdf Student", "CS39005")
+    attempt = start(client, auth).json()["attempt"]
+    cert_id = client.post(f"/api/v1/attempts/{attempt['id']}/submit",
+                          headers={"Authorization": auth}).json()["certificate_id"]
+
+    r = client.get(f"/api/v1/certificates/{cert_id}/pdf")
+    assert r.status_code == 200
+    assert r.headers["content-type"] == "application/pdf"
+    assert r.content.startswith(b"%PDF-")
+    assert len(r.content) > 1000  # a QR and text, not an empty page

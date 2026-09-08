@@ -8,3 +8,4 @@ graphify-out/
 .vercel
 .venv/
 .env.local
+tsconfig.tsbuildinfo
