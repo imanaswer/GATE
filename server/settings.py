@@ -36,6 +36,13 @@ class Settings:
         # its own throwaway domain into a QR code that outlives it, so set it in
         # production; the forwarded headers are only the fallback.
         self.site_url = os.environ.get("SITE_URL", "").rstrip("/")
+        # Optional like CRON_SECRET, and for the same reason: absent means the
+        # admin panel refuses to issue a session, never that it issues one
+        # signed with a default anybody could forge.
+        self.admin_secret = os.environ.get("ADMIN_SECRET") or None
+        # Vercel is always HTTPS; localhost is not, and a Secure cookie there
+        # would silently never be sent.
+        self.secure_cookies = bool(os.environ.get("VERCEL"))
 
 
 settings = Settings()

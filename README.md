@@ -14,11 +14,11 @@ string. `vercel.json` owns that rewrite.
 
 ## Status
 
-**Phases 1–5 complete** — auth, registration, the one-attempt constraint, the
+**Phases 1–6 complete** — auth, registration, the one-attempt constraint, the
 question bank, the exam engine (blueprint selection, server-authoritative
 timer, autosave, resume, idempotent submit, backend scoring), the student UI end
-to end, and participation certificates. Phases 6–7 (admin, hardening) are in the
-spec's build order.
+to end, participation certificates, and the admin panel. Phase 7 (hardening) is
+in the spec's build order.
 
 The arena is the screen that matters most and it sits behind Google sign-in, so
 `/preview` renders it with fixture data — every question type, save state and
@@ -100,6 +100,45 @@ has none. It shows the minimum: valid badge, name, college, domain, ID, issue
 date, check code. **No score, no email, no phone.** Certificate IDs are random,
 not sequential, so the endpoint cannot be walked to harvest the roster, and an
 unknown ID and a malformed one return the same 404. Rate limiting is Phase 7.
+
+## Admin
+
+There is no self-service signup and there should not be. The first account is
+created from a shell that already has database access:
+
+```bash
+pnpm admin:create you@example.com --role admin   # or --role viewer
+pnpm admin:list
+```
+
+`ADMIN_SECRET` must be set or the panel refuses to issue a session — never
+falls back to a default anyone could forge. Admins sign in at `/admin` against
+`admin_users`, not Google: an admin account must not depend on an OAuth app
+whose verification status is itself a project risk (spec §10). The session is an
+HttpOnly, SameSite=Lax cookie issued by FastAPI, so no token is readable from
+JavaScript and enforcement stays in one place — the Next middleware deliberately
+does **not** gate `/admin`, because that would mean putting `ADMIN_SECRET` into
+the Next runtime too.
+
+`admin` can write, `viewer` can only read. Questions are **retired, never
+deleted** — deleting one would cascade away the `attempt_questions` rows that
+explain the score of every student who was given it.
+
+Overview counters come from a one-row `admin_overview` table refreshed by a
+one-minute cron, not counted live: `COUNT(*)` over every attempt on each
+dashboard load would be the slowest thing in the system. The screen says how
+stale they are rather than pretending to be live.
+
+CSV export streams in constant memory via batched keyset pagination — not a
+server-side named cursor, which would hold a connection open for the whole
+stream and, with a pool of 2, starve the exam path on event day.
+
+Batch certificate PDFs come back as a **ZIP streamed directly from the request**,
+capped at 500. The spec called for a background job on the assumption that
+rendering is expensive; it is ~20ms, so 500 is ten seconds inside a 300s
+timeout. The `jobs` table stays unused, and that is the point. The cap is about
+nobody reading a 50,000-certificate archive, not about cost — above it, CSV is
+what you actually wanted.
 
 ## Question bank
 

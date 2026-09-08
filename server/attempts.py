@@ -6,7 +6,7 @@ import logging
 from fastapi import APIRouter, Header, HTTPException, Request, Response, status
 from pydantic import BaseModel, Field
 
-from server import certificates, db, exam
+from server import admin, certificates, db, exam
 from server.auth import CurrentIdentity
 from server.settings import settings
 from server.students import ensure_user
@@ -317,6 +317,24 @@ def _result(cur, attempt_id) -> dict:
     }
 
 
+def _require_cron(authorization: str | None) -> None:
+    if not settings.cron_secret:
+        raise HTTPException(status.HTTP_503_SERVICE_UNAVAILABLE, "cron is not configured")
+    if authorization != f"Bearer {settings.cron_secret}":
+        raise HTTPException(status.HTTP_401_UNAUTHORIZED, "unauthorised")
+
+
+@router.post("/cron/refresh-overview")
+def refresh_overview(authorization: str | None = Header(default=None)):
+    """The admin dashboard reads one pre-computed row instead of counting every
+    attempt on every load. Once a minute is close enough to live for a number
+    an organiser glances at."""
+    _require_cron(authorization)
+    with db.transaction() as cur:
+        row = admin.refresh_overview(cur)
+    return {"refreshed_at": row["refreshed_at"].isoformat()}
+
+
 @router.post("/cron/expire-attempts")
 def sweep_expired(authorization: str | None = Header(default=None)):
     """Auto-submits attempts whose owner never came back — a closed laptop, a
@@ -324,10 +342,7 @@ def sweep_expired(authorization: str | None = Header(default=None)):
     in_progress forever, never scored and never certificated.
 
     Attempts are also expired lazily on access; this catches the rest."""
-    if not settings.cron_secret:
-        raise HTTPException(status.HTTP_503_SERVICE_UNAVAILABLE, "cron is not configured")
-    if authorization != f"Bearer {settings.cron_secret}":
-        raise HTTPException(status.HTTP_401_UNAUTHORIZED, "unauthorised")
+    _require_cron(authorization)
 
     swept = []
     with db.cursor() as cur:
