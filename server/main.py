@@ -25,6 +25,18 @@ if settings.sentry_dsn:  # pragma: no cover - needs a real DSN to exercise
         send_default_pii=False,
     )
 
+# Optional settings whose absence degrades something silently. Warned about at
+# boot so a misconfigured deploy says so on the first log line, rather than on
+# event day when someone tries to sign in.
+for _name, _value, _effect in (
+    ("ADMIN_SECRET", settings.admin_secret, "the admin panel will refuse every sign-in"),
+    ("SITE_URL", settings.site_url, "certificate QR codes fall back to request headers"),
+    ("CRON_SECRET", settings.cron_secret, "scheduled sweeps and counters will not run"),
+):
+    if not _value:
+        log.warning("%s is not set — %s", _name, _effect)
+
+
 @asynccontextmanager
 async def lifespan(_: FastAPI):
     db.pool.open()

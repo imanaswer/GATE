@@ -88,4 +88,29 @@ begin
   raise notice 'PASS: re-saving an answer updates in place, never duplicates';
 end $$;
 
+\echo '--- 6. every table has RLS on, with no policies'
+do $$
+declare bad text;
+begin
+  -- The schema's own most important line of defence: RLS enabled with no
+  -- policies means the anon and authenticated keys can read nothing through
+  -- PostgREST, and every read goes through FastAPI instead. Checked across all
+  -- tables rather than a list, so a table added later cannot quietly miss it.
+  select string_agg(c.relname, ', ' order by c.relname) into bad
+  from pg_class c
+  join pg_namespace n on n.oid = c.relnamespace
+  where n.nspname = 'public' and c.relkind = 'r' and not c.relrowsecurity;
+  if bad is not null then
+    raise exception 'FAIL: tables without row level security: %', bad;
+  end if;
+  raise notice 'PASS: row level security is on for every table';
+
+  select string_agg(distinct p.tablename, ', ') into bad
+  from pg_policies p where p.schemaname = 'public';
+  if bad is not null then
+    raise exception 'FAIL: unexpected RLS policies on: %', bad;
+  end if;
+  raise notice 'PASS: no table grants a policy to the anon key';
+end $$;
+
 rollback;

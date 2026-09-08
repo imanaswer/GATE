@@ -195,6 +195,10 @@ exactly that. They produce a list at `/admin` for a human. Rescanned hourly by
 cron and on demand from the admin panel; a rescan replaces its own flags rather
 than piling up duplicates.
 
+Missing optional configuration is warned about at boot (`ADMIN_SECRET`,
+`SITE_URL`, `CRON_SECRET`), so a misconfigured deploy says so on its first log
+line rather than when an organiser tries to sign in on event day.
+
 ### Errors
 
 `SENTRY_DSN` is optional. Unset, errors still reach the platform log — Sentry
@@ -215,6 +219,16 @@ gets two attempts under concurrency**. See `scripts/loadtest/README.md`.
 the invariants in the database rather than trusting the responses that produced
 them: no double attempts, every finished attempt scored and certificated, no
 certificate ID collisions, and stored scores still agreeing with stored answers.
+
+The numbers so far, on one laptop against uvicorn: 200 concurrent students at
+~98 req/s, 3400/3400 checks green, zero one-attempt violations, autosave p95
+49ms, exam start p95 433ms; then 300 exams through the soak with 300 distinct
+certificates and every invariant clean. **That is a shape check, not a capacity
+claim.** The tested configuration ran `DB_POOL_MAX=20` against four local
+workers; production runs `DB_POOL_MAX=2` against the Supabase transaction
+pooler, and connection exhaustion — not CPU — is the failure mode the spec names
+as the real risk (§2). Re-run the 1k/5k/10k ladder against a preview deployment
+before the event; that is the number that decides whether this holds.
 
 Both need a scratch Supabase project — they use the symmetric JWT path, which
 `settings.py` refuses in production outright. That refusal is doing its job:
