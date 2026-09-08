@@ -13,7 +13,8 @@
     "dev:full": "vercel dev",
     "bank:import": ".venv/bin/python scripts/questions.py import",
     "bank:check": ".venv/bin/python scripts/questions.py check",
-    "bank:export": ".venv/bin/python scripts/questions.py export"
+    "bank:export": ".venv/bin/python scripts/questions.py export",
+    "bank:audit": ".venv/bin/python scripts/audit_selection.py"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.6",

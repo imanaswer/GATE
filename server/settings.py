@@ -21,6 +21,7 @@ class Settings:
         self.jwt_audience = os.environ.get("SUPABASE_JWT_AUD", "authenticated")
         self.event_slug = os.environ.get("EVENT_SLUG", "tech-arena-2026")
         self.db_pool_max = int(os.environ.get("DB_POOL_MAX", "2"))
+        self.cron_secret = os.environ.get("CRON_SECRET") or None
 
 
 settings = Settings()

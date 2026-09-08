@@ -14,9 +14,10 @@ string. `vercel.json` owns that rewrite.
 
 ## Status
 
-**Phases 1–2 complete** — auth, registration, the one-attempt constraint, and
-the question bank with a 1,000-question seed. Phases 3–7 (exam engine, student
-UI, certificates, admin, hardening) are in the spec's build order.
+**Phases 1–3 complete** — auth, registration, the one-attempt constraint, the
+question bank, and the exam engine (blueprint selection, server-authoritative
+timer, autosave, resume, idempotent submit, backend scoring). Phases 4–7
+(student UI, certificates, admin, hardening) are in the spec's build order.
 
 ⚠️ **The seed bank is LLM-authored and has not been reviewed by a subject
 expert.** `bank:check` verifies quantity and distribution, not correctness.
@@ -70,6 +71,7 @@ Two local-only gotchas, both already handled in this repo:
 
 ```bash
 pnpm bank:check                          # can each domain serve the blueprint?
+pnpm bank:audit                          # measure what selection actually does
 pnpm bank:import data/questions/*.csv    # all-or-nothing per file
 pnpm bank:export ai-ml > ai-ml.csv       # round-trips back into import
 ```
@@ -85,6 +87,12 @@ answers. `scripts/balance_answers.py` fixes that last one by rotating options.
 place instead of duplicating the bank. Export and import round-trip exactly —
 answer keys, question status and multi-line code snippets all survive, which is
 verified rather than assumed.
+
+`bank:check` predicts overlap from pool sizes; `bank:audit` measures it by
+generating papers. On the seed bank two students share ~1.4 of their 15
+questions and the blueprint is exact on every paper. Re-run the audit after
+replacing the bank — the prediction assumes uniform topics and a real bank
+never is.
 
 Author new questions in the `~~`-delimited staging format and convert with
 `scripts/psv2csv.py`, which handles CSV quoting. Editing the CSV directly is

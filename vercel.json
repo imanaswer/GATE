@@ -6,5 +6,8 @@
   },
   "rewrites": [
     { "source": "/api/v1/:path*", "destination": "/api/index.py" }
+  ],
+  "crons": [
+    { "path": "/api/v1/cron/expire-attempts", "schedule": "*/5 * * * *" }
   ]
 }
