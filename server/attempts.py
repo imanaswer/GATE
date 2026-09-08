@@ -105,17 +105,33 @@ def _require_live(attempt):
 
 def _check_session(cur, attempt, presented_token: str | None):
     """A second device takes over rather than being locked out — a student whose
-    phone dies must be able to continue on a laptop. The takeover is logged, and
-    rapid ping-ponging between sessions is what an admin should look at."""
-    if presented_token and presented_token != str(attempt["session_token"]):
-        cur.execute(
-            """
-            insert into suspicious_activity (attempt_id, user_id, type, detail)
-            values (%s, %s, 'session_takeover', %s)
-            """,
-            (attempt["id"], attempt["user_id"],
-             json.dumps({"presented": presented_token[:64]})),
-        )
+    phone dies must be able to continue on a laptop.
+
+    The takeover is recorded once per switch, not once per answer: a legitimate
+    laptop swap would otherwise write fifteen rows into the table an admin reads
+    to spot genuine ping-ponging, and bury the signal it exists to surface."""
+    if not presented_token or presented_token == str(attempt["session_token"]):
+        return
+
+    cur.execute(
+        """
+        select detail ->> 'presented' as presented from suspicious_activity
+        where attempt_id = %s and type = 'session_takeover'
+        order by occurred_at desc limit 1
+        """,
+        (attempt["id"],),
+    )
+    last = cur.fetchone()
+    if last and last["presented"] == presented_token[:64]:
+        return
+
+    cur.execute(
+        """
+        insert into suspicious_activity (attempt_id, user_id, type, detail)
+        values (%s, %s, 'session_takeover', %s)
+        """,
+        (attempt["id"], attempt["user_id"], json.dumps({"presented": presented_token[:64]})),
+    )
 
 
 def _attempt_public(attempt) -> dict:
@@ -255,10 +271,13 @@ def submit(attempt_id: str, identity: CurrentIdentity, response: Response):
 
 @router.get("/attempts/{attempt_id}/result")
 def result(attempt_id: str, identity: CurrentIdentity):
-    with db.cursor() as cur:
-        attempt = _load_attempt(cur, identity.id)
+    with db.transaction() as cur:
+        attempt = _load_attempt(cur, identity.id, for_update=True)
         if not attempt or str(attempt["id"]) != attempt_id:
             raise HTTPException(status.HTTP_404_NOT_FOUND, "Attempt not found.")
+        # Finalise here too, so a student whose time ran out can simply navigate
+        # to their result. The client never has to submit on their behalf.
+        attempt = _expire_if_due(cur, attempt)
         if attempt["status"] == "in_progress":
             raise HTTPException(status.HTTP_409_CONFLICT, "This exam is still in progress.")
         return _result(cur, attempt["id"])

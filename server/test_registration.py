@@ -138,3 +138,28 @@ def test_profile_frozen_once_exam_starts(client):
     )
     assert second.returncode != 0
     assert "duplicate key" in second.stderr
+
+
+def test_hs256_is_refused_unless_explicitly_enabled(monkeypatch):
+    """A shared signing secret lets anyone mint a token for any user. It must be
+    opted into, never picked up silently from a stray environment variable."""
+    import importlib
+
+    import server.settings as settings_module
+
+    monkeypatch.delenv("ALLOW_HS256_JWT", raising=False)
+    monkeypatch.setenv("SUPABASE_JWT_SECRET", "leaked-from-a-dotenv")
+    reloaded = importlib.reload(settings_module)
+    assert reloaded.settings.supabase_jwt_secret is None
+    assert reloaded.settings.allow_hs256 is False
+
+    monkeypatch.setenv("ALLOW_HS256_JWT", "true")
+    monkeypatch.setenv("VERCEL_ENV", "production")
+    try:
+        importlib.reload(settings_module)
+        raise AssertionError("production must refuse the symmetric path")
+    except RuntimeError as e:
+        assert "must not be set in production" in str(e)
+    finally:
+        monkeypatch.delenv("VERCEL_ENV", raising=False)
+        importlib.reload(settings_module)

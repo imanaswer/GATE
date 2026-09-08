@@ -78,16 +78,48 @@ def test_no_question_appears_twice_in_one_paper(client):
     assert len({(q["body"], q["code"]) for q in qs}) == 15
 
 
+def keys_anywhere(node) -> set[str]:
+    """Every key name in a nested structure. Asserting on keys rather than on the
+    raw text matters: twelve questions legitimately contain the word
+    "explanation" in an option ("What is the most likely explanation?"), so a
+    substring check on the response body fails at random when one is drawn."""
+    if isinstance(node, dict):
+        return set(node) | {k for v in node.values() for k in keys_anywhere(v)}
+    if isinstance(node, list):
+        return {k for item in node for k in keys_anywhere(item)}
+    return set()
+
+
 def test_correct_answers_never_reach_the_client(client):
     """The single most important assertion in this file."""
     auth = register(client, "leak@example.edu", "Leak", "CS30003")
-    raw = start(client, auth).text
-    assert "is_correct" not in raw
-    assert "explanation" not in raw
+    body = start(client, auth).json()
 
-    for q in start(client, auth).json()["questions"]:
+    leaked = keys_anywhere(body) & {"is_correct", "explanation", "correct", "answer"}
+    assert not leaked, f"answer key leaked: {leaked}"
+
+    for q in body["questions"]:
         for option in q["options"]:
             assert set(option) == {"id", "body"}
+
+
+def test_no_response_on_the_exam_path_carries_the_answer_key(client):
+    """Not just exam start: resume and every answer save are on the same path."""
+    auth = register(client, "leak2@example.edu", "Leak Two", "CS30004")
+    started = start(client, auth).json()
+    attempt = started["attempt"]
+    h = {"Authorization": auth}
+
+    saved = client.put(f"/api/v1/attempts/{attempt['id']}/answers/1",
+                       json={"option_id": started["questions"][0]["options"][0]["id"]},
+                       headers=h).json()
+    resumed = client.get("/api/v1/attempts/current", headers=h).json()
+    submitted = client.post(f"/api/v1/attempts/{attempt['id']}/submit", headers=h).json()
+
+    forbidden = {"is_correct", "explanation", "correct_option_id", "answer"}
+    for name, payload in (("save", saved), ("resume", resumed), ("submit", submitted)):
+        leaked = keys_anywhere(payload) & forbidden
+        assert not leaked, f"{name} leaked {leaked}"
 
 
 def test_papers_differ_between_students(client):
@@ -500,3 +532,52 @@ def test_cron_sweep_leaves_live_attempts_alone(client):
     client.post("/api/v1/cron/expire-attempts",
                 headers={"Authorization": "Bearer test-cron-secret"})
     assert scalar(f"select status from exam_attempts where id = '{attempt['id']}'") == "in_progress"
+
+
+def test_result_finalises_an_expired_attempt(client):
+    """The client never submits when time runs out — it just navigates to the
+    result. Any read path that finds an expired attempt must finalise it, or the
+    student sees a 409 instead of their score."""
+    auth = register(client, "ranout@example.edu", "Ran Out", "CS41001")
+    body = start(client, auth)
+    attempt = body.json()["attempt"]
+    h = {"Authorization": auth}
+    client.put(f"/api/v1/attempts/{attempt['id']}/answers/1",
+               json={"option_id": correct_option_for(client, auth, attempt["id"], 1)},
+               headers=h)
+    expire_attempt(attempt["id"])
+
+    r = client.get(f"/api/v1/attempts/{attempt['id']}/result", headers=h)
+    assert r.status_code == 200, "a student whose time ran out must still see their result"
+    assert r.json()["status"] == "expired"
+    assert r.json()["score"] == 1
+    assert scalar(f"select status from exam_attempts where id = '{attempt['id']}'") == "expired"
+
+
+def test_one_takeover_row_per_switch_not_per_answer(client):
+    """A legitimate laptop swap must not write fifteen rows into the table an
+    admin reads to spot genuine ping-ponging."""
+    auth = register(client, "swap@example.edu", "Swapped Device", "CS41002")
+    body = start(client, auth).json()
+    attempt, qs = body["attempt"], body["questions"]
+    other = "11111111-2222-3333-4444-555555555555"
+
+    for pos in range(1, 6):
+        r = client.put(f"/api/v1/attempts/{attempt['id']}/answers/{pos}",
+                       json={"option_id": qs[pos - 1]["options"][0]["id"]},
+                       headers={"Authorization": auth, "X-Session-Token": other})
+        assert r.status_code == 200
+
+    assert int(scalar(f"""select count(*) from suspicious_activity
+                          where attempt_id = '{attempt['id']}'
+                            and type = 'session_takeover'""")) == 1
+
+    # Ping-ponging between two devices is the signal worth surfacing, so a
+    # switch back must still be recorded.
+    third = "99999999-8888-7777-6666-555555555555"
+    client.put(f"/api/v1/attempts/{attempt['id']}/answers/6",
+               json={"option_id": qs[5]["options"][0]["id"]},
+               headers={"Authorization": auth, "X-Session-Token": third})
+    assert int(scalar(f"""select count(*) from suspicious_activity
+                          where attempt_id = '{attempt['id']}'
+                            and type = 'session_takeover'""")) == 2

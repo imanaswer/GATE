@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { api, ApiError, type Result } from "@/lib/api";
 import { useExam } from "@/lib/useExam";
@@ -16,10 +16,8 @@ export default function Arena() {
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
 
-  const submitRef = useRef<() => void>(() => {});
-  const onExpire = useCallback(() => submitRef.current(), []);
-  const exam = useExam({ onExpire });
-  const { attempt, markShown, logEvent, finished } = exam;
+  const exam = useExam();
+  const { attempt, markShown, logEvent, remaining, finished } = exam;
 
   useEffect(() => {
     if (exam.loadError === "NO_ATTEMPT") router.replace("/domains");
@@ -73,9 +71,12 @@ export default function Arena() {
     }
   }, [attempt, submitting, router]);
 
+  // At 00:00 the student just goes to their result. The server has already
+  // expired and scored the attempt — the client never submits on its behalf,
+  // which is why this is a navigation and not a chain of callbacks.
   useEffect(() => {
-    submitRef.current = () => void doSubmit();
-  }, [doSubmit]);
+    if (remaining === 0) router.replace("/complete");
+  }, [remaining, router]);
 
   if (exam.loading || !attempt) {
     return (

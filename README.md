@@ -39,7 +39,9 @@ cp .env.example .env.local     # then fill it in
 
 **Supabase**
 
-1. Create a project. Copy the URL and anon key into `.env.local`.
+1. Create a project. Copy the URL and anon key into `.env.local`. Leave
+   `ALLOW_HS256_JWT` unset — new projects sign with asymmetric JWKS keys, and
+   the symmetric path is refused outright when `VERCEL_ENV=production`.
 2. `DATABASE_URL` must be the **transaction pooler** URI (port 6543), not the
    direct 5432 one — serverless instances against a direct port exhaust
    Postgres connections.

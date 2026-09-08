@@ -24,7 +24,7 @@ function subscribeToConnection(onChange: () => void) {
   };
 }
 
-export function useExam({ onExpire }: { onExpire?: () => void } = {}) {
+export function useExam() {
   const [attempt, setAttempt] = useState<Attempt | null>(null);
   const [questions, setQuestions] = useState<Question[]>([]);
   const [answers, setAnswers] = useState<Record<number, string | null>>({});
@@ -43,10 +43,6 @@ export function useExam({ onExpire }: { onExpire?: () => void } = {}) {
   // Retries call back into save; a ref breaks the circular reference without
   // recreating the callback on every render.
   const saveRef = useRef<(p: number, o: string | null, n?: number) => void>(() => {});
-  const expireRef = useRef(onExpire);
-  useEffect(() => {
-    expireRef.current = onExpire;
-  }, [onExpire]);
 
   useEffect(() => {
     let cancelled = false;
@@ -83,20 +79,10 @@ export function useExam({ onExpire }: { onExpire?: () => void } = {}) {
   const ticking = remaining !== null && !finished;
   useEffect(() => {
     if (!ticking) return;
-    let fired = false;
-    const id = setInterval(() => {
-      setRemaining((r) => {
-        if (r === null) return null;
-        const next = Math.max(0, r - 1);
-        if (next === 0 && !fired) {
-          fired = true;
-          // The server has already expired the attempt by now. This only moves
-          // the student along instead of leaving them staring at 00:00.
-          expireRef.current?.();
-        }
-        return next;
-      });
-    }, 1000);
+    const id = setInterval(
+      () => setRemaining((r) => (r === null ? null : Math.max(0, r - 1))),
+      1000,
+    );
     return () => clearInterval(id);
   }, [ticking]);
 

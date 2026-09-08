@@ -38,6 +38,7 @@ def database():
         SUPABASE_JWT_SECRET=SECRET,
         EVENT_SLUG="tech-arena-2026",
         CRON_SECRET="test-cron-secret",
+        ALLOW_HS256_JWT="true",
     )
     yield
     subprocess.run(["dropdb", "--if-exists", DB], check=False)
