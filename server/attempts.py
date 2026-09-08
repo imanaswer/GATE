@@ -4,9 +4,9 @@ import json
 import logging
 
 from fastapi import APIRouter, Header, HTTPException, Request, Response, status
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 
-from server import admin, certificates, db, exam
+from server import admin, certificates, db, exam, integrity, ratelimit
 from server.auth import CurrentIdentity
 from server.settings import settings
 from server.students import ensure_user
@@ -23,7 +23,22 @@ class StartIn(BaseModel):
 
 class AnswerIn(BaseModel):
     option_id: str | None = None
-    response_ms: int | None = Field(default=None, ge=0, le=24 * 60 * 60 * 1000)
+    response_ms: int | None = None
+
+    @field_validator("response_ms", mode="before")
+    @classmethod
+    def _advisory_only(cls, value):
+        """Never allowed to reject the save. This field is client-reported
+        analytics that is explicitly not an input to scoring, so a float, a
+        negative, or an absurd value becomes None — a 422 here would throw away
+        a real student's real answer over a number nobody scores on."""
+        if value is None:
+            return None
+        try:
+            ms = int(float(value))
+        except (TypeError, ValueError):
+            return None
+        return ms if 0 <= ms <= 24 * 60 * 60 * 1000 else None
 
 
 class ActivityIn(BaseModel):
@@ -252,7 +267,12 @@ def save_answer(
 def submit(attempt_id: str, identity: CurrentIdentity, response: Response):
     """Idempotent. SELECT ... FOR UPDATE serialises concurrent submits of the
     same attempt, so a double-click returns the same result rather than racing.
-    No Redis lock needed: the row we must protect is already the row we lock."""
+    No Redis lock needed: the row we must protect is already the row we lock.
+
+    Deliberately not rate limited, against the spec. A repeat submit is a row
+    lock and a read of a result already computed — there is nothing here to
+    abuse — while a limit that fires has blocked a real student from handing in
+    a real exam. An impatient double-click is not an attack."""
     with db.transaction() as cur:
         attempt = _load_attempt(cur, identity.id, for_update=True)
         if not attempt or str(attempt["id"]) != attempt_id:
@@ -335,6 +355,16 @@ def refresh_overview(authorization: str | None = Header(default=None)):
     return {"refreshed_at": row["refreshed_at"].isoformat()}
 
 
+@router.post("/cron/scan-integrity")
+def scan_integrity(authorization: str | None = Header(default=None)):
+    """Produces a list for a human, never a disqualification. See the design
+    spec §1.2 for what browser-side signals can and cannot detect — these two
+    are server-side and carry more information than any of them."""
+    _require_cron(authorization)
+    with db.transaction() as cur:
+        return integrity.scan(cur)
+
+
 @router.post("/cron/expire-attempts")
 def sweep_expired(authorization: str | None = Header(default=None)):
     """Auto-submits attempts whose owner never came back — a closed laptop, a
@@ -371,6 +401,11 @@ def sweep_expired(authorization: str | None = Header(default=None)):
                     swept.append(str(attempt_id))
         except Exception:
             log.exception("failed to expire attempt %s", attempt_id)
+
+    # Piggybacked so the limiter needs no schedule of its own; its old windows
+    # can never be read again.
+    with db.cursor() as cur:
+        ratelimit.sweep(cur)
 
     return {"swept": len(swept), "remaining": len(ids) - len(swept)}
 

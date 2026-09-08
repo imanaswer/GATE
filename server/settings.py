@@ -43,6 +43,11 @@ class Settings:
         # Vercel is always HTTPS; localhost is not, and a Secure cookie there
         # would silently never be sent.
         self.secure_cookies = bool(os.environ.get("VERCEL"))
+        # Optional. Absent means errors go to the platform log only, which is
+        # where they already go — Sentry adds grouping and alerting, not the
+        # record itself, so nothing is lost by running without it.
+        self.sentry_dsn = os.environ.get("SENTRY_DSN") or None
+        self.environment = os.environ.get("VERCEL_ENV", "development")
 
 
 settings = Settings()

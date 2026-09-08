@@ -125,3 +125,14 @@ export type CollegeStat = {
   average_score: number | null;
   top_score: number | null;
 };
+
+export type IntegrityFlag = {
+  type: string;
+  detail: Record<string, unknown>;
+  occurred_at: string;
+  user_id: string;
+  name: string;
+  email: string;
+  college_name: string | null;
+  score: number | null;
+};

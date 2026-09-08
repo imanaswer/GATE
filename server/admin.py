@@ -18,7 +18,7 @@ from fastapi import (
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, Field
 
-from server import certificates, db, questions
+from server import certificates, db, integrity, questions, ratelimit
 from server.adminauth import (
     COOKIE,
     SESSION_HOURS,
@@ -44,9 +44,18 @@ class LoginIn(BaseModel):
 # ------------------------------------------------------------------ auth
 
 @router.post("/login")
-def login(payload: LoginIn, response: Response):
+def login(payload: LoginIn, response: Response, request: Request):
+    # Both keys, because either alone is evadable: one address trying a thousand
+    # accounts, or a thousand addresses trying one account. Checked before the
+    # KDF runs, so being over the limit costs an attacker nothing of ours.
+    ip, email = ratelimit.client_ip(request), payload.email.strip().lower()
+    ratelimit.guard("admin_login_ip", ip, limit=10, per_seconds=300)
+    ratelimit.guard("admin_login_email", email, limit=5, per_seconds=300)
+
     admin = authenticate(payload.email, payload.password)
     if not admin:
+        ratelimit.record_failure("admin_login_ip", ip, per_seconds=300)
+        ratelimit.record_failure("admin_login_email", email, per_seconds=300)
         # One message for "no such account" and "wrong password". The timing is
         # equalised in authenticate(); saying which one it was would undo that.
         raise HTTPException(status.HTTP_401_UNAUTHORIZED, "Incorrect email or password.")
@@ -131,6 +140,41 @@ def refresh_overview(cur) -> dict:
         """
     )
     return cur.fetchone()
+
+
+@router.post("/integrity/scan")
+def rescan_integrity(admin: CurrentWriter):
+    """Also on an hourly cron. Exposed here so an organiser can re-run it the
+    moment a slot finishes rather than waiting for the schedule."""
+    with db.transaction() as cur:
+        return integrity.scan(cur)
+
+
+@router.get("/integrity/flags")
+def integrity_flags(admin: CurrentAdmin, limit: int = Query(default=200, ge=1, le=1000)):
+    rows = db.fetch_all(
+        """
+        select sa.type, sa.detail, sa.occurred_at, u.id as user_id, u.name, u.email,
+               co.name as college_name, a.score
+        from suspicious_activity sa
+        join users u on u.id = sa.user_id
+        left join colleges co on co.id = u.college_id
+        left join exam_attempts a on a.id = sa.attempt_id
+        order by sa.occurred_at desc limit %s
+        """,
+        (limit,),
+    )
+    return {
+        "flags": [
+            {
+                "type": r["type"], "detail": r["detail"],
+                "occurred_at": r["occurred_at"].isoformat(),
+                "user_id": str(r["user_id"]), "name": r["name"], "email": r["email"],
+                "college_name": r["college_name"], "score": r["score"],
+            }
+            for r in rows
+        ]
+    }
 
 
 # ------------------------------------------------------------------ students
@@ -605,6 +649,7 @@ def export_csv(
 
 @router.get("/export/pdf")
 def export_pdf(
+    request: Request,
     admin: CurrentAdmin,
     q: str = Query(default="", max_length=120),
     college_id: str | None = None,
@@ -620,6 +665,8 @@ def export_pdf(
     # No attempt_status filter: an attempt that timed out is certificated on
     # exactly the same terms as one that was submitted, and an export that
     # silently dropped those students would be the cruellest possible bug.
+    # Ten seconds of CPU per call at the cap, so this one is limited by admin.
+    ratelimit.check("admin_export_pdf", admin.id, limit=5, per_seconds=3600)
     where, params = _student_filters(q, college_id, domain, None)
     rows = db.fetch_all(
         f"{STUDENT_SELECT} where {where} and c.certificate_id is not null "

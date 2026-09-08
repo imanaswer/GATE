@@ -1,11 +1,31 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { adminApi, type CollegeStat, type QuestionStat } from "@/lib/adminApi";
+import Link from "next/link";
+import {
+  adminApi,
+  type AdminMe,
+  type CollegeStat,
+  type IntegrityFlag,
+  type QuestionStat,
+} from "@/lib/adminApi";
 
 export default function Analytics() {
   const [questions, setQuestions] = useState<QuestionStat[] | null>(null);
   const [colleges, setColleges] = useState<CollegeStat[] | null>(null);
+  const [flags, setFlags] = useState<IntegrityFlag[] | null>(null);
+  const [me, setMe] = useState<AdminMe | null>(null);
+  const [scanning, setScanning] = useState(false);
+
+  const loadFlags = () =>
+    adminApi<{ flags: IntegrityFlag[] }>("/integrity/flags?limit=100")
+      .then((r) => setFlags(r.flags))
+      .catch(() => setFlags([]));
+
+  useEffect(() => {
+    adminApi<AdminMe>("/me").then(setMe).catch(() => {});
+    void loadFlags();
+  }, []);
 
   useEffect(() => {
     adminApi<{ questions: QuestionStat[] }>("/analytics/questions?limit=50")
@@ -60,6 +80,73 @@ export default function Analytics() {
                   <td className="px-4 py-2 font-mono tabular-nums text-muted">
                     {q.avg_ms ? `${Math.round(q.avg_ms / 1000)}s` : "—"}
                   </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+
+      <div className="mt-10 mb-2 flex flex-wrap items-center justify-between gap-2">
+        <h2 className="text-sm font-semibold">Integrity flags</h2>
+        {me?.role === "admin" && (
+          <button
+            disabled={scanning}
+            onClick={async () => {
+              setScanning(true);
+              try {
+                await adminApi("/integrity/scan", { method: "POST" });
+                await loadFlags();
+              } finally {
+                setScanning(false);
+              }
+            }}
+            className="rounded-xl border border-line px-3 py-1.5 text-sm font-semibold disabled:opacity-50"
+          >
+            {scanning ? "Scanning…" : "Re-scan now"}
+          </button>
+        )}
+      </div>
+      <p className="mb-3 text-xs text-muted">
+        A list for a human, never a disqualification — nothing here changes a
+        score or voids a certificate. Browser signals (tab switches, fullscreen
+        exits) catch a student who alt-tabs on the same device and nothing else:
+        not a second device, not a phone, not someone sitting next to them. The
+        two server-side signals carry more.
+      </p>
+      {!flags ? (
+        <div className="h-24 animate-pulse rounded-2xl bg-surface-2" aria-busy="true" />
+      ) : flags.length === 0 ? (
+        <p className="text-sm text-muted">Nothing flagged.</p>
+      ) : (
+        <div className="overflow-x-auto rounded-2xl border border-line">
+          <table className="w-full min-w-[560px] text-left text-sm">
+            <thead className="bg-surface-2 text-xs uppercase tracking-wide text-muted">
+              <tr>
+                {["Student", "College", "Signal", "Detail", "Score"].map((h) => (
+                  <th key={h} scope="col" className="px-4 py-2">{h}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {flags.map((f, i) => (
+                <tr key={`${f.user_id}-${f.type}-${i}`} className="border-t border-line">
+                  <td className="px-4 py-2">
+                    <Link
+                      href={`/admin/students/${f.user_id}`}
+                      className="underline underline-offset-2"
+                    >
+                      {f.name}
+                    </Link>
+                  </td>
+                  <td className="px-4 py-2 text-muted">{f.college_name ?? "—"}</td>
+                  <td className="px-4 py-2 font-mono text-xs text-accent">{f.type}</td>
+                  <td className="px-4 py-2 font-mono text-xs text-muted">
+                    {Object.entries(f.detail)
+                      .map(([k, v]) => `${k}=${String(v).slice(0, 20)}`)
+                      .join(" ")}
+                  </td>
+                  <td className="px-4 py-2 font-mono tabular-nums">{f.score ?? "—"}</td>
                 </tr>
               ))}
             </tbody>

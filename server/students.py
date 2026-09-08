@@ -4,7 +4,7 @@ import re
 from fastapi import APIRouter, HTTPException, Query, status
 from pydantic import BaseModel, Field, field_validator
 
-from server import db
+from server import db, ratelimit
 from server.auth import CurrentIdentity, Identity
 from server.settings import settings
 
@@ -124,6 +124,9 @@ def list_domains():
 
 @router.post("/register")
 def register(payload: RegistrationIn, identity: CurrentIdentity):
+    # Keyed on the user, not the IP: an entire college sits behind one NAT
+    # address, and a shared budget there would lock out real students.
+    ratelimit.check("register", identity.id, limit=5, per_seconds=60)
     user = ensure_user(identity)
 
     # Once the exam has started, identity data is frozen — otherwise a student

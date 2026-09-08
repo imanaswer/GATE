@@ -12,7 +12,7 @@ from datetime import date
 
 from fastapi import APIRouter, HTTPException, Request, Response, status
 
-from server import db
+from server import db, ratelimit
 from server.settings import settings
 
 router = APIRouter()
@@ -123,7 +123,8 @@ def _public(row: dict) -> dict:
 
 
 @router.get("/certificates/{certificate_id}")
-def show(certificate_id: str):
+def show(certificate_id: str, request: Request):
+    ratelimit.check("verify", ratelimit.client_ip(request), limit=30, per_seconds=60)
     return _public(_lookup(certificate_id))
 
 
@@ -140,6 +141,7 @@ def _site_url(request: Request) -> str:
 
 @router.get("/certificates/{certificate_id}/pdf")
 def pdf(certificate_id: str, request: Request):
+    ratelimit.check("verify_pdf", ratelimit.client_ip(request), limit=10, per_seconds=60)
     row = _lookup(certificate_id)
     cert = _public(row)
     verify_url = f"{_site_url(request)}/verify/{cert['certificate_id']}"

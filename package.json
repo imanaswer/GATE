@@ -16,7 +16,8 @@
     "bank:export": ".venv/bin/python scripts/questions.py export",
     "bank:audit": ".venv/bin/python scripts/audit_selection.py",
     "admin:create": ".venv/bin/python scripts/admin.py create",
-    "admin:list": ".venv/bin/python scripts/admin.py list"
+    "admin:list": ".venv/bin/python scripts/admin.py list",
+    "soak": ".venv/bin/python scripts/soak.py"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.6",

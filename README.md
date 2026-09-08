@@ -14,11 +14,10 @@ string. `vercel.json` owns that rewrite.
 
 ## Status
 
-**Phases 1–6 complete** — auth, registration, the one-attempt constraint, the
+**All seven phases complete** — auth, registration, the one-attempt constraint, the
 question bank, the exam engine (blueprint selection, server-authoritative
 timer, autosave, resume, idempotent submit, backend scoring), the student UI end
-to end, participation certificates, and the admin panel. Phase 7 (hardening) is
-in the spec's build order.
+to end, participation certificates, the admin panel, and hardening.
 
 The arena is the screen that matters most and it sits behind Google sign-in, so
 `/preview` renders it with fixture data — every question type, save state and
@@ -139,6 +138,87 @@ rendering is expensive; it is ~20ms, so 500 is ten seconds inside a 300s
 timeout. The `jobs` table stays unused, and that is the point. The cap is about
 nobody reading a 50,000-certificate archive, not about cost — above it, CSV is
 what you actually wanted.
+
+## Hardening
+
+### What is rate limited, and what deliberately is not
+
+Limits live in Postgres, not Upstash. Every limited endpoint here is low-volume,
+and on the one that isn't authenticated the limiter is *cheaper than the thing it
+protects* — a single-row upsert against the five-table join behind `/verify` — so
+it lowers total database work under abuse rather than amplifying it. Old windows
+are swept by the attempt-expiry cron, so it needs no schedule of its own.
+
+| Path | Limit | Keyed on |
+|---|---|---|
+| `GET /certificates/{id}` | 30 / min | IP |
+| `GET /certificates/{id}/pdf` | 10 / min | IP |
+| `POST /register` | 5 / min | user — *not* IP, because a whole college shares one NAT address |
+| `POST /admin/login` | 5 failures / 5 min per email, 10 per IP | both, since either alone is evadable |
+| `GET /admin/export/pdf` | 5 / hour | admin |
+
+Two paths are **deliberately unlimited**, and both are deliberate against the
+spec:
+
+- **Answer autosave.** The hot path — about 110 writes a second at slot
+  capacity. A save is an idempotent upsert onto a single row that a student
+  cannot use to do harm, so a limiter here would double the write load on the one
+  path that cannot be degraded on event day, to prevent nothing.
+- **Submit.** A repeat submit is a row lock and a read of a result already
+  computed. There is nothing to abuse, and a limit that fires has blocked a real
+  student from handing in a real exam. An impatient double-click is not an attack.
+
+Only *failed* admin logins count towards the brute-force budget. Counting
+successes would lock out an admin signing in from a phone and a laptop — the
+limiter causing the incident it exists to prevent. The limiter also **fails
+open**: if it cannot reach the database it lets the request through, because an
+outage in a protective mechanism must never stop students sitting the exam.
+
+### Integrity signals
+
+Read spec §1.2 before extending these. Tab-switch and fullscreen-exit detection
+catches a student who alt-tabs on the same device and *nothing else* — not a
+second device, not a phone, not a shared screen, not a person sitting next to
+them. Two server-side signals carry more information, and both are computed
+post-hoc from data the student cannot edit:
+
+- `fast_response` — several correct answers returned faster than the question can
+  be read. One quick answer is luck; the threshold exists so the list is short
+  enough to actually be read.
+- `pattern_match` — two students whose entire answer sequence is identical. A
+  `GROUP BY` on a hash, not a pairwise scan: at slot capacity the naive version
+  is 12.5 million comparisons. All-blank papers are excluded, because several
+  students who answered nothing is absence, not collusion.
+
+Nothing here disqualifies anyone or changes a score — there is a test asserting
+exactly that. They produce a list at `/admin` for a human. Rescanned hourly by
+cron and on demand from the admin panel; a rescan replaces its own flags rather
+than piling up duplicates.
+
+### Errors
+
+`SENTRY_DSN` is optional. Unset, errors still reach the platform log — Sentry
+adds grouping and alerting, not the record itself. PII is off (`send_default_pii`
+is false): student phone numbers pass through these requests, and errors are for
+debugging, not for copying the roster to another vendor. Traces default to 0%,
+because at slot capacity a 10% sample of the autosave path is millions of spans
+nobody reads.
+
+### Load and soak
+
+`scripts/loadtest/` holds k6 scripts for the two paths that actually break —
+exam start and autosave — with thresholds that fail the run rather than printing
+a number to squint at, including a **zero-tolerance check that one student never
+gets two attempts under concurrency**. See `scripts/loadtest/README.md`.
+
+`pnpm soak` drives many complete exams through the real HTTP API and then checks
+the invariants in the database rather than trusting the responses that produced
+them: no double attempts, every finished attempt scored and certificated, no
+certificate ID collisions, and stored scores still agreeing with stored answers.
+
+Both need a scratch Supabase project — they use the symmetric JWT path, which
+`settings.py` refuses in production outright. That refusal is doing its job:
+you should not be able to point these at the real event.
 
 ## Question bank
 

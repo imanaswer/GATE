@@ -1,13 +1,29 @@
 import logging
+import os
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, Request, status
 from fastapi.responses import JSONResponse
 
 from server import admin, attempts, certificates, db, students
+from server.settings import settings
 
 logging.basicConfig(level=logging.INFO)
 log = logging.getLogger("tech-arena")
+
+if settings.sentry_dsn:  # pragma: no cover - needs a real DSN to exercise
+    import sentry_sdk
+
+    sentry_sdk.init(
+        dsn=settings.sentry_dsn,
+        environment=settings.environment,
+        # Traces off by default: at slot capacity a 10% sample of the autosave
+        # path is millions of spans nobody reads. Turn it on deliberately.
+        traces_sample_rate=float(os.environ.get("SENTRY_TRACES_SAMPLE_RATE", "0")),
+        # Student phone numbers and emails pass through these requests. Errors
+        # are for debugging, not for copying the roster into another vendor.
+        send_default_pii=False,
+    )
 
 @asynccontextmanager
 async def lifespan(_: FastAPI):
