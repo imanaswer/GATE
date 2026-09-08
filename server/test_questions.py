@@ -83,8 +83,16 @@ def test_missing_explanation_rejected():
     assert "explanation is too short" in r.errors[0]
 
 
+def vary(i: int) -> str:
+    """A distinct question with a distinct id — the fixtures below test the
+    answer-key rules, not the duplicate-text rule."""
+    return (GOOD.replace("AIML-001", f"AIML-{i:03d}")
+                .replace("What does a high", f"Question {i}: what does a high"))
+
+
 def test_duplicate_external_id_rejected():
-    r = parse_csv(sheet(GOOD, GOOD), DOMAINS)
+    r = parse_csv(sheet(GOOD, GOOD.replace("What does a high", "Different stem: high")),
+                  DOMAINS)
     assert not r.ok
     assert "duplicate external_id" in r.errors[0]
 
@@ -92,8 +100,7 @@ def test_duplicate_external_id_rejected():
 def test_one_bad_row_blocks_the_whole_file():
     """All-or-nothing: a half-imported spreadsheet is worse than a rejected one,
     because the operator cannot tell which half landed."""
-    r = parse_csv(sheet(GOOD, GOOD.replace("AIML-001", "AIML-002").replace(",easy,", ",???,")),
-                  DOMAINS)
+    r = parse_csv(sheet(GOOD, vary(2).replace(",easy,", ",???,")), DOMAINS)
     assert not r.ok
     assert len(r.rows) == 1        # parsed, but the caller must not apply() a failed report
 
@@ -194,17 +201,13 @@ def test_lopsided_answer_key_rejected():
     """A bank where the answer is nearly always A is solvable without knowing
     anything, and the per-attempt shuffle hides the problem rather than fixing
     the filler distractors it produces."""
-    rows = [GOOD.replace("AIML-001", f"AIML-{i:03d}") for i in range(25)]
-    r = parse_csv(sheet(*rows), DOMAINS)
+    r = parse_csv(sheet(*[vary(i) for i in range(25)]), DOMAINS)
     assert not r.ok
     assert "lopsided" in r.errors[-1]
 
 
 def test_spread_answer_key_accepted():
-    rows = []
-    for i in range(28):
-        letter = "ABCD"[i % 4]
-        rows.append(GOOD.replace("AIML-001", f"AIML-{i:03d}").replace(",A,", f",{letter},"))
+    rows = [vary(i).replace(",A,", f",{'ABCD'[i % 4]},") for i in range(28)]
     r = parse_csv(sheet(*rows), DOMAINS)
     assert r.ok, r.errors
 
@@ -238,3 +241,21 @@ def test_row_status_beats_the_import_default(conn):
         conn.commit()
         cur.execute("select status from questions where external_id = 'AIML-902'")
         assert cur.fetchone()["status"] == "retired"   # …the row wins
+
+
+def test_duplicate_question_text_rejected():
+    """Same stem and same code is the same question twice, whatever its id."""
+    twin = GOOD.replace("AIML-001", "AIML-002")
+    r = parse_csv(sheet(GOOD, twin), DOMAINS)
+    assert not r.ok
+    assert "duplicate question text" in r.errors[0]
+
+
+def test_shared_stem_with_different_code_is_allowed():
+    """Code-output questions all ask "What does this print?"."""
+    def q(qid, code):
+        return (f'{qid},full-stack,code_output,javascript,easy,What does this print?,'
+                f'"{code}",javascript,one,two,three,four,A,'
+                f'"Statements execute in order."')
+    r = parse_csv(sheet(q("FS-1", "console.log(1)"), q("FS-2", "console.log(2)")), DOMAINS)
+    assert r.ok, r.errors

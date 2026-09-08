@@ -71,10 +71,11 @@ def test_paper_matches_the_blueprint(client):
 
 
 def test_no_question_appears_twice_in_one_paper(client):
+    """Compared on (body, code): code-output questions legitimately share the
+    stem "What does this print?" while carrying different snippets."""
     auth = register(client, "dupes@example.edu", "Dupes", "CS30002")
     qs = start(client, auth).json()["questions"]
-    bodies = [q["body"] for q in qs]
-    assert len(set(bodies)) == 15
+    assert len({(q["body"], q["code"]) for q in qs}) == 15
 
 
 def test_correct_answers_never_reach_the_client(client):
@@ -94,7 +95,8 @@ def test_papers_differ_between_students(client):
     papers = []
     for i in range(6):
         auth = register(client, f"vary{i}@example.edu", f"Vary {i}", f"CS31{i:03d}")
-        papers.append({q["body"] for q in start(client, auth).json()["questions"]})
+        papers.append({(q["body"], q["code"])
+                       for q in start(client, auth).json()["questions"]})
 
     for a in range(len(papers)):
         for b in range(a + 1, len(papers)):
@@ -137,6 +139,7 @@ def test_second_start_returns_the_same_attempt(client):
     second = start(client, auth).json()
     assert first["attempt"]["id"] == second["attempt"]["id"]
     assert [q["body"] for q in first["questions"]] == [q["body"] for q in second["questions"]]
+    assert [q["code"] for q in first["questions"]] == [q["code"] for q in second["questions"]]
 
 
 def test_cannot_start_a_second_attempt_after_submitting(client):

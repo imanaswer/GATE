@@ -73,6 +73,7 @@ def parse_csv(text: str, known_domains: set[str]) -> ImportReport:
         return report
 
     seen: dict[tuple[str, str], int] = {}
+    seen_text: dict[tuple[str, str, str], int] = {}
 
     for line, raw in enumerate(reader, start=2):
         row = {(k or "").strip().lower(): v for k, v in raw.items()}
@@ -130,6 +131,17 @@ def parse_csv(text: str, known_domains: set[str]) -> ImportReport:
             errors.append(f"duplicate external_id {external_id!r} (also on line {seen[key]})")
         else:
             seen[key] = line
+
+        # Same stem AND same code is the same question twice. Compared as a pair
+        # because code-output questions legitimately share "What does this print?"
+        # while carrying different snippets.
+        text_key = (domain, question.lower(), _clean(row.get("code")))
+        if text_key in seen_text:
+            errors.append(
+                f"duplicate question text (also on line {seen_text[text_key]})"
+            )
+        else:
+            seen_text[text_key] = line
 
         if errors:
             report.errors.append(f"line {line}: " + "; ".join(errors))

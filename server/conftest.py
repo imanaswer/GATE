@@ -37,6 +37,7 @@ def database():
         SUPABASE_URL="https://example.supabase.co",
         SUPABASE_JWT_SECRET=SECRET,
         EVENT_SLUG="tech-arena-2026",
+        CRON_SECRET="test-cron-secret",
     )
     yield
     subprocess.run(["dropdb", "--if-exists", DB], check=False)
