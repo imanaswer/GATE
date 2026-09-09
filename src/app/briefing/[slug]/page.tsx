@@ -45,7 +45,7 @@ export default function Briefing({ params }: PageProps<"/briefing/[slug]">) {
     <main className="flex flex-1 justify-center px-6 py-12">
       <div className="w-full max-w-lg">
         <div className="rise rounded-2xl border border-line bg-surface p-7">
-          <p className="mb-3 font-mono text-xs tracking-widest text-accent">
+          <p className="mb-3 font-mono text-xs tracking-widest text-accent-soft">
             MISSION BRIEFING
           </p>
           <h1 className="flex items-center gap-3 text-2xl font-bold">
@@ -96,7 +96,7 @@ export default function Briefing({ params }: PageProps<"/briefing/[slug]">) {
           <button
             onClick={begin}
             disabled={starting || !domain}
-            className="mt-7 w-full rounded-xl bg-accent px-6 py-4 font-semibold text-accent-ink transition-transform duration-150 hover:-translate-y-0.5 active:translate-y-0 disabled:cursor-wait disabled:opacity-60 disabled:hover:translate-y-0"
+            className="mt-7 w-full btn px-6 py-4"
           >
             {starting ? "Starting your exam…" : "Start — the timer begins now"}
           </button>

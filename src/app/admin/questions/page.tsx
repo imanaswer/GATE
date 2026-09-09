@@ -123,7 +123,7 @@ export default function Questions() {
         {data?.questions.map((question) => (
           <li key={question.id} className="rounded-2xl border border-line bg-surface p-4">
             <div className="flex flex-wrap items-baseline gap-2 text-xs text-muted">
-              <span className="font-mono text-accent">{question.domain_slug}</span>
+              <span className="font-mono text-accent-soft">{question.domain_slug}</span>
               <span>{question.topic}</span>
               <span>{question.difficulty}</span>
               <span>{question.type}</span>

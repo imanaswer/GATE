@@ -61,7 +61,7 @@ export default function Verify({ params }: PageProps<"/verify/[certificateId]">)
                 <p className="mt-1 text-sm text-muted">{cert.college_name}</p>
               )}
               <p className="mt-6 text-xs text-muted">participated in Tech Arena 2026 in</p>
-              <p className="mt-1 text-lg font-semibold text-accent">{cert.domain_name}</p>
+              <p className="mt-1 text-lg font-semibold text-accent-soft">{cert.domain_name}</p>
             </div>
             <dl className="grid grid-cols-2 gap-px border-t border-line bg-line text-center">
               {[

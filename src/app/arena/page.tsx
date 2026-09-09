@@ -27,6 +27,26 @@ export default function Arena() {
 
   useEffect(() => markShown(), [position, markShown]);
 
+  // Keyboard: A–E (or 1–5) picks an option, ←/→ moves between challenges.
+  // Ignored while typing or while the submit dialog is open.
+  useEffect(() => {
+    if (!attempt || confirming) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.metaKey || e.ctrlKey || e.altKey) return;
+      const tag = (e.target as HTMLElement | null)?.tagName;
+      if (tag === "INPUT" || tag === "TEXTAREA") return;
+      const total = exam.questions.length;
+      if (e.key === "ArrowRight") return setPosition((p) => Math.min(total, p + 1));
+      if (e.key === "ArrowLeft") return setPosition((p) => Math.max(1, p - 1));
+      const k = e.key.toUpperCase();
+      const idx = "ABCDE".indexOf(k) >= 0 ? "ABCDE".indexOf(k) : "12345".indexOf(k);
+      const option = exam.questions.find((q) => q.position === position)?.options[idx];
+      if (option) exam.answer(position, option.id);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [attempt, confirming, position, exam]);
+
   // Integrity signals. Recorded and shown to organisers; they never end an
   // attempt on their own. See the design doc §1.2 for what this can and
   // cannot actually detect — which is much less than it appears.
@@ -143,14 +163,14 @@ export default function Arena() {
           {position < total ? (
             <button
               onClick={() => setPosition((p) => Math.min(total, p + 1))}
-              className="rounded-xl bg-accent px-6 py-3 font-semibold text-accent-ink transition-transform duration-150 hover:-translate-y-0.5 active:translate-y-0"
+              className="btn px-6 py-3"
             >
               Next →
             </button>
           ) : (
             <button
               onClick={() => setConfirming(true)}
-              className="rounded-xl bg-accent px-6 py-3 font-semibold text-accent-ink transition-transform duration-150 hover:-translate-y-0.5 active:translate-y-0"
+              className="btn px-6 py-3"
             >
               Review & submit
             </button>
@@ -179,6 +199,9 @@ export default function Arena() {
               Submit now
             </button>
           )}
+          <p className="mt-5 hidden text-xs text-muted sm:block">
+            Tip: press <Kbd>A</Kbd>–<Kbd>E</Kbd> to answer, <Kbd>←</Kbd> <Kbd>→</Kbd> to move.
+          </p>
         </section>
       </main>
 
@@ -226,7 +249,7 @@ export default function Arena() {
               <button
                 onClick={doSubmit}
                 disabled={submitting}
-                className="flex-1 rounded-xl bg-accent px-4 py-3 text-sm font-semibold text-accent-ink disabled:cursor-wait disabled:opacity-60"
+                className="btn flex-1 px-4 py-3 text-sm"
               >
                 {submitting ? "Submitting…" : "Submit"}
               </button>
@@ -235,5 +258,13 @@ export default function Arena() {
         </div>
       )}
     </div>
+  );
+}
+
+function Kbd({ children }: { children: React.ReactNode }) {
+  return (
+    <kbd className="keycap mx-0.5 inline-block rounded-md border border-line bg-surface-2 px-1.5 font-mono text-[10px] text-ink">
+      {children}
+    </kbd>
   );
 }

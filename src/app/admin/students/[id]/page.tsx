@@ -106,7 +106,7 @@ export default function StudentDetailPage({
           <ul className="space-y-2 text-sm">
             {s.flags.map((f, i) => (
               <li key={i} className="rounded-xl border border-line bg-surface px-4 py-2">
-                <span className="font-mono text-xs text-accent">{f.type}</span>
+                <span className="font-mono text-xs text-accent-soft">{f.type}</span>
                 <span className="ml-2 text-xs text-muted">
                   {new Date(f.occurred_at).toLocaleString()}
                 </span>

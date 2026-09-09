@@ -3,7 +3,16 @@
 import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 
-export function GoogleSignIn({ next = "/register" }: { next?: string }) {
+export function GoogleSignIn({
+  next = "/register",
+  bare = false,
+  className = "btn px-6 py-4",
+}: {
+  next?: string;
+  /** Button only: no helper line, for surfaces that carry their own copy. */
+  bare?: boolean;
+  className?: string;
+}) {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -29,7 +38,7 @@ export function GoogleSignIn({ next = "/register" }: { next?: string }) {
       <button
         onClick={signIn}
         disabled={busy}
-        className="group flex w-full items-center justify-center gap-3 rounded-xl bg-accent px-6 py-4 font-semibold text-accent-ink transition-transform duration-150 hover:-translate-y-0.5 active:translate-y-0 disabled:cursor-wait disabled:opacity-60 disabled:hover:translate-y-0"
+        className={`group flex w-full items-center justify-center gap-3 ${className}`}
       >
         <GoogleMark />
         {busy ? "Connecting to Google…" : "Continue with Google"}
@@ -39,9 +48,11 @@ export function GoogleSignIn({ next = "/register" }: { next?: string }) {
           {error}
         </p>
       )}
-      <p className="mt-3 text-center text-xs text-muted">
-        One Google account, one attempt.
-      </p>
+      {!bare && (
+        <p className="mt-3 text-center text-xs text-muted">
+          One Google account, one attempt.
+        </p>
+      )}
     </div>
   );
 }

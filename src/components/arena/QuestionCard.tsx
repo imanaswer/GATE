@@ -84,10 +84,10 @@ export function QuestionCard({
               >
                 <label
                   className={[
-                    "flex cursor-pointer items-center gap-4 rounded-xl p-4 transition-all duration-150",
+                    "relative flex cursor-pointer items-center gap-4 overflow-hidden rounded-xl p-4 transition-all duration-150",
                     isSelected
-                      ? "bg-accent/12 ring-2 ring-accent"
-                      : "bg-surface ring-1 ring-line hover:bg-surface-2 hover:ring-muted/60",
+                      ? "bg-surface-2 ring-2 ring-accent shadow-[0_12px_32px_-16px_#e8000f]"
+                      : "bg-surface ring-1 ring-line hover:translate-x-1 hover:bg-surface-2 hover:ring-sky/60",
                   ].join(" ")}
                 >
                   <input
@@ -102,7 +102,7 @@ export function QuestionCard({
                     aria-hidden="true"
                     key={`${option.id}-${isSelected}`}
                     className={[
-                      "flex size-8 shrink-0 items-center justify-center rounded-lg font-mono text-sm transition-colors",
+                      "keycap flex size-8 shrink-0 items-center justify-center rounded-lg font-mono text-sm transition-colors",
                       isSelected
                         ? "pop bg-accent font-bold text-accent-ink"
                         : "bg-surface-2 text-muted",

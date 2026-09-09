@@ -140,7 +140,7 @@ export default function Analytics() {
                     </Link>
                   </td>
                   <td className="px-4 py-2 text-muted">{f.college_name ?? "—"}</td>
-                  <td className="px-4 py-2 font-mono text-xs text-accent">{f.type}</td>
+                  <td className="px-4 py-2 font-mono text-xs text-accent-soft">{f.type}</td>
                   <td className="px-4 py-2 font-mono text-xs text-muted">
                     {Object.entries(f.detail)
                       .map(([k, v]) => `${k}=${String(v).slice(0, 20)}`)

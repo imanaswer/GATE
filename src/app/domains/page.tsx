@@ -77,16 +77,24 @@ export default function Domains() {
                 }}
                 disabled={selected !== null}
                 aria-label={`${d.name}. ${d.description ?? ""}`}
-                className="group h-full w-full rounded-2xl bg-surface p-5 text-left ring-1 ring-line transition-[transform,box-shadow] duration-150 hover:-translate-y-1 hover:ring-accent focus-visible:ring-accent disabled:opacity-50 disabled:hover:translate-y-0"
+                className="group relative h-full w-full overflow-hidden rounded-2xl bg-surface p-5 text-left ring-1 ring-line transition-[transform,box-shadow] duration-150 hover:-translate-y-1 hover:ring-accent hover:shadow-[0_16px_40px_-16px_#e8000f80] focus-visible:ring-accent active:translate-y-0 disabled:opacity-50 disabled:hover:translate-y-0"
               >
-                <span className="mb-3 block text-3xl" aria-hidden="true">
+                {/* Red edge that grows in on hover — the brand arc, flattened. */}
+                <span
+                  aria-hidden="true"
+                  className="absolute inset-x-0 bottom-0 h-1 origin-left scale-x-0 bg-accent transition-transform duration-300 ease-out group-hover:scale-x-100"
+                />
+                <span
+                  className="mb-3 inline-block text-3xl transition-transform duration-300 ease-out group-hover:-rotate-6 group-hover:scale-125"
+                  aria-hidden="true"
+                >
                   {d.icon}
                 </span>
                 <span className="block text-lg font-semibold">{d.name}</span>
                 <span className="mt-1 block text-sm leading-snug text-muted">
                   {d.description}
                 </span>
-                <span className="mt-4 flex items-center gap-1.5 text-sm font-medium text-accent">
+                <span className="mt-4 flex items-center gap-1.5 text-sm font-medium text-accent-soft">
                   {selected === d.slug ? "Opening" : "Enter"}
                   <span
                     aria-hidden="true"

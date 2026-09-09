@@ -1,19 +1,26 @@
 @import "tailwindcss";
 
 /* Dark-only by design: this is an event product used in one sitting, and a single
-   committed palette is easier to keep AA-contrast-correct than two half-tuned ones. */
+   committed palette is easier to keep AA-contrast-correct than two half-tuned ones.
+
+   Brand palette (G-TEC): navy #004282, red #ff0000, white. The navy is the
+   surface, not the background — the background sits a few steps darker so the
+   brand navy still reads as a colour on top of it. Red is for fills and display
+   sizes only; small red text on navy fails AA, so `accent-soft` exists for that. */
 @theme {
-  --color-base: #08090c;
-  --color-surface: #101218;
-  --color-surface-2: #171a22;
-  --color-line: #232734;
-  --color-ink: #e9ebf2;
-  --color-muted: #8b92a4;
-  --color-accent: #ffc447;
-  --color-accent-ink: #1a1300;
+  --color-base: #021736;
+  --color-surface: #04275a;
+  --color-surface-2: #0a3a7c;
+  --color-line: #1f5299;
+  --color-ink: #ffffff;
+  --color-muted: #a8c1e6;
+  --color-accent: #e8000f;
+  --color-accent-soft: #ff7070;
+  --color-accent-ink: #ffffff;
+  --color-sky: #7cc4ff;
   --color-ok: #4ade80;
-  --color-warn: #fb923c;
-  --color-danger: #f87171;
+  --color-warn: #fbbf24;
+  --color-danger: #ff7070;
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
@@ -27,20 +34,23 @@ html {
    Declared on :root rather than in @theme because these are only ever read
    through var() — Tailwind drops @theme entries no utility class references. */
 :root {
-  --color-stage-1: #5eead4;
-  --color-stage-2: #a78bfa;
-  --color-stage-3: #ffc447;
+  --color-stage-1: #7cc4ff;
+  --color-stage-2: #ffffff;
+  --color-stage-3: #ff4d4d;
 }
 
 body {
-  background: var(--color-base);
+  /* One soft navy glow at the top: depth without a decorative texture. */
+  background:
+    radial-gradient(120% 60% at 50% -10%, #0a3a7c 0%, transparent 60%),
+    var(--color-base);
   color: var(--color-ink);
   font-family: var(--font-sans), system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
 }
 
 *:focus-visible {
-  outline: 2px solid var(--color-accent);
+  outline: 2px solid var(--color-accent-soft);
   outline-offset: 2px;
   border-radius: 4px;
 }
@@ -108,7 +118,7 @@ body {
   content: "";
   position: absolute;
   inset: 0;
-  background: linear-gradient(90deg, transparent, #ffffff14, transparent);
+  background: linear-gradient(90deg, transparent, #ffffff1f, transparent);
   animation: sweep 1.4s ease-in-out infinite;
 }
 
@@ -118,4 +128,90 @@ body {
   font-variant-numeric: tabular-nums;
   letter-spacing: -0.04em;
   line-height: 0.8;
+}
+
+/* Primary button: a brand-red slab with a press you can feel. */
+.btn {
+  position: relative;
+  overflow: hidden;
+  border-radius: 0.75rem;
+  background: var(--color-accent);
+  color: var(--color-accent-ink);
+  font-weight: 600;
+  box-shadow: 0 6px 0 -2px #8a0009, 0 10px 24px -8px #e8000f99;
+  transition: transform 0.15s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.15s;
+}
+.btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 0 -2px #8a0009, 0 14px 28px -8px #e8000fb3;
+}
+.btn:active:not(:disabled) {
+  transform: translateY(2px);
+  box-shadow: 0 2px 0 -2px #8a0009, 0 4px 12px -6px #e8000f99;
+}
+.btn:disabled { opacity: 0.6; cursor: wait; }
+
+/* Confetti for the result screen: brand colours only, transform + opacity only,
+   fires once. Each piece gets its own start position and delay inline. */
+@keyframes confetti {
+  0%   { transform: translateY(-10vh) rotate(0deg); opacity: 1; }
+  100% { transform: translateY(70vh) rotate(720deg); opacity: 0; }
+}
+.confetti {
+  position: absolute;
+  top: 0;
+  width: 8px;
+  height: 14px;
+  border-radius: 2px;
+  animation: confetti 1.8s cubic-bezier(0.22, 0.61, 0.36, 1) forwards;
+}
+
+/* Answer letter chip: a key cap. */
+.keycap {
+  box-shadow: inset 0 -2px 0 #00000040;
+}
+
+/* ------------------------------------------------------------ landing desk
+
+   The landing page is a light desktop: a dotted grid, white windows, and the
+   brand navy and red as the only colours. Scoped to .desk so the rest of the
+   product stays on the dark palette. */
+.desk {
+  background-color: #f5f5f3;
+  background-image: radial-gradient(#cfcfcb 1px, transparent 1px);
+  background-size: 24px 24px;
+  color-scheme: light;
+}
+
+@keyframes bob {
+  50% { transform: translateY(-6px); }
+}
+.bob { animation: bob 6s ease-in-out infinite; }
+
+.pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  border-radius: 9999px;
+  padding: 0.8rem 1.6rem;
+  font-size: 1.05rem;
+  font-weight: 500;
+  white-space: nowrap;
+  transition: transform 0.15s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.15s;
+}
+.pill:hover:not(:disabled) { transform: translateY(-2px); }
+.pill:active:not(:disabled) { transform: translateY(1px); }
+.pill:disabled { opacity: 0.6; cursor: wait; }
+.pill-primary {
+  background: #004282;
+  color: #fff;
+  box-shadow: 0 1px 0 #ffffff33 inset, 0 12px 24px -12px #00428299;
+}
+.pill-primary:hover { box-shadow: 0 1px 0 #ffffff33 inset, 0 16px 30px -12px #004282b3; }
+.pill-secondary {
+  background: #fff;
+  color: #121212;
+  border: 1px solid #d9d9d6;
+  box-shadow: 0 8px 20px -14px #00000066;
 }

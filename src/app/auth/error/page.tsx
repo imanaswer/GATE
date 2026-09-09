@@ -19,7 +19,7 @@ export default async function AuthError({ searchParams }: PageProps<"/auth/error
         </p>
         <Link
           href="/"
-          className="inline-block rounded-xl bg-accent px-6 py-3 font-semibold text-accent-ink"
+          className="btn inline-block px-6 py-3"
         >
           Try again
         </Link>

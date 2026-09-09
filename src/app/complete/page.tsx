@@ -49,6 +49,7 @@ export default function Complete() {
 
   return (
     <Shell>
+      {result.score > 0 && <Confetti />}
       <div className="rise">
         <h1 className="text-3xl font-bold tracking-tight">That&rsquo;s a wrap.</h1>
         <p className="mt-2 text-sm text-muted">
@@ -105,7 +106,7 @@ export default function Complete() {
                 to download a PDF, and this one works with the tab closed. */}
             <a
               href={`/api/v1/certificates/${result.certificate_id}/pdf`}
-              className="flex-1 rounded-xl bg-accent px-4 py-2.5 text-sm font-semibold text-black"
+              className="btn flex-1 px-4 py-2.5 text-center text-sm"
             >
               Download certificate
             </a>
@@ -126,6 +127,29 @@ export default function Complete() {
         </p>
       </div>
     </Shell>
+  );
+}
+
+/** One burst of brand-coloured confetti over the result. Positions are derived
+ *  from the index, not Math.random, so server and client render the same DOM. */
+function Confetti() {
+  const COLOURS = ["#e8000f", "#ffffff", "#7cc4ff"];
+  return (
+    <div aria-hidden="true" className="pointer-events-none fixed inset-0 overflow-hidden">
+      {Array.from({ length: 28 }, (_, i) => (
+        <span
+          key={i}
+          className="confetti"
+          style={{
+            left: `${(i * 37) % 100}%`,
+            background: COLOURS[i % 3],
+            animationDelay: `${(i * 53) % 700}ms`,
+            width: i % 4 === 0 ? 12 : 8,
+            height: i % 3 === 0 ? 8 : 14,
+          }}
+        />
+      ))}
+    </div>
   );
 }
 

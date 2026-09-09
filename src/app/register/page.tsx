@@ -204,7 +204,7 @@ export default function Register() {
         <button
           type="submit"
           disabled={saving}
-          className="w-full rounded-xl bg-accent px-6 py-4 font-semibold text-accent-ink transition-transform duration-150 hover:-translate-y-0.5 active:translate-y-0 disabled:cursor-wait disabled:opacity-60 disabled:hover:translate-y-0"
+          className="w-full btn px-6 py-4"
         >
           {saving ? "Saving…" : "Continue"}
         </button>
@@ -214,7 +214,7 @@ export default function Register() {
 }
 
 const inputClass =
-  "w-full rounded-xl border border-line bg-surface-2 px-4 py-3 text-ink placeholder:text-muted/60 focus:border-accent";
+  "w-full rounded-xl border border-line bg-surface-2 px-4 py-3 text-ink placeholder:text-muted/60 focus:border-sky";
 
 function Shell({ children }: { children: React.ReactNode }) {
   return (

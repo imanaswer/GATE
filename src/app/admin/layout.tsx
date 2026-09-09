@@ -44,7 +44,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     <div className="flex flex-1 flex-col">
       <header className="border-b border-line bg-surface">
         <div className="mx-auto flex w-full max-w-6xl flex-wrap items-center gap-x-6 gap-y-2 px-6 py-3">
-          <span className="font-mono text-xs tracking-widest text-accent">TECH ARENA ADMIN</span>
+          <span className="font-mono text-xs tracking-widest text-accent-soft">TECH ARENA ADMIN</span>
           <nav className="flex gap-4 text-sm">
             {TABS.map(([href, label]) => (
               <Link
