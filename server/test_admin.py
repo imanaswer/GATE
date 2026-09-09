@@ -6,7 +6,7 @@ import zipfile
 
 import pytest
 
-from server.conftest import DB, make_student, scalar
+from server.conftest import DB, make_student, psql, scalar
 # Same real 1,000-question bank the exam tests use: the analytics and export
 # queries are only meaningful against a populated one.
 from server.test_exam import seed_bank  # noqa: F401  (module-scoped autouse)
@@ -424,3 +424,58 @@ def test_batch_pdf_is_capped_rather_than_becoming_an_outage(admin, monkeypatch):
 
 def test_batch_pdf_404s_when_nothing_matches(admin):
     assert admin.get("/api/v1/admin/export/pdf?q=zzz-nobody").status_code == 404
+
+
+# ------------------------------------------------------------------ cron-independence
+
+def test_the_dashboard_refreshes_itself_when_the_counters_go_stale(admin, sat_exam):
+    """Vercel's Hobby plan caps cron jobs at once per day. If the dashboard
+    depended on that cron it would show yesterday's numbers all through the
+    event, so a stale read recomputes rather than serving what it has."""
+    from server import db as dbmod
+
+    with dbmod.cursor() as cur:
+        cur.execute("update admin_overview set refreshed_at = now() - interval '1 day', "
+                    "students = -1 where id")
+
+    body = admin.get("/api/v1/admin/overview").json()
+    assert body["students"] > 0, "a stale dashboard served its stale value"
+    assert body["stale_seconds"] < 60
+
+
+def test_a_fresh_dashboard_does_not_recompute_on_every_read(admin, sat_exam):
+    """The counters exist because COUNT(*) over every attempt on each page load
+    would be the slowest thing in the system. Refreshing on read must not
+    quietly reintroduce exactly that."""
+    admin.get("/api/v1/admin/overview")
+    first = scalar("select refreshed_at from admin_overview where id")
+    for _ in range(5):
+        admin.get("/api/v1/admin/overview")
+    assert scalar("select refreshed_at from admin_overview where id") == first
+
+
+def test_an_organiser_can_finalise_abandoned_attempts_without_the_cron(admin, client):
+    """Same reason: on a daily cron a student who walked away would wait until
+    tomorrow for the certificate they already earned."""
+    from server.test_exam import register, start
+
+    auth = register(client, "walkaway@example.edu", "Walk Away", "WA0001")
+    attempt = start(client, auth).json()["attempt"]
+    psql("-c", f"update exam_attempts set expires_at = now() - interval '1 hour' "
+               f"where id = '{attempt['id']}'")
+    admin.cookies.clear()
+    signin(admin)
+
+    r = admin.post("/api/v1/admin/attempts/finalise-abandoned")
+    assert r.status_code == 200
+    assert r.json()["swept"] >= 1
+    assert scalar(f"select status from exam_attempts where id = '{attempt['id']}'") == "expired"
+    assert scalar(f"select count(*) from certificates where attempt_id = '{attempt['id']}'") == "1"
+
+
+def test_finalising_abandoned_attempts_is_writer_only(client):
+    """A viewer watching the dashboard must not be able to close out a slot."""
+    client.cookies.clear()
+    signin(client, "watcher@arena.test")
+    assert client.post("/api/v1/admin/attempts/finalise-abandoned").status_code == 403
+    client.cookies.clear()

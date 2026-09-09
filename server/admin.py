@@ -90,9 +90,22 @@ def whoami(admin: CurrentAdmin):
 
 # ------------------------------------------------------------------ overview
 
+# How stale the counters may get before a dashboard read recomputes them.
+OVERVIEW_MAX_AGE_SECONDS = 60
+
+
 @router.get("/overview")
 def overview(admin: CurrentAdmin):
-    row = db.fetch_one("select * from admin_overview where id")
+    """Recomputes on read when the cached row has aged out, rather than relying
+    on the cron to be frequent. Vercel's Hobby plan caps cron jobs at once per
+    day, and a dashboard showing yesterday's numbers during the event is worse
+    than no dashboard. The guarded UPDATE means concurrent admins recompute at
+    most once a minute between them — the same cost the cron had, and the cron
+    stays as a backstop for when nobody is looking."""
+    with db.transaction() as cur:
+        refresh_overview(cur, max_age_seconds=OVERVIEW_MAX_AGE_SECONDS)
+        cur.execute("select * from admin_overview where id")
+        row = cur.fetchone()
     return {
         **{k: v for k, v in row.items() if k not in ("id", "refreshed_at", "average_score")},
         "average_score": float(row["average_score"]) if row["average_score"] is not None else None,
@@ -103,12 +116,17 @@ def overview(admin: CurrentAdmin):
     }
 
 
-def refresh_overview(cur) -> dict:
-    """One pass over the attempt table per minute, instead of a COUNT(*) per
-    dashboard load. Everything here is a single scan the planner can do cheaply;
-    it is not meant to be exact to the second."""
+def refresh_overview(cur, max_age_seconds: int | None = None) -> dict | None:
+    """One pass over the attempt table, instead of a COUNT(*) per dashboard
+    load. Everything here is a single scan the planner can do cheaply; it is not
+    meant to be exact to the second.
+
+    With `max_age_seconds` the UPDATE only fires if the row is older than that.
+    The predicate is re-checked after the row lock is taken, so two concurrent
+    readers cannot both recompute — the loser simply matches no rows."""
+    guard = "and refreshed_at < now() - make_interval(secs => %s)" if max_age_seconds else ""
     cur.execute(
-        """
+        f"""
         update admin_overview set
           students      = (select count(*) from users),
           registered    = (select count(*) from users where registered_at is not null),
@@ -135,11 +153,23 @@ def refresh_overview(cur) -> dict:
               group by d.id, d.slug, d.name
             ) t), '[]'::jsonb),
           refreshed_at  = now()
-        where id
+        where id {guard}
         returning refreshed_at
-        """
+        """,
+        (max_age_seconds,) if max_age_seconds else (),
     )
     return cur.fetchone()
+
+
+@router.post("/attempts/finalise-abandoned")
+def finalise_abandoned(admin: CurrentWriter):
+    """Scores and certificates every attempt whose owner never came back.
+    Also on a daily cron; exposed here because on Hobby that cron cannot run
+    more than once a day, and an organiser closing out a slot should not have
+    to wait until tomorrow for those students to get their certificates."""
+    from server.attempts import finalise_abandoned as sweep
+
+    return sweep()
 
 
 @router.post("/integrity/scan")

@@ -13,15 +13,15 @@
   "crons": [
     {
       "path": "/api/v1/cron/expire-attempts",
-      "schedule": "*/5 * * * *"
-    },
-    {
-      "path": "/api/v1/cron/refresh-overview",
-      "schedule": "* * * * *"
+      "schedule": "0 2 * * *"
     },
     {
       "path": "/api/v1/cron/scan-integrity",
-      "schedule": "0 * * * *"
+      "schedule": "0 3 * * *"
+    },
+    {
+      "path": "/api/v1/cron/refresh-overview",
+      "schedule": "0 4 * * *"
     }
   ]
 }

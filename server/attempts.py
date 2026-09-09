@@ -352,7 +352,10 @@ def refresh_overview(authorization: str | None = Header(default=None)):
     _require_cron(authorization)
     with db.transaction() as cur:
         row = admin.refresh_overview(cur)
-    return {"refreshed_at": row["refreshed_at"].isoformat()}
+    # The dashboard also refreshes on read, so this is a backstop for when
+    # nobody is looking — which is the only thing it can be on a plan that
+    # caps cron jobs at once per day.
+    return {"refreshed": row is not None}
 
 
 @router.post("/cron/scan-integrity")
@@ -373,7 +376,13 @@ def sweep_expired(authorization: str | None = Header(default=None)):
 
     Attempts are also expired lazily on access; this catches the rest."""
     _require_cron(authorization)
+    return finalise_abandoned()
 
+
+def finalise_abandoned() -> dict:
+    """Shared by the cron and the admin panel. On Hobby the cron can only run
+    daily, so an organiser closing out a slot needs a way to finalise the
+    students who walked away without waiting until tomorrow."""
     swept = []
     with db.cursor() as cur:
         cur.execute(

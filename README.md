@@ -302,10 +302,26 @@ the Next runtime too.
 deleted** — deleting one would cascade away the `attempt_questions` rows that
 explain the score of every student who was given it.
 
-Overview counters come from a one-row `admin_overview` table refreshed by a
-one-minute cron, not counted live: `COUNT(*)` over every attempt on each
-dashboard load would be the slowest thing in the system. The screen says how
-stale they are rather than pretending to be live.
+Overview counters come from a one-row `admin_overview` table rather than being
+counted live: `COUNT(*)` over every attempt on each dashboard load would be the
+slowest thing in the system. The row is recomputed **on read, at most once a
+minute**, with the refresh guarded so concurrent admins cannot both trigger it.
+
+That matters because of the plan you deploy on. **Vercel's Hobby plan caps cron
+jobs at once per day** (100 jobs, but a minimum interval of 24h, and ±59min
+precision) — a per-minute or per-5-minute expression fails the deploy outright.
+So nothing user-facing is allowed to depend on cron frequency:
+
+| Job | Cron | What actually keeps it correct |
+|---|---|---|
+| Overview counters | daily | recomputed on read when older than 60s |
+| Expiring abandoned attempts | daily | already lazy on access; plus **Finalise abandoned** in the admin panel |
+| Integrity scan | daily | **Re-scan now** in the admin panel |
+
+On Pro you can lower those schedules and the on-read paths simply stop firing.
+If you stay on Hobby and want the sweeps to run unattended during the event,
+point an external scheduler (a GitHub Actions cron is free) at the same
+endpoints with the `CRON_SECRET` bearer token.
 
 CSV export streams in constant memory via batched keyset pagination — not a
 server-side named cursor, which would hold a connection open for the whole
