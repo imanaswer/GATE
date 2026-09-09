@@ -141,12 +141,31 @@ There is no self-service signup. This needs `DATABASE_URL` in your shell or in
 
 ### 6. Start it
 
+Two terminals. The API first:
+
 ```bash
-pnpm dev:full     # vercel dev — Next.js + the Python function + the rewrite
+.venv/bin/python -m uvicorn server.main:app --port 8100
 ```
 
-Use this, not `pnpm dev`, for anything touching the API: `pnpm dev` runs Next.js
-alone and every `/api/v1/*` call 404s.
+then the site, told where that API is:
+
+```bash
+LOCAL_API_URL=http://127.0.0.1:8100 pnpm dev
+```
+
+Open **http://localhost:3000**. `next.config.ts` rewrites `/api/v1/*` to
+`LOCAL_API_URL`, which is what `vercel.json` does in production — so one server
+on one port serves the whole thing. Without that variable the rewrite is inert
+and `/api/v1/*` 404s, which is what you want on Vercel, where `vercel.json`
+already owns it.
+
+`pnpm dev:full` (`vercel dev`) still works and is closer to production, but it
+needs a linked Vercel project and pulls its own environment.
+
+**Do not run `pnpm dev` and `pnpm start` at the same time from this directory.**
+They share `.next`, the dev server rewrites the build artifacts underneath the
+production server, and the production server then returns 500 for its own CSS —
+which looks like a page with no styling rather than an error.
 
 ### 7. Walk the flow
 
