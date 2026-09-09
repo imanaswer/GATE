@@ -44,8 +44,14 @@ cp .env.example .env.local     # then fill it in
 2. `DATABASE_URL` must be the **transaction pooler** URI (port 6543), not the
    direct 5432 one — serverless instances against a direct port exhaust
    Postgres connections.
-3. Apply the schema: `pnpm db:push` (uses `MIGRATION_DATABASE_URL`, the
-   direct 5432 connection — transaction-mode pooling does not reliably run DDL)
+3. Apply the schema: `pnpm db:push`. It uses `MIGRATION_DATABASE_URL` — the
+   **session-mode pooler on 5432**, because transaction-mode pooling does not
+   reliably run DDL. Use the pooler host, not `db.<ref>.supabase.co`: the direct
+   host is IPv6-only on new projects and will simply time out from most laptops
+   and CI runners.
+   **Percent-encode the password.** A `#`, `@`, `/` or `?` in it will silently
+   truncate the URI — `#` in particular makes everything after it a fragment,
+   and the failure surfaces as an authentication error rather than a parse one.
 4. Authentication → Sign In / Providers → **Google**: paste your Google OAuth
    client ID and secret, and add the callback Supabase shows you to the Google
    client's authorised redirect URIs.
