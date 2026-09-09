@@ -49,13 +49,14 @@ export default function Domains() {
 
   return (
     <Shell>
-      <div className="mb-10 text-center">
-        <p className="mb-3 font-mono text-xs tracking-widest text-accent">STEP 3 / 4</p>
-        <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">
-          Select your challenge
+      <div className="mb-9">
+        <p className="mb-2 text-xs text-muted">Step 3 of 4</p>
+        <h1 className="text-3xl font-bold tracking-tight text-balance sm:text-4xl">
+          Which arena?
         </h1>
-        <p className="mt-3 text-sm text-muted">
-          15 challenges, 20 minutes, one attempt. Choose the domain you know best.
+        <p className="mt-2 max-w-md text-muted">
+          You get one attempt, so pick the domain you know best. The questions
+          are drawn fresh for you either way.
         </p>
       </div>
 
@@ -76,17 +77,23 @@ export default function Domains() {
                 }}
                 disabled={selected !== null}
                 aria-label={`${d.name}. ${d.description ?? ""}`}
-                className="group h-full w-full rounded-2xl border border-line bg-surface p-5 text-left transition-[transform,border-color] duration-150 hover:-translate-y-0.5 hover:border-accent focus-visible:border-accent disabled:opacity-50 disabled:hover:translate-y-0"
+                className="group h-full w-full rounded-2xl bg-surface p-5 text-left ring-1 ring-line transition-[transform,box-shadow] duration-150 hover:-translate-y-1 hover:ring-accent focus-visible:ring-accent disabled:opacity-50 disabled:hover:translate-y-0"
               >
-                <span className="mb-3 block text-2xl" aria-hidden="true">
+                <span className="mb-3 block text-3xl" aria-hidden="true">
                   {d.icon}
                 </span>
-                <span className="block font-semibold">{d.name}</span>
+                <span className="block text-lg font-semibold">{d.name}</span>
                 <span className="mt-1 block text-sm leading-snug text-muted">
                   {d.description}
                 </span>
-                <span className="mt-3 block font-mono text-[10px] tracking-widest text-accent opacity-0 transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100">
-                  {selected === d.slug ? "OPENING…" : "ENTER →"}
+                <span className="mt-4 flex items-center gap-1.5 text-sm font-medium text-accent">
+                  {selected === d.slug ? "Opening" : "Enter"}
+                  <span
+                    aria-hidden="true"
+                    className="transition-transform duration-150 group-hover:translate-x-1"
+                  >
+                    →
+                  </span>
                 </span>
               </button>
             </li>

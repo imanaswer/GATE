@@ -62,8 +62,7 @@ export type Profile = {
   phone: string | null;
   college_id: string | null;
   college_name: string | null;
-  course: string | null;
-  academic_year: number | null;
+  location: string | null;
   student_id: string | null;
   registered: boolean;
 };
@@ -78,6 +77,7 @@ export type AttemptSummary = {
 
 export type Me = { profile: Profile; attempt: AttemptSummary | null };
 export type College = { id: string; name: string; city: string | null };
+export type Place = { id: string; name: string };
 
 export type Option = { id: string; body: string };
 

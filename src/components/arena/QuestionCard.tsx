@@ -4,17 +4,17 @@ import type { Question } from "@/lib/api";
 import { bandFor } from "./ProgressRail";
 
 const DIFFICULTY_TONE = {
-  easy: "border-ok/40 text-ok",
-  medium: "border-warn/40 text-warn",
-  hard: "border-danger/40 text-danger",
+  easy: "text-ok",
+  medium: "text-warn",
+  hard: "text-danger",
 } as const;
 
 const TYPE_LABEL = {
-  mcq: "MULTIPLE CHOICE",
-  code_output: "CODE OUTPUT",
-  debug: "DEBUG",
-  scenario: "SCENARIO",
-  logic: "LOGIC",
+  mcq: "Multiple choice",
+  code_output: "Code output",
+  debug: "Debug",
+  scenario: "Scenario",
+  logic: "Logic",
 } as const;
 
 export function QuestionCard({
@@ -32,30 +32,41 @@ export function QuestionCard({
 
   return (
     <article key={question.position} className="rise">
-      <header className="mb-5">
-        <div className="mb-3 flex flex-wrap items-center gap-2">
-          <span className="font-mono text-sm font-bold tracking-widest text-accent">
-            ⚡ CHALLENGE {String(question.position).padStart(2, "0")} / {total}
-          </span>
-          <span className="rounded-md border border-line px-2 py-0.5 font-mono text-[10px] tracking-widest text-muted">
-            {band.label}
-          </span>
+      <header className="mb-7">
+        {/* The numeral carries the position, so the metadata below it can be a
+            quiet sentence instead of a row of competing chips. */}
+        <div className="flex items-start gap-5">
           <span
-            className={`rounded-md border px-2 py-0.5 font-mono text-[10px] tracking-widest ${DIFFICULTY_TONE[question.difficulty]}`}
+            aria-hidden="true"
+            className="tally shrink-0 text-6xl font-bold select-none sm:text-7xl"
+            style={{ color: `color-mix(in srgb, var(--color-${band.token}) 26%, transparent)` }}
           >
-            {question.difficulty.toUpperCase()}
+            {String(question.position).padStart(2, "0")}
           </span>
-          <span className="rounded-md border border-line px-2 py-0.5 font-mono text-[10px] tracking-widest text-muted">
-            {TYPE_LABEL[question.type]}
-          </span>
+          <div className="min-w-0 pt-1">
+            <p className="text-xs text-muted">
+              <span className="sr-only">Challenge </span>
+              {question.position} of {total}
+              <span className="mx-2 text-line">/</span>
+              <span style={{ color: `var(--color-${band.token})` }}>{band.label}</span>
+              <span className="mx-2 text-line">/</span>
+              <span className={DIFFICULTY_TONE[question.difficulty]}>
+                {question.difficulty}
+              </span>
+              <span className="mx-2 text-line">/</span>
+              {TYPE_LABEL[question.type]}
+            </p>
+            <h2 className="mt-2 text-xl leading-snug font-semibold text-balance sm:text-2xl">
+              {question.body}
+            </h2>
+          </div>
         </div>
-        <h2 className="text-lg leading-relaxed font-medium text-balance">{question.body}</h2>
       </header>
 
       {question.code && (
         // Wide code scrolls inside its own container so the page never scrolls
         // sideways on a phone.
-        <pre className="mb-5 overflow-x-auto rounded-xl border border-line bg-base p-4 text-sm leading-relaxed">
+        <pre className="mb-6 overflow-x-auto rounded-xl bg-surface-2 p-4 text-sm leading-relaxed">
           <code className="font-mono">{question.code}</code>
         </pre>
       )}
@@ -66,13 +77,17 @@ export function QuestionCard({
           {question.options.map((option, i) => {
             const isSelected = selected === option.id;
             return (
-              <li key={option.id}>
+              <li
+                key={option.id}
+                className="deal"
+                style={{ animationDelay: `${i * 45}ms` }}
+              >
                 <label
                   className={[
-                    "flex cursor-pointer items-start gap-3 rounded-xl border p-4 transition-colors",
+                    "flex cursor-pointer items-center gap-4 rounded-xl p-4 transition-all duration-150",
                     isSelected
-                      ? "border-accent bg-accent/10"
-                      : "border-line bg-surface hover:border-muted",
+                      ? "bg-accent/12 ring-2 ring-accent"
+                      : "bg-surface ring-1 ring-line hover:bg-surface-2 hover:ring-muted/60",
                   ].join(" ")}
                 >
                   <input
@@ -85,11 +100,12 @@ export function QuestionCard({
                   />
                   <span
                     aria-hidden="true"
+                    key={`${option.id}-${isSelected}`}
                     className={[
-                      "mt-0.5 flex size-6 shrink-0 items-center justify-center rounded-md border font-mono text-xs",
+                      "flex size-8 shrink-0 items-center justify-center rounded-lg font-mono text-sm transition-colors",
                       isSelected
-                        ? "border-accent bg-accent text-accent-ink font-bold"
-                        : "border-line text-muted",
+                        ? "pop bg-accent font-bold text-accent-ink"
+                        : "bg-surface-2 text-muted",
                     ].join(" ")}
                   >
                     {"ABCDE"[i]}
@@ -105,7 +121,7 @@ export function QuestionCard({
       {selected && (
         <button
           onClick={() => onSelect(null)}
-          className="mt-3 text-xs text-muted underline underline-offset-4"
+          className="mt-4 text-xs text-muted underline underline-offset-4 hover:text-ink"
         >
           Clear my answer
         </button>

@@ -14,8 +14,7 @@ from server.conftest import DB, make_student, psql, scalar
 REG = {
     "phone": "9876543210",
     "college_name": "ABC College of Engineering",
-    "course": "Computer Science",
-    "academic_year": 3,
+    "location": "Kochi",
     "student_id": "CS21001",
 }
 

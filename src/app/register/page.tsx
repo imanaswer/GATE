@@ -2,14 +2,13 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { api, ApiError, type College, type Me } from "@/lib/api";
-
-const YEARS = [1, 2, 3, 4, 5];
+import { api, ApiError, type College, type Me, type Place } from "@/lib/api";
 
 export default function Register() {
   const router = useRouter();
   const [me, setMe] = useState<Me | null>(null);
   const [colleges, setColleges] = useState<College[]>([]);
+  const [places, setPlaces] = useState<Place[]>([]);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
@@ -18,13 +17,15 @@ export default function Register() {
     let cancelled = false;
     (async () => {
       try {
-        const [profile, list] = await Promise.all([
+        const [profile, list, cities] = await Promise.all([
           api<Me>("/me"),
           api<College[]>("/colleges"),
+          api<Place[]>("/locations"),
         ]);
         if (cancelled) return;
         setMe(profile);
         setColleges(list);
+        setPlaces(cities);
         if (profile.profile.registered) return router.replace("/domains");
       } catch (e) {
         if (!cancelled) {
@@ -61,9 +62,10 @@ export default function Register() {
           phone: form.get("phone"),
           college_id: match?.id ?? null,
           college_name: match ? null : collegeName,
-          course: form.get("course"),
-          academic_year: Number(form.get("academic_year")),
-          student_id: form.get("student_id"),
+          location: form.get("location"),
+          // Optional: sent as null rather than "" so the server stores an
+          // absent value instead of an empty string that looks like an answer.
+          student_id: String(form.get("student_id") ?? "").trim() || null,
         },
       });
       router.replace("/domains");
@@ -111,10 +113,13 @@ export default function Register() {
   return (
     <Shell>
       <div className="mb-8">
-        <p className="mb-2 font-mono text-xs tracking-widest text-accent">STEP 2 / 4</p>
-        <h1 className="text-2xl font-semibold">Complete your registration</h1>
-        <p className="mt-1 text-sm text-muted">
-          This appears on your certificate, so check it carefully.
+        <p className="mb-2 text-xs text-muted">Step 2 of 4</p>
+        <h1 className="text-3xl font-bold tracking-tight text-balance">
+          Three quick details and you&rsquo;re in.
+        </h1>
+        <p className="mt-2 text-sm text-muted">
+          Your name and email come from Google and go on your certificate. We ask
+          for nothing else we don&rsquo;t need.
         </p>
       </div>
 
@@ -122,7 +127,7 @@ export default function Register() {
         <Locked label="Name" value={p.name} />
         <Locked label="Email" value={p.email} />
 
-        <Field label="Phone number" name="phone" required>
+        <Field label="Phone number" name="phone">
           <input
             id="phone"
             name="phone"
@@ -136,7 +141,7 @@ export default function Register() {
           />
         </Field>
 
-        <Field label="College" name="college" required hint="Start typing to find yours, or enter a new one.">
+        <Field label="College" name="college" hint="Start typing to find yours, or add a new one.">
           <input
             id="college"
             name="college"
@@ -154,43 +159,35 @@ export default function Register() {
           </datalist>
         </Field>
 
-        <Field label="Course / Branch" name="course" required>
+        <Field label="Where you're based" name="location" hint="Your city or town.">
           <input
-            id="course"
-            name="course"
+            id="location"
+            name="location"
+            list="location-options"
             required
             minLength={2}
             maxLength={120}
-            defaultValue={p.course ?? ""}
-            placeholder="Computer Science"
+            defaultValue={p.location ?? ""}
+            placeholder="Kochi"
+            autoComplete="address-level2"
             className={inputClass}
           />
-        </Field>
-
-        <Field label="Academic year" name="academic_year" required>
-          <select
-            id="academic_year"
-            name="academic_year"
-            required
-            defaultValue={p.academic_year ?? ""}
-            className={inputClass}
-          >
-            <option value="" disabled>
-              Select year
-            </option>
-            {YEARS.map((y) => (
-              <option key={y} value={y}>
-                Year {y}
-              </option>
+          <datalist id="location-options">
+            {places.map((c) => (
+              <option key={c.id} value={c.name} />
             ))}
-          </select>
+          </datalist>
         </Field>
 
-        <Field label="Student ID / Register number" name="student_id" required>
+        <Field
+          label="Student ID"
+          name="student_id"
+          optional
+          hint="Helps your college match you to their records."
+        >
           <input
             id="student_id"
             name="student_id"
-            required
             maxLength={60}
             defaultValue={p.student_id ?? ""}
             placeholder="CS21001"
@@ -230,21 +227,23 @@ function Shell({ children }: { children: React.ReactNode }) {
 function Field({
   label,
   name,
-  required,
+  optional,
   hint,
   children,
 }: {
   label: string;
   name: string;
-  required?: boolean;
+  optional?: boolean;
   hint?: string;
   children: React.ReactNode;
 }) {
   return (
     <div>
-      <label htmlFor={name} className="mb-1.5 block text-sm font-medium">
+      <label htmlFor={name} className="mb-1.5 flex items-baseline gap-2 text-sm font-medium">
         {label}
-        {required && <span className="ml-1 text-accent">*</span>}
+        {/* Almost everything here is required, so the exception is what earns a
+            label. A field of asterisks tells the student nothing. */}
+        {optional && <span className="text-xs font-normal text-muted">optional</span>}
       </label>
       {children}
       {hint && <p className="mt-1.5 text-xs text-muted">{hint}</p>}

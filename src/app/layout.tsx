@@ -23,7 +23,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       // which otherwise reports a mismatch that is not ours.
       suppressHydrationWarning
     >
-      <body className="arena-grid min-h-full flex flex-col">{children}</body>
+      <body className="min-h-full flex flex-col">{children}</body>
     </html>
   );
 }

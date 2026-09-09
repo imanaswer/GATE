@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { api, ApiError, type Me, type Result } from "@/lib/api";
 
@@ -45,29 +45,39 @@ export default function Complete() {
   }
 
   const minutes = result.duration_seconds ? Math.round(result.duration_seconds / 60) : null;
+  const pct = result.total ? Math.round((result.score / result.total) * 100) : 0;
 
   return (
     <Shell>
-      <div className="rise text-center">
-        <p className="mb-4 text-5xl" aria-hidden="true">
-          🎉
-        </p>
-        <h1 className="text-3xl font-bold tracking-tight">Mission complete</h1>
+      <div className="rise">
+        <h1 className="text-3xl font-bold tracking-tight">That&rsquo;s a wrap.</h1>
         <p className="mt-2 text-sm text-muted">
           {result.status === "expired"
             ? "Time ran out, so your exam was submitted automatically and scored."
-            : "Your exam has been submitted successfully."}
+            : "Your exam is submitted and scored."}
         </p>
 
-        <div className="my-8 rounded-2xl border border-line bg-surface p-8">
-          <p className="font-mono text-[10px] tracking-widest text-muted">YOUR SCORE</p>
-          <p className="my-2 font-mono text-6xl font-bold text-accent tabular-nums">
-            {result.score}
-            <span className="text-2xl text-muted"> / {result.total}</span>
+        <div className="my-8 rounded-2xl bg-surface p-8 ring-1 ring-line">
+          <p className="text-xs text-muted">Your score</p>
+          {/* The number counts up once. It is the only moment on this screen
+              worth animating, and it lands before a student can look away. */}
+          <p className="mt-1 mb-4 flex items-baseline gap-2">
+            <CountUp to={result.score} className="tally text-7xl font-bold text-accent" />
+            <span className="text-2xl text-muted">/ {result.total}</span>
           </p>
-          <p className="text-sm text-muted">{result.domain_name}</p>
+          <div
+            className="h-1.5 overflow-hidden rounded-full bg-surface-2"
+            role="img"
+            aria-label={`${pct} percent correct`}
+          >
+            <div
+              className="h-full rounded-full bg-accent transition-[width] duration-1000 ease-out"
+              style={{ width: `${pct}%` }}
+            />
+          </div>
+          <p className="mt-3 text-sm text-muted">{result.domain_name}</p>
 
-          <dl className="mt-7 grid grid-cols-3 gap-3 border-t border-line pt-6 text-center">
+          <dl className="mt-7 grid grid-cols-3 gap-3 border-t border-line pt-6">
             {[
               ["Correct", result.correct, "text-ok"],
               ["Wrong", result.wrong, "text-danger"],
@@ -75,7 +85,7 @@ export default function Complete() {
             ].map(([label, value, tone]) => (
               <div key={label as string}>
                 <dt className="text-xs text-muted">{label}</dt>
-                <dd className={`mt-1 font-mono text-xl font-bold ${tone}`}>{value}</dd>
+                <dd className={`tally mt-1 text-2xl font-bold ${tone}`}>{value}</dd>
               </div>
             ))}
           </dl>
@@ -86,8 +96,8 @@ export default function Complete() {
           )}
         </div>
 
-        <div className="rounded-2xl border border-line bg-surface p-6">
-          <p className="font-mono text-[10px] tracking-widest text-muted">CERTIFICATE</p>
+        <div className="rounded-2xl bg-surface p-6 ring-1 ring-line">
+          <p className="text-xs text-muted">Certificate</p>
           <p className="mt-2 text-sm text-ok">\u2713 Issued and valid</p>
           <p className="mt-3 break-all font-mono text-sm">{result.certificate_id}</p>
           <div className="mt-5 flex flex-col gap-2 sm:flex-row">
@@ -111,11 +121,44 @@ export default function Complete() {
           </p>
         </div>
 
-        <p className="mt-8 text-xs text-muted">
+        <p className="mt-8 text-center text-xs text-muted">
           You can close this page. Your result is saved.
         </p>
       </div>
     </Shell>
+  );
+}
+
+/** Counts from zero to the final score once, then stops. Respects
+ *  prefers-reduced-motion by landing on the value immediately. */
+function CountUp({ to, className }: { to: number; className?: string }) {
+  const [value, setValue] = useState(0);
+  const frame = useRef(0);
+
+  useEffect(() => {
+    // Set on the next frame rather than synchronously in the effect body: a
+    // sync setState here cascades a render, and starting from 0 on the server
+    // keeps hydration matching.
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches || to === 0) {
+      frame.current = requestAnimationFrame(() => setValue(to));
+      return () => cancelAnimationFrame(frame.current);
+    }
+    const start = performance.now();
+    const DURATION = 900;
+    const tick = (now: number) => {
+      const t = Math.min(1, (now - start) / DURATION);
+      // Ease-out cubic: fast off the mark, settles onto the number.
+      setValue(Math.round(to * (1 - Math.pow(1 - t, 3))));
+      if (t < 1) frame.current = requestAnimationFrame(tick);
+    };
+    frame.current = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(frame.current);
+  }, [to]);
+
+  return (
+    <span className={className} aria-label={String(to)}>
+      <span aria-hidden="true">{value}</span>
+    </span>
   );
 }
 

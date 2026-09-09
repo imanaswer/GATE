@@ -22,25 +22,21 @@ html {
   color-scheme: dark;
 }
 
+/* One hue per stage of the paper, so a student always knows how deep in they are
+   without reading a number. Ordered cool -> warm as the exam gets harder.
+   Declared on :root rather than in @theme because these are only ever read
+   through var() — Tailwind drops @theme entries no utility class references. */
+:root {
+  --color-stage-1: #5eead4;
+  --color-stage-2: #a78bfa;
+  --color-stage-3: #ffc447;
+}
+
 body {
   background: var(--color-base);
   color: var(--color-ink);
   font-family: var(--font-sans), system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
-}
-
-/* Faint grid. Fixed attachment so it never repaints during scroll. */
-.arena-grid::before {
-  content: "";
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  z-index: -1;
-  background-image:
-    linear-gradient(to right, #ffffff08 1px, transparent 1px),
-    linear-gradient(to bottom, #ffffff08 1px, transparent 1px);
-  background-size: 56px 56px;
-  mask-image: radial-gradient(ellipse 90% 60% at 50% 0%, #000 40%, transparent 100%);
 }
 
 *:focus-visible {
@@ -73,4 +69,53 @@ body {
 /* Transform + opacity only — nothing here triggers layout. */
 .rise {
   animation: rise 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+
+/* ---------------------------------------------------------------- motion
+
+   One authored moment per surface, from an already-visible default, on
+   transform/opacity/filter only. Everything here is disabled wholesale by the
+   reduced-motion block above. */
+
+@keyframes lift {
+  from { transform: translateY(6px); opacity: 0; }
+  to   { transform: none; opacity: 1; }
+}
+
+/* Staggered entrance for a list of options. The delay is set inline per item so
+   the sequence reads as dealing cards rather than one block appearing. */
+.deal {
+  animation: lift 0.34s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes pop {
+  0%   { transform: scale(1); }
+  45%  { transform: scale(1.14); }
+  100% { transform: scale(1); }
+}
+
+/* Fires on the letter chip when an answer is chosen — the single piece of
+   feedback the exam is allowed to give, since correctness is never revealed. */
+.pop { animation: pop 0.26s cubic-bezier(0.16, 1, 0.3, 1); }
+
+@keyframes sweep {
+  from { transform: translateX(-100%); }
+  to   { transform: translateX(100%); }
+}
+
+.sweep::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent, #ffffff14, transparent);
+  animation: sweep 1.4s ease-in-out infinite;
+}
+
+/* The numeral behind each challenge. Big, quiet, and purely positional — it is
+   the one place a display size earns its keep. */
+.tally {
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.04em;
+  line-height: 0.8;
 }

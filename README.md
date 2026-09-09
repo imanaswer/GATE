@@ -204,6 +204,34 @@ start running on the first production deploy. Set `SITE_URL` to your real domain
 **before** anyone sits an exam — it is the origin printed into every certificate
 QR code, and a certificate outlives the deployment that issued it.
 
+## What we ask students for
+
+Five things, and three of them are one input each:
+
+| Field | Where it comes from |
+|---|---|
+| Name | Google, read-only |
+| Email | Google, read-only |
+| Phone | typed |
+| Location | typed, autocompletes from places already entered |
+| College | typed, autocompletes from colleges already entered |
+| Student ID | typed, **optional** |
+
+Course and academic year were dropped, and `0006` drops the columns rather than
+leaving them nullable — a column nobody populates is the same form with hidden
+fields, not a shorter one. Name and email are never accepted from the client;
+they come from the verified Google token, so nobody registers under someone
+else's name.
+
+Student ID stayed because it is the only signal behind the duplicate-register-
+number flag (spec §1.1), but it is optional: a student who does not know theirs
+must not be blocked from sitting the exam. Two students who both leave it blank
+do not flag each other — absent is not a match.
+
+`locations` mirrors `colleges` for the same reason: free text is accepted, but
+"Kochi", "kochi" and " Kochi " must be one row in the analytics rather than
+three.
+
 ## Certificates
 
 Every finalised attempt gets one — submitted, timed out, or swept by cron alike,

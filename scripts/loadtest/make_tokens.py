@@ -19,11 +19,7 @@ import jwt  # noqa: E402
 
 from server import db  # noqa: E402
 
-REG = {
-    "phone": "9000000000",
-    "course": "Load Test",
-    "academic_year": 1,
-}
+REG = {"phone": "9000000000"}
 
 
 def main() -> int:
@@ -42,6 +38,11 @@ def main() -> int:
                 "on conflict (lower(name)) do update set name = excluded.name returning id"
             )
             college = cur.fetchone()["id"]
+            cur.execute(
+                "insert into locations (name) values ('Load Test City') "
+                "on conflict (lower(name)) do update set name = excluded.name returning id"
+            )
+            location = cur.fetchone()["id"]
 
         tokens = []
         for i in range(count):
@@ -51,12 +52,12 @@ def main() -> int:
                 cur.execute("insert into auth.users (id, email) values (%s, %s)", (sub, email))
                 cur.execute(
                     """
-                    insert into users (id, email, name, phone, college_id, course,
-                                       academic_year, student_id, registered_at)
-                    values (%s, %s, %s, %s, %s, %s, %s, %s, now())
+                    insert into users (id, email, name, phone, college_id,
+                                       location_id, student_id, registered_at)
+                    values (%s, %s, %s, %s, %s, %s, %s, now())
                     """,
                     (sub, email, f"Load Test {i}", REG["phone"], college,
-                     REG["course"], REG["academic_year"], f"LT{i:06d}"),
+                     location, f"LT{i:06d}"),
                 )
             tokens.append(jwt.encode(
                 {"sub": sub, "email": email, "aud": "authenticated",

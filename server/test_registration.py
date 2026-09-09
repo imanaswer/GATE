@@ -13,8 +13,7 @@ from server.conftest import DB, make_student, scalar
 REG = {
     "phone": "+91 98765 43210",
     "college_name": "ABC College of Engineering",
-    "course": "Computer Science",
-    "academic_year": 3,
+    "location": "Kochi",
     "student_id": "CS21001",
 }
 
@@ -73,8 +72,9 @@ def test_invalid_payloads_rejected(client):
     auth = make_student("bad@example.edu", "Bad Input")
     h = {"Authorization": auth}
     assert client.post("/api/v1/register", json={**REG, "phone": "123"}, headers=h).status_code == 422
-    assert client.post("/api/v1/register", json={**REG, "academic_year": 9}, headers=h).status_code == 422
-    assert client.post("/api/v1/register", json={**REG, "course": ""}, headers=h).status_code == 422
+    assert client.post("/api/v1/register", json={**REG, "location": ""}, headers=h).status_code == 422
+    assert client.post("/api/v1/register", json={k: v for k, v in REG.items() if k != "location"},
+                       headers=h).status_code == 422
     no_college = {k: v for k, v in REG.items() if k != "college_name"}
     assert client.post("/api/v1/register", json=no_college, headers=h).status_code == 422
 
@@ -163,3 +163,71 @@ def test_hs256_is_refused_unless_explicitly_enabled(monkeypatch):
     finally:
         monkeypatch.delenv("VERCEL_ENV", raising=False)
         importlib.reload(settings_module)
+
+
+# ------------------------------------------------------- collecting less
+
+def test_registration_succeeds_without_a_student_id(client):
+    """Optional means optional. A student who does not know their register
+    number must still be able to sit the exam."""
+    auth = make_student("noid@example.edu", "No Id")
+    payload = {k: v for k, v in REG.items() if k != "student_id"}
+    r = client.post("/api/v1/register", json=payload, headers={"Authorization": auth})
+    assert r.status_code == 200, r.text
+    assert r.json()["profile"]["registered"] is True
+    assert r.json()["profile"]["student_id"] is None
+
+
+def test_students_without_a_student_id_do_not_flag_each_other(client):
+    """Two absent IDs are not the same ID. Flagging them would fill the review
+    list an organiser reads with people who simply left a field blank."""
+    payload = {k: v for k, v in REG.items() if k != "student_id"}
+    for email in ("blank-a@example.edu", "blank-b@example.edu"):
+        auth = make_student(email, email.split("@")[0])
+        r = client.post("/api/v1/register", json=payload, headers={"Authorization": auth})
+        assert r.json()["flagged_duplicate_student_id"] is False
+
+    assert scalar(
+        "select count(*) from suspicious_activity where type = 'duplicate_student_id' "
+        "and user_id in (select id from users where email like 'blank-%')"
+    ) == "0"
+
+
+def test_location_is_required(client):
+    auth = make_student("noloc@example.edu", "No Loc")
+    payload = {k: v for k, v in REG.items() if k != "location"}
+    assert client.post("/api/v1/register", json=payload,
+                       headers={"Authorization": auth}).status_code == 422
+
+
+def test_the_same_place_spelled_differently_is_one_row(client):
+    """The whole reason location is a table and not a text column: 'Kochi',
+    'kochi' and '  Kochi  ' must group as one place in the analytics."""
+    for i, spelling in enumerate(("Trivandrum", "trivandrum", "  Trivandrum  ")):
+        auth = make_student(f"place{i}@example.edu", f"Place {i}")
+        r = client.post("/api/v1/register",
+                        json={**REG, "location": spelling, "student_id": f"PL{i}"},
+                        headers={"Authorization": auth})
+        assert r.status_code == 200, r.text
+        assert r.json()["profile"]["location"] == "Trivandrum"
+
+    assert scalar("select count(*) from locations where lower(name) = 'trivandrum'") == "1"
+
+
+def test_the_form_no_longer_collects_course_or_year(client):
+    """Collecting less is a schema fact, not a form convention — otherwise the
+    columns come back the first time someone adds an input."""
+    columns = scalar(
+        "select count(*) from information_schema.columns "
+        "where table_name = 'users' and column_name in ('course', 'academic_year')"
+    )
+    assert columns == "0"
+
+
+def test_locations_autocomplete_lists_places_already_entered(client):
+    auth = make_student("autoc@example.edu", "Auto C")
+    client.post("/api/v1/register", json={**REG, "location": "Coimbatore"},
+                headers={"Authorization": auth})
+    names = [p["name"] for p in client.get("/api/v1/locations?q=coim").json()]
+    assert "Coimbatore" in names
+    assert client.get("/api/v1/locations?q=zzzznowhere").json() == []

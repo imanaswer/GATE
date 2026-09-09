@@ -43,18 +43,18 @@ def call(base, path, token=None, method="GET", payload=None):
         return e.code, json.loads(e.read() or b"null")
 
 
-def make_student(secret, college_id, index):
+def make_student(secret, college_id, location_id, index):
     sub = str(uuid.uuid4())
     email = f"soak-{index}-{sub[:8]}@soak.invalid"
     with db.cursor() as cur:
         cur.execute("insert into auth.users (id, email) values (%s, %s)", (sub, email))
         cur.execute(
             """
-            insert into users (id, email, name, phone, college_id, course,
-                               academic_year, student_id, registered_at)
-            values (%s, %s, %s, '9000000000', %s, 'Soak', 2, %s, now())
+            insert into users (id, email, name, phone, college_id, location_id,
+                               student_id, registered_at)
+            values (%s, %s, %s, '9000000000', %s, %s, %s, now())
             """,
-            (sub, email, f"Soak {index}", college_id, f"SOAK{index:06d}"),
+            (sub, email, f"Soak {index}", college_id, location_id, f"SOAK{index:06d}"),
         )
     return jwt.encode(
         {"sub": sub, "email": email, "aud": "authenticated",
@@ -172,9 +172,13 @@ def main() -> int:
                         "on conflict (lower(name)) do update set name = excluded.name "
                         "returning id")
             college = cur.fetchone()["id"]
+            cur.execute("insert into locations (name) values ('Soak City') "
+                        "on conflict (lower(name)) do update set name = excluded.name "
+                        "returning id")
+            location = cur.fetchone()["id"]
 
         print(f"minting {args.students} students…")
-        tokens = [make_student(secret, college, i) for i in range(args.students)]
+        tokens = [make_student(secret, college, location, i) for i in range(args.students)]
 
         print(f"sitting {args.students} exams against {args.base_url}…")
         with ThreadPoolExecutor(max_workers=args.concurrency) as pool:

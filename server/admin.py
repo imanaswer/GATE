@@ -185,8 +185,11 @@ def _student_filters(q, college_id, domain, attempt_status):
     would export a different set than they filtered."""
     where, params = ["1=1"], []
     if q:
-        where.append("(u.name ilike %s or u.email ilike %s or u.student_id ilike %s)")
-        params += [f"%{q}%"] * 3
+        where.append(
+            "(u.name ilike %s or u.email ilike %s or u.student_id ilike %s "
+            "or lo.name ilike %s)"
+        )
+        params += [f"%{q}%"] * 4
     if college_id:
         where.append("u.college_id = %s")
         params.append(college_id)
@@ -202,15 +205,16 @@ def _student_filters(q, college_id, domain, attempt_status):
 
 
 STUDENT_SELECT = """
-    select u.id, u.name, u.email, u.phone, u.student_id, u.course,
-           u.academic_year, u.registered_at, u.created_at,
-           co.name as college_name,
+    select u.id, u.name, u.email, u.phone, u.student_id,
+           u.registered_at, u.created_at,
+           co.name as college_name, lo.name as location_name,
            a.id as attempt_id, a.status as attempt_status, a.score,
            a.correct_count, a.wrong_count, a.skipped_count, a.submitted_at,
            d.name as domain_name, d.slug as domain_slug,
            c.certificate_id, c.verify_hash, c.issued_at
     from users u
     left join colleges co on co.id = u.college_id
+    left join locations lo on lo.id = u.location_id
     left join exam_attempts a on a.user_id = u.id
     left join domains d on d.id = a.domain_id
     left join certificates c on c.attempt_id = a.id
@@ -260,8 +264,7 @@ def _student_row(r) -> dict:
         "phone": r["phone"],
         "student_id": r["student_id"],
         "college_name": r["college_name"],
-        "course": r["course"],
-        "academic_year": r["academic_year"],
+        "location": r["location_name"],
         "registered": r["registered_at"] is not None,
         "attempt_status": r["attempt_status"],
         "domain_name": r["domain_name"],
@@ -589,8 +592,8 @@ def college_analytics(admin: CurrentAdmin, limit: int = Query(default=200, ge=1,
 # ------------------------------------------------------------------ exports
 
 CSV_COLUMNS = [
-    "name", "email", "phone", "student_id", "college_name", "course",
-    "academic_year", "domain_name", "attempt_status", "score", "correct",
+    "name", "email", "phone", "student_id", "college_name", "location",
+    "domain_name", "attempt_status", "score", "correct",
     "wrong", "skipped", "submitted_at", "certificate_id",
 ]
 
@@ -631,7 +634,7 @@ def export_csv(
             for r in batch:
                 writer.writerow([
                     r["name"], r["email"], r["phone"], r["student_id"],
-                    r["college_name"], r["course"], r["academic_year"],
+                    r["college_name"], r["location_name"],
                     r["domain_name"], r["attempt_status"], r["score"],
                     r["correct_count"], r["wrong_count"], r["skipped_count"],
                     r["submitted_at"].isoformat() if r["submitted_at"] else "",

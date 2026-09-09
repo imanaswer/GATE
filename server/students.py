@@ -19,9 +19,11 @@ class RegistrationIn(BaseModel):
     phone: str
     college_id: str | None = None
     college_name: str | None = Field(default=None, max_length=160)
-    course: str = Field(min_length=2, max_length=120)
-    academic_year: int = Field(ge=1, le=6)
-    student_id: str = Field(min_length=1, max_length=60)
+    location: str = Field(min_length=2, max_length=120)
+    # Optional. It is the only signal behind the duplicate-register-number flag
+    # (spec §1.1), so it is still asked for — but a student who does not know
+    # theirs must not be blocked from sitting the exam over it.
+    student_id: str | None = Field(default=None, max_length=60)
 
     @field_validator("phone")
     @classmethod
@@ -31,10 +33,12 @@ class RegistrationIn(BaseModel):
             raise ValueError("phone must have 10 to 15 digits")
         return digits
 
-    @field_validator("student_id", "course")
+    @field_validator("student_id", "location")
     @classmethod
-    def strip(cls, v: str) -> str:
-        return v.strip()
+    def strip(cls, v: str | None) -> str | None:
+        if v is None:
+            return None
+        return " ".join(v.split()) or None
 
 
 def ensure_user(identity: Identity) -> dict:
@@ -72,8 +76,7 @@ def _profile(user: dict) -> dict:
         "phone": user["phone"],
         "college_id": str(user["college_id"]) if user["college_id"] else None,
         "college_name": user.get("college_name"),
-        "course": user["course"],
-        "academic_year": user["academic_year"],
+        "location": user.get("location_name"),
         "student_id": user["student_id"],
         "registered": user["registered_at"] is not None,
     }
@@ -84,8 +87,10 @@ def me(identity: CurrentIdentity):
     ensure_user(identity)
     user = db.fetch_one(
         """
-        select u.*, c.name as college_name
-        from users u left join colleges c on c.id = u.college_id
+        select u.*, c.name as college_name, l.name as location_name
+        from users u
+        left join colleges c on c.id = u.college_id
+        left join locations l on l.id = u.location_id
         where u.id = %s
         """,
         (identity.id,),
@@ -109,6 +114,20 @@ def list_colleges(q: str = Query(default="", max_length=120)):
     else:
         rows = db.fetch_all("select id, name, city from colleges order by name limit 50")
     return [{"id": str(r["id"]), "name": r["name"], "city": r["city"]} for r in rows]
+
+
+@router.get("/locations")
+def list_locations(q: str = Query(default="", max_length=120)):
+    """Autocomplete over places students have already entered. Free text is still
+    accepted — this exists so one city does not arrive spelled four ways."""
+    if q.strip():
+        rows = db.fetch_all(
+            "select id, name from locations where name ilike %s order by name limit 20",
+            (f"%{q.strip()}%",),
+        )
+    else:
+        rows = db.fetch_all("select id, name from locations order by name limit 50")
+    return [{"id": str(r["id"]), "name": r["name"]} for r in rows]
 
 
 @router.get("/domains")
@@ -164,37 +183,44 @@ def register(payload: RegistrationIn, identity: CurrentIdentity):
             )
             college_id = cur.fetchone()["id"]
 
+        # Same trust-boundary reasoning as the college name above: an
+        # authenticated student writes into a permanent analytics dimension, so
+        # it is normalised and deduplicated on the way in.
+        cur.execute(
+            """
+            insert into locations (name) values (%s)
+            on conflict (lower(name)) do update set name = locations.name
+            returning id
+            """,
+            (payload.location,),
+        )
+        location_id = cur.fetchone()["id"]
+
         cur.execute(
             """
             update users set
-              phone = %s, college_id = %s, course = %s,
-              academic_year = %s, student_id = %s,
+              phone = %s, college_id = %s, location_id = %s, student_id = %s,
               registered_at = coalesce(registered_at, now()), updated_at = now()
             where id = %s
             returning *
             """,
-            (
-                payload.phone,
-                college_id,
-                payload.course,
-                payload.academic_year,
-                payload.student_id,
-                identity.id,
-            ),
+            (payload.phone, college_id, location_id, payload.student_id, identity.id),
         )
         updated = cur.fetchone()
 
         # Deliberately NOT a rejection. See docs/.../design.md §1.1 — a mistyped
         # register number must never lock out the student who owns it. Flag it and
         # let an admin resolve it.
-        cur.execute(
-            """
-            select id, name, email from users
-            where college_id = %s and student_id = %s and id <> %s
-            """,
-            (college_id, payload.student_id, identity.id),
-        )
-        clashes = cur.fetchall()
+        clashes = []
+        if payload.student_id:
+            cur.execute(
+                """
+                select id, name, email from users
+                where college_id = %s and student_id = %s and id <> %s
+                """,
+                (college_id, payload.student_id, identity.id),
+            )
+            clashes = cur.fetchall()
         if clashes:
             cur.execute(
                 """
@@ -215,8 +241,11 @@ def register(payload: RegistrationIn, identity: CurrentIdentity):
 
     user = db.fetch_one(
         """
-        select u.*, c.name as college_name
-        from users u left join colleges c on c.id = u.college_id where u.id = %s
+        select u.*, c.name as college_name, l.name as location_name
+        from users u
+        left join colleges c on c.id = u.college_id
+        left join locations l on l.id = u.location_id
+        where u.id = %s
         """,
         (identity.id,),
     )

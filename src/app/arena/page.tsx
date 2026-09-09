@@ -4,7 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { api, ApiError, type Result } from "@/lib/api";
 import { useExam } from "@/lib/useExam";
-import { ProgressRail } from "@/components/arena/ProgressRail";
+import { ProgressRail, StageMeters } from "@/components/arena/ProgressRail";
 import { QuestionCard } from "@/components/arena/QuestionCard";
 import { SaveStatus } from "@/components/arena/SaveStatus";
 import { Timer } from "@/components/arena/Timer";
@@ -99,22 +99,16 @@ export default function Arena() {
 
   return (
     <div className="flex flex-1 flex-col">
-      <header className="sticky top-0 z-10 border-b border-line bg-base/90 backdrop-blur">
-        <div className="mx-auto flex max-w-3xl flex-wrap items-center justify-between gap-3 px-5 py-3">
-          <span className="font-mono text-xs tracking-widest text-accent">
-            ⚡ {attempt.domain_name.toUpperCase()}
-          </span>
-          <Timer seconds={exam.remaining} />
+      <header className="sticky top-0 z-10 border-b border-line bg-base/92 backdrop-blur">
+        <div className="mx-auto max-w-3xl px-5 pt-3 pb-2.5">
+          <div className="mb-2.5 flex flex-wrap items-center justify-between gap-3">
+            <span className="truncate text-sm font-medium">{attempt.domain_name}</span>
+            <Timer seconds={exam.remaining} />
+          </div>
+          {/* Three stage meters, not one flat bar: depth through the paper is
+              what a student actually wants to know, and it costs the same row. */}
+          <StageMeters current={position} answered={answered} />
         </div>
-        <div
-          className="h-0.5 bg-accent transition-[width] duration-300"
-          style={{ width: `${(answered.size / total) * 100}%` }}
-          role="progressbar"
-          aria-valuenow={answered.size}
-          aria-valuemin={0}
-          aria-valuemax={total}
-          aria-label="Challenges answered"
-        />
       </header>
 
       {exam.offline && (
@@ -165,7 +159,7 @@ export default function Arena() {
 
         <section className="mt-9 border-t border-line pt-6">
           <div className="mb-3 flex items-baseline justify-between">
-            <h2 className="font-mono text-[10px] tracking-widest text-muted">CHALLENGES</h2>
+            <h2 className="text-sm font-medium">All challenges</h2>
             <p className="text-xs text-muted">
               {answered.size} of {total} answered
             </p>

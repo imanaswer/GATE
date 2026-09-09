@@ -3,7 +3,7 @@
 import { notFound } from "next/navigation";
 import { useState } from "react";
 import type { Question } from "@/lib/api";
-import { ProgressRail } from "@/components/arena/ProgressRail";
+import { ProgressRail, StageMeters } from "@/components/arena/ProgressRail";
 import { QuestionCard } from "@/components/arena/QuestionCard";
 import { SaveStatus } from "@/components/arena/SaveStatus";
 import { Timer } from "@/components/arena/Timer";
@@ -81,17 +81,14 @@ export default function Preview() {
 
   return (
     <div className="flex flex-1 flex-col">
-      <header className="sticky top-0 z-10 border-b border-line bg-base/90 backdrop-blur">
-        <div className="mx-auto flex max-w-3xl flex-wrap items-center justify-between gap-3 px-5 py-3">
-          <span className="font-mono text-xs tracking-widest text-accent">
-            ⚡ FULL STACK DEVELOPMENT
-          </span>
-          <Timer seconds={seconds} />
+      <header className="sticky top-0 z-10 border-b border-line bg-base/92 backdrop-blur">
+        <div className="mx-auto max-w-3xl px-5 pt-3 pb-2.5">
+          <div className="mb-2.5 flex flex-wrap items-center justify-between gap-3">
+            <span className="truncate text-sm font-medium">Full Stack Development</span>
+            <Timer seconds={seconds} />
+          </div>
+          <StageMeters current={question.position} answered={answered} />
         </div>
-        <div
-          className="h-0.5 bg-accent transition-[width] duration-300"
-          style={{ width: `${(answered.size / 15) * 100}%` }}
-        />
       </header>
 
       <main className="mx-auto w-full max-w-3xl flex-1 px-5 py-7">
@@ -117,7 +114,7 @@ export default function Preview() {
         </section>
 
         <section className="mt-10 rounded-xl border border-dashed border-line p-4">
-          <p className="mb-3 font-mono text-[10px] tracking-widest text-muted">
+          <p className="mb-3 text-sm font-medium">
             PREVIEW CONTROLS — NOT PART OF THE EXAM
           </p>
           <div className="flex flex-wrap gap-2 text-xs">

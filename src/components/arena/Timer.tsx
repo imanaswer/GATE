@@ -13,9 +13,12 @@ export function Timer({ seconds }: { seconds: number | null }) {
 
   return (
     <div className="flex items-baseline gap-2">
-      <span className="font-mono text-[10px] tracking-widest text-muted">TIME</span>
       <span
-        className={`font-mono text-lg font-bold tabular-nums ${tone}`}
+        className={`font-mono text-xl font-bold tabular-nums transition-colors sm:text-2xl ${tone} ${
+          // Under a minute the timer earns the attention; before that it must
+          // not pull focus away from the question.
+          seconds <= 60 ? "animate-pulse" : ""
+        }`}
         // Announce at one-minute granularity: a per-second live region would
         // make a screen reader unusable.
         aria-label={label}

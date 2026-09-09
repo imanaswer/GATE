@@ -61,8 +61,7 @@ export type AdminStudent = {
   phone: string | null;
   student_id: string | null;
   college_name: string | null;
-  course: string | null;
-  academic_year: number | null;
+  location: string | null;
   registered: boolean;
   attempt_status: "in_progress" | "submitted" | "expired" | null;
   domain_name: string | null;
