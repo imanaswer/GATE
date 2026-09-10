@@ -1,6 +1,7 @@
 "use client";
 
 import { use, useEffect, useState } from "react";
+import { Desk } from "@/components/desk";
 import type { Certificate } from "@/lib/api";
 
 /**
@@ -23,8 +24,8 @@ export default function Verify({ params }: PageProps<"/verify/[certificateId]">)
   }, [certificateId]);
 
   return (
-    <main className="flex flex-1 justify-center px-6 py-16">
-      <div className="rise w-full max-w-md">
+    <Desk width="max-w-md">
+      <div className="rise">
         <p className="mb-8 text-center font-mono text-xs tracking-widest text-muted">
           TECH ARENA · CERTIFICATE VERIFICATION
         </p>
@@ -86,6 +87,6 @@ export default function Verify({ params }: PageProps<"/verify/[certificateId]">)
           in real time.
         </p>
       </div>
-    </main>
+    </Desk>
   );
 }

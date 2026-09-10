@@ -119,10 +119,19 @@ export default function Arena() {
 
   return (
     <div className="flex flex-1 flex-col">
-      <header className="sticky top-0 z-10 border-b border-line bg-base/92 backdrop-blur">
-        <div className="mx-auto max-w-3xl px-5 pt-3 pb-2.5">
+      <header className="sticky top-0 z-10 border-b border-line/70 bg-surface/80 backdrop-blur">
+        <div className="mx-auto max-w-3xl px-5 pt-2.5 pb-2.5">
           <div className="mb-2.5 flex flex-wrap items-center justify-between gap-3">
-            <span className="truncate text-sm font-medium">{attempt.domain_name}</span>
+            <span className="flex min-w-0 items-center gap-2 text-sm font-medium">
+              {/* Traffic lights, so the arena reads as another window on the
+                  same desk. They close nothing — the exam is not dismissable. */}
+              <span aria-hidden="true" className="flex shrink-0 items-center gap-1.5">
+                <span className="size-2.5 rounded-full bg-[#ff5f57]" />
+                <span className="size-2.5 rounded-full bg-[#febc2e]" />
+                <span className="size-2.5 rounded-full bg-[#28c840]" />
+              </span>
+              <span className="truncate">{attempt.domain_name}</span>
+            </span>
             <Timer seconds={exam.remaining} />
           </div>
           {/* Three stage meters, not one flat bar: depth through the paper is
@@ -141,6 +150,9 @@ export default function Arena() {
       )}
 
       <main className="mx-auto w-full max-w-3xl flex-1 px-5 py-7">
+        {/* A window, but deliberately not a draggable one: a card that slides
+            out from under the cursor mid-exam is a defect, not a style. */}
+        <div className="overflow-hidden rounded-xl border border-line bg-surface p-5 shadow-[0_20px_50px_-24px_#00000040] sm:p-7">
         <QuestionCard
           question={question}
           total={total}
@@ -177,7 +189,11 @@ export default function Arena() {
           )}
         </div>
 
-        <section className="mt-9 border-t border-line pt-6">
+        </div>
+
+        {/* The rail is a second window on the desk rather than a footer inside
+            the paper: navigating away from a question is a different act. */}
+        <section className="mt-5 rounded-xl border border-line bg-surface p-5 shadow-[0_20px_50px_-24px_#00000040]">
           <div className="mb-3 flex items-baseline justify-between">
             <h2 className="text-sm font-medium">All challenges</h2>
             <p className="text-xs text-muted">

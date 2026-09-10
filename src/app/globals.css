@@ -48,9 +48,12 @@ html {
 }
 
 body {
-  /* Flat off-white. The dotted grid stays on .desk: it is a decorative layer
-     that belongs on a marketing surface, not behind 15 questions of exam text. */
-  background: var(--color-base);
+  /* The whole product is one desk, so the dotted grid is on the body rather
+     than a wrapper — a second full-height flex ancestor would stop the arena's
+     sticky header sticking. */
+  background-color: var(--color-base);
+  background-image: radial-gradient(#cfcfcb 1px, transparent 1px);
+  background-size: 24px 24px;
   color: var(--color-ink);
   font-family: var(--font-sans), system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
@@ -165,16 +168,10 @@ body {
   box-shadow: inset 0 -2px 0 #00000040;
 }
 
-/* ------------------------------------------------------------ landing desk
+/* ---------------------------------------------------------------- the desk
 
-   The landing page is a light desktop: a dotted grid, white windows, and the
-   brand navy and red as the only colours. Scoped to .desk so the rest of the
-   product stays on the dark palette. */
-.desk {
-  background-image: radial-gradient(#cfcfcb 1px, transparent 1px);
-  background-size: 24px 24px;
-}
-
+   The whole product is one desktop now: dotted grid on the body, white windows,
+   brand navy and red as the only colours. */
 @keyframes bob {
   50% { transform: translateY(-6px); }
 }

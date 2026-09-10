@@ -2,6 +2,7 @@
 
 import { useRef, useState } from "react";
 import { GoogleSignIn } from "@/components/GoogleSignIn";
+import { MenuBar, TrafficLights } from "@/components/desk";
 
 /**
  * The landing page as a desktop: the exam's real moments (a challenge, the
@@ -12,13 +13,11 @@ import { GoogleSignIn } from "@/components/GoogleSignIn";
 export function LandingDesktop({ next }: { next: string }) {
   return (
     <div className="desk relative flex min-h-svh flex-col overflow-hidden text-ink">
-      <nav className="relative z-20 flex items-center justify-between px-5 py-4 text-sm sm:px-8">
-        <span className="font-semibold">tech arena</span>
-        <span aria-hidden="true" className="hidden font-mono text-lg sm:block">
-          ^ω^
-        </span>
-        <span className="text-muted">by G-TEC Education</span>
-      </nav>
+      <MenuBar
+        left={<span className="font-semibold">tech arena</span>}
+        center={<span aria-hidden="true" className="font-mono text-base text-muted">^ω^</span>}
+        right={<span>by G-TEC Education</span>}
+      />
 
       {/* The scattered desktop. Decorative and draggable, never load-bearing. */}
       {/* Above the hero (z-20) so a window dragged over the wordmark stays on top;
@@ -219,19 +218,14 @@ function Window({
       onPointerCancel={() => setDragging(false)}
     >
       <div
-        className={`bob rounded-xl border border-line bg-surface shadow-[0_20px_50px_-24px_#00000066] transition-[transform,box-shadow] duration-200 ${
+        className={`bob overflow-hidden rounded-xl border border-line bg-surface shadow-[0_20px_50px_-24px_#00000066] transition-[transform,box-shadow] duration-200 ${
           dragging
             ? "cursor-grabbing scale-[1.03] shadow-[0_30px_60px_-20px_#00000080]"
             : "cursor-grab hover:scale-[1.02]"
         }`}
         style={{ animationDuration: `${bob}s` }}
       >
-        <div className="flex items-center gap-1.5 border-b border-[#ececea] px-3 py-2">
-          <span className="size-2.5 rounded-full bg-[#ff5f57]" />
-          <span className="size-2.5 rounded-full bg-[#febc2e]" />
-          <span className="size-2.5 rounded-full bg-[#28c840]" />
-          <span className="ml-auto text-[10px] text-[#b5b5b1]">×</span>
-        </div>
+        <TrafficLights />
         {children}
       </div>
       <p className="mt-2 text-center text-xs text-[#8a8a86]">{caption}</p>

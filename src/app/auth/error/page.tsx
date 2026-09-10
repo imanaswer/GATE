@@ -1,3 +1,4 @@
+import { Desk, Win } from "@/components/desk";
 import Link from "next/link";
 
 const REASONS: Record<string, string> = {
@@ -10,8 +11,8 @@ export default async function AuthError({ searchParams }: PageProps<"/auth/error
   const reason = typeof params.reason === "string" ? params.reason : "";
 
   return (
-    <main className="flex flex-1 flex-col items-center justify-center px-6 py-16">
-      <div className="w-full max-w-md rounded-2xl border border-line bg-surface p-8 text-center">
+    <Desk width="max-w-md">
+      <Win caption="error.log" bodyClassName="p-8 text-center">
         <p className="mb-3 font-mono text-xs tracking-widest text-danger">SIGN-IN FAILED</p>
         <h1 className="mb-3 text-2xl font-semibold">We could not sign you in</h1>
         <p className="mb-6 text-sm text-muted">
@@ -23,7 +24,7 @@ export default async function AuthError({ searchParams }: PageProps<"/auth/error
         >
           Try again
         </Link>
-      </div>
-    </main>
+      </Win>
+    </Desk>
   );
 }

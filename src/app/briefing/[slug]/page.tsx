@@ -1,6 +1,7 @@
 "use client";
 
 import { use, useEffect, useState } from "react";
+import { Desk, Win } from "@/components/desk";
 import { useRouter } from "next/navigation";
 import { api, ApiError, type Domain, type Paper } from "@/lib/api";
 
@@ -42,8 +43,8 @@ export default function Briefing({ params }: PageProps<"/briefing/[slug]">) {
   }
 
   return (
-    <main className="flex flex-1 justify-center px-6 py-12">
-      <div className="w-full max-w-lg">
+    <Desk width="max-w-lg">
+      <Win caption="briefing.txt" bodyClassName="p-6 sm:p-8">
         <div className="rise rounded-2xl border border-line bg-surface p-7">
           <p className="mb-3 font-mono text-xs tracking-widest text-accent-soft">
             MISSION BRIEFING
@@ -112,7 +113,7 @@ export default function Briefing({ params }: PageProps<"/briefing/[slug]">) {
         >
           Choose a different domain
         </button>
-      </div>
-    </main>
+      </Win>
+    </Desk>
   );
 }

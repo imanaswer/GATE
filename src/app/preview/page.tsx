@@ -81,10 +81,17 @@ export default function Preview() {
 
   return (
     <div className="flex flex-1 flex-col">
-      <header className="sticky top-0 z-10 border-b border-line bg-base/92 backdrop-blur">
-        <div className="mx-auto max-w-3xl px-5 pt-3 pb-2.5">
+      <header className="sticky top-0 z-10 border-b border-line/70 bg-surface/80 backdrop-blur">
+        <div className="mx-auto max-w-3xl px-5 pt-2.5 pb-2.5">
           <div className="mb-2.5 flex flex-wrap items-center justify-between gap-3">
-            <span className="truncate text-sm font-medium">Full Stack Development</span>
+            <span className="flex min-w-0 items-center gap-2 text-sm font-medium">
+              <span aria-hidden="true" className="flex shrink-0 items-center gap-1.5">
+                <span className="size-2.5 rounded-full bg-[#ff5f57]" />
+                <span className="size-2.5 rounded-full bg-[#febc2e]" />
+                <span className="size-2.5 rounded-full bg-[#28c840]" />
+              </span>
+              <span className="truncate">Full Stack Development</span>
+            </span>
             <Timer seconds={seconds} />
           </div>
           <StageMeters current={question.position} answered={answered} />
@@ -92,6 +99,7 @@ export default function Preview() {
       </header>
 
       <main className="mx-auto w-full max-w-3xl flex-1 px-5 py-7">
+        <div className="overflow-hidden rounded-xl border border-line bg-surface p-5 shadow-[0_20px_50px_-24px_#00000040] sm:p-7">
         <QuestionCard
           question={question}
           total={15}
@@ -103,7 +111,9 @@ export default function Preview() {
           <SaveStatus state={saveState} onRetry={() => setSaveState("saved")} />
         </div>
 
-        <section className="mt-9 border-t border-line pt-6">
+        </div>
+
+        <section className="mt-5 rounded-xl border border-line bg-surface p-5 shadow-[0_20px_50px_-24px_#00000040]">
           <ProgressRail
             total={15}
             current={question.position}

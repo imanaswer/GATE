@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { Desk, Win } from "@/components/desk";
 import { api, ApiError, type Domain, type Me } from "@/lib/api";
 
 export default function Domains() {
@@ -114,8 +115,10 @@ export default function Domains() {
 
 function Shell({ children }: { children: React.ReactNode }) {
   return (
-    <main className="flex flex-1 justify-center px-6 py-12">
-      <div className="w-full max-w-2xl">{children}</div>
-    </main>
+    <Desk width="max-w-2xl">
+      <Win caption="arenas.txt" bodyClassName="p-6 sm:p-8">
+        {children}
+      </Win>
+    </Desk>
   );
 }

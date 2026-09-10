@@ -28,6 +28,7 @@ export default function AdminLogin() {
   return (
     <main className="flex flex-1 items-center justify-center px-6 py-16">
       <form action={submit} className="w-full max-w-sm">
+        <div className="overflow-hidden rounded-xl border border-line bg-surface p-6 shadow-[0_20px_50px_-24px_#00000040]">
         <h1 className="text-2xl font-bold tracking-tight">Admin sign-in</h1>
         <p className="mt-1 text-sm text-muted">
           Accounts are created from the shell with <code>pnpm admin:create</code>.
@@ -67,6 +68,7 @@ export default function AdminLogin() {
         >
           {busy ? "Signing in…" : "Sign in"}
         </button>
+        </div>
       </form>
     </main>
   );

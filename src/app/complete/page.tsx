@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import { Desk, Win } from "@/components/desk";
 import { api, ApiError, type Me, type Result } from "@/lib/api";
 
 export default function Complete() {
@@ -188,8 +189,10 @@ function CountUp({ to, className }: { to: number; className?: string }) {
 
 function Shell({ children }: { children: React.ReactNode }) {
   return (
-    <main className="flex flex-1 justify-center px-6 py-12">
-      <div className="w-full max-w-md">{children}</div>
-    </main>
+    <Desk width="max-w-md">
+      <Win caption="result.png" bodyClassName="p-6 sm:p-8">
+        {children}
+      </Win>
+    </Desk>
   );
 }

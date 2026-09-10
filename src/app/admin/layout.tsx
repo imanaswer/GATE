@@ -42,8 +42,15 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   return (
     <div className="flex flex-1 flex-col">
-      <header className="border-b border-line bg-surface">
-        <div className="mx-auto flex w-full max-w-6xl flex-wrap items-center gap-x-6 gap-y-2 px-6 py-3">
+      {/* Real navigation, so it keeps its own tabs — it just wears the menu
+          bar's chrome so the panel reads as part of the same desk. */}
+      <header className="sticky top-0 z-30 border-b border-line/70 bg-surface/80 backdrop-blur">
+        <div className="mx-auto flex w-full max-w-6xl flex-wrap items-center gap-x-6 gap-y-2 px-6 py-2.5">
+          <span aria-hidden="true" className="flex shrink-0 items-center gap-1.5">
+            <span className="size-2.5 rounded-full bg-[#ff5f57]" />
+            <span className="size-2.5 rounded-full bg-[#febc2e]" />
+            <span className="size-2.5 rounded-full bg-[#28c840]" />
+          </span>
           <span className="font-mono text-xs tracking-widest text-accent-soft">TECH ARENA ADMIN</span>
           <nav className="flex gap-4 text-sm">
             {TABS.map(([href, label]) => (
