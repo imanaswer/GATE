@@ -151,6 +151,9 @@ def refresh_overview(cur, max_age_seconds: int | None = None) -> dict | None:
               left join exam_attempts a
                 on a.domain_id = d.id and a.status in ('submitted','expired')
               group by d.id, d.slug, d.name
+              -- A retired domain still belongs here while it has attempts to
+              -- account for; once it has none it is just noise on every load.
+              having d.is_active or count(a.id) > 0
             ) t), '[]'::jsonb),
           refreshed_at  = now()
         where id {guard}

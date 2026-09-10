@@ -210,7 +210,7 @@ export default function Arena() {
           role="dialog"
           aria-modal="true"
           aria-labelledby="submit-title"
-          className="fixed inset-0 z-20 flex items-center justify-center bg-base/80 p-6 backdrop-blur-sm"
+          className="fixed inset-0 z-20 flex items-center justify-center bg-black/40 p-6 backdrop-blur-sm"
         >
           <div className="w-full max-w-sm rounded-2xl border border-line bg-surface p-6">
             <h2 id="submit-title" className="mb-2 text-lg font-semibold">

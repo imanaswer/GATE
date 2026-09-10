@@ -116,19 +116,6 @@ body {
    feedback the exam is allowed to give, since correctness is never revealed. */
 .pop { animation: pop 0.26s cubic-bezier(0.16, 1, 0.3, 1); }
 
-@keyframes sweep {
-  from { transform: translateX(-100%); }
-  to   { transform: translateX(100%); }
-}
-
-.sweep::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(90deg, transparent, #00000014, transparent);
-  animation: sweep 1.4s ease-in-out infinite;
-}
-
 /* The numeral behind each challenge. Big, quiet, and purely positional — it is
    the one place a display size earns its keep. */
 .tally {
