@@ -122,11 +122,8 @@ already exists.
 ### 4. Seed the question bank
 
 ```bash
-# Bulk import must use the DIRECT connection, not the transaction pooler that
-# DATABASE_URL points at — pgbouncer in transaction mode rejects the prepared
-# statements psycopg uses, with DuplicatePreparedStatement.
-DATABASE_URL="$MIGRATION_DATABASE_URL" pnpm bank:import   # 350 questions, 7 domains
-DATABASE_URL="$MIGRATION_DATABASE_URL" pnpm bank:check    # can every domain serve the blueprint?
+pnpm bank:import          # all of data/questions/*.csv — 350 questions, 7 domains
+pnpm bank:check           # can every domain serve the blueprint?
 ```
 
 Every domain must come back ✓. If one doesn't, exam start fails for it with a
@@ -452,7 +449,7 @@ you should not be able to point these at the real event.
 ```bash
 pnpm bank:check                          # can each domain serve the blueprint?
 pnpm bank:audit                          # measure what selection actually does
-DATABASE_URL="$MIGRATION_DATABASE_URL" pnpm bank:import data/questions/*.csv   # all-or-nothing per file
+pnpm bank:import data/questions/*.csv    # all-or-nothing per file
 pnpm bank:export math > math.csv       # round-trips back into import
 ```
 

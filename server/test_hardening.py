@@ -336,3 +336,19 @@ def test_a_sane_response_time_is_still_recorded(client):
         join attempt_questions aq on aq.id = ans.attempt_question_id
         where aq.attempt_id = '{attempt['id']}' and aq.position = 1
     """) == "7500"
+
+
+def test_pooled_connections_never_prepare_server_side(client):
+    """DATABASE_URL points at pgbouncer in transaction mode, which hands each
+    statement whatever backend is free — a server-side prepared statement is
+    not there next time. psycopg auto-prepares after the 5th execution of the
+    same query, so this only bit loops: building a paper runs one SELECT per
+    question and the 6th raised DuplicatePreparedStatement in production.
+
+    The local test database is plain Postgres with no pooler in front, so the
+    failure cannot be reproduced here — the invariant is what gets asserted.
+    """
+    from server import db
+
+    with db.pool.connection() as conn:
+        assert conn.prepare_threshold is None
