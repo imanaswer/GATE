@@ -122,13 +122,21 @@ already exists.
 ### 4. Seed the question bank
 
 ```bash
-pnpm bank:import          # all of data/questions/*.csv — 1,000 questions
-pnpm bank:check           # can every domain serve the blueprint?
+# Bulk import must use the DIRECT connection, not the transaction pooler that
+# DATABASE_URL points at — pgbouncer in transaction mode rejects the prepared
+# statements psycopg uses, with DuplicatePreparedStatement.
+DATABASE_URL="$MIGRATION_DATABASE_URL" pnpm bank:import   # 350 questions, 7 domains
+DATABASE_URL="$MIGRATION_DATABASE_URL" pnpm bank:check    # can every domain serve the blueprint?
 ```
 
-`bank:check` must end with *"every domain can serve the blueprint with room to
-randomise"*. If it doesn't, exam start will fail for that domain with a 503, by
-design — silent degradation here means an unfair exam.
+Every domain must come back ✓. If one doesn't, exam start fails for it with a
+503, by design — silent degradation here means an unfair exam.
+
+The bank is 50 questions per domain, 25 easy and 25 medium, and the blueprint
+is **7 easy + 8 medium** (15 per paper). At that size two students share about
+5.7 of 15 questions; `bank:check` flags it as *thin*, and
+`test_papers_differ_between_students` is xfailed against a 4.0 budget. Growing
+each domain to roughly 120 questions clears both.
 
 ⚠️ These seed questions are **public in this repository, answers included**.
 Replace them with reviewed questions before a real event: put your CSV in
@@ -205,7 +213,7 @@ done
 ## Tests
 
 ```bash
-pnpm api:test     # 144 tests: exam engine, certificates, admin, hardening
+pnpm api:test     # 154 tests: exam engine, certificates, admin, hardening
 pnpm db:test      # constraints and RLS, asserted against real Postgres
 pnpm lint && pnpm exec tsc --noEmit && pnpm build
 ```
@@ -444,7 +452,7 @@ you should not be able to point these at the real event.
 ```bash
 pnpm bank:check                          # can each domain serve the blueprint?
 pnpm bank:audit                          # measure what selection actually does
-pnpm bank:import data/questions/*.csv    # all-or-nothing per file
+DATABASE_URL="$MIGRATION_DATABASE_URL" pnpm bank:import data/questions/*.csv   # all-or-nothing per file
 pnpm bank:export math > math.csv       # round-trips back into import
 ```
 
