@@ -1,4 +1,7 @@
 {
+  "regions": [
+    "sin1"
+  ],
   "functions": {
     "api/index.py": {
       "includeFiles": "server/**"
