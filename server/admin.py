@@ -682,8 +682,10 @@ def college_analytics(admin: CurrentAdmin, limit: int = Query(default=200, ge=1,
 
 # ------------------------------------------------------------------ exports
 
+# Header text is user-visible — organisers open this file. The underlying
+# column is still colleges.name; only the label says institution.
 CSV_COLUMNS = [
-    "name", "email", "phone", "student_id", "college_name", "location",
+    "name", "email", "phone", "student_id", "institution", "location",
     "domain_name", "attempt_status", "score", "correct",
     "wrong", "skipped", "started_at", "submitted_at", "duration_seconds",
     "certificate_id",

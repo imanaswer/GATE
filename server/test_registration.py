@@ -11,6 +11,7 @@ import subprocess
 from server.conftest import DB, make_student, scalar
 
 REG = {
+    "name": "Test Student",
     "phone": "+91 98765 43210",
     "college_name": "ABC College of Engineering",
     "location": "Kochi",
@@ -55,17 +56,34 @@ def test_registration_completes_and_normalises(client):
     assert r.json()["flagged_duplicate_student_id"] is False
 
 
-def test_client_cannot_spoof_name_or_email(client):
+def test_the_name_is_the_students_to_set_but_the_email_is_not(client):
+    """The display name is what gets printed on the certificate, so a student
+    may correct it — a Google account name is often initials or the wrong
+    script. The email is the verified identity of the account and is taken from
+    the token no matter what the client sends."""
     auth = make_student("real@example.edu", "Real Name")
     client.post(
         "/api/v1/register",
-        json={**REG, "student_id": "CS21099", "name": "Somebody Else",
+        json={**REG, "student_id": "CS21099", "name": "Preferred Name",
               "email": "attacker@example.edu"},
         headers={"Authorization": auth},
     )
     p = client.get("/api/v1/me", headers={"Authorization": auth}).json()["profile"]
-    assert p["name"] == "Real Name"
+    assert p["name"] == "Preferred Name"
     assert p["email"] == "real@example.edu"
+
+
+def test_a_later_request_does_not_revert_the_edited_name(client):
+    """ensure_user runs on every authenticated request. If its ON CONFLICT
+    branch refreshed `name` from the token, the edit would silently vanish on
+    the student's next page load."""
+    auth = make_student("keeps@example.edu", "Token Name")
+    client.post("/api/v1/register",
+                json={**REG, "student_id": "CS21098", "name": "Chosen Name"},
+                headers={"Authorization": auth})
+    for _ in range(3):
+        p = client.get("/api/v1/me", headers={"Authorization": auth}).json()["profile"]
+    assert p["name"] == "Chosen Name"
 
 
 def test_invalid_payloads_rejected(client):

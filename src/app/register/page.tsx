@@ -60,6 +60,7 @@ export default function Register() {
       await api("/register", {
         method: "POST",
         json: {
+          name: String(form.get("name") ?? "").trim(),
           phone: form.get("phone"),
           college_id: match?.id ?? null,
           college_name: match ? null : collegeName,
@@ -116,16 +117,33 @@ export default function Register() {
       <div className="mb-8">
         <p className="mb-2 text-xs text-muted">Step 2 of 4</p>
         <h1 className="text-3xl font-bold tracking-tight text-balance">
-          Three quick details and you&rsquo;re in.
+          A few quick details and you&rsquo;re in.
         </h1>
         <p className="mt-2 text-sm text-muted">
-          Your name and email come from Google and go on your certificate. We ask
-          for nothing else we don&rsquo;t need.
+          Your name goes on your certificate, so check it reads the way you want
+          it printed. Your email comes from Google. We ask for nothing else we
+          don&rsquo;t need.
         </p>
       </div>
 
       <form onSubmit={submit} className="space-y-5">
-        <Locked label="Name" value={p.name} />
+        {/* Editable: Google account names are often initials, a nickname or the
+            wrong script, and this is what gets printed on the certificate. */}
+        <Field label="Name" name="name" hint="As it should appear on your certificate.">
+          <input
+            id="name"
+            name="name"
+            type="text"
+            autoComplete="name"
+            required
+            minLength={2}
+            maxLength={120}
+            defaultValue={p.name}
+            className={inputClass}
+          />
+        </Field>
+
+        {/* Email stays locked: it is the verified identity of the account. */}
         <Locked label="Email" value={p.email} />
 
         <Field label="Phone number" name="phone">
@@ -142,7 +160,7 @@ export default function Register() {
           />
         </Field>
 
-        <Field label="College" name="college" hint="Start typing to find yours, or add a new one.">
+        <Field label="Institution" name="college" hint="Start typing to find yours, or add a new one.">
           <input
             id="college"
             name="college"
@@ -184,7 +202,7 @@ export default function Register() {
           label="Student ID"
           name="student_id"
           optional
-          hint="Helps your college match you to their records."
+          hint="Helps your institution match you to their records."
         >
           <input
             id="student_id"

@@ -19,7 +19,7 @@ import jwt  # noqa: E402
 
 from server import db  # noqa: E402
 
-REG = {"phone": "9000000000"}
+REG = {"name": "Load Test", "phone": "9000000000"}
 
 
 def main() -> int:

@@ -56,7 +56,7 @@ export default function Briefing({ params }: PageProps<"/briefing/[slug]">) {
 
           <dl className="my-7 grid grid-cols-3 gap-3 text-center">
             {[
-              ["15", "challenges"],
+              ["20", "challenges"],
               ["20", "minutes"],
               ["1", "attempt"],
             ].map(([value, label]) => (

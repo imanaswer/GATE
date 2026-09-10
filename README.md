@@ -130,10 +130,10 @@ Every domain must come back ✓. If one doesn't, exam start fails for it with a
 503, by design — silent degradation here means an unfair exam.
 
 The bank is 50 questions per domain, 25 easy and 25 medium, and the blueprint
-is **7 easy + 8 medium** (15 per paper). At that size two students share about
-5.7 of 15 questions; `bank:check` flags it as *thin*, and
-`test_papers_differ_between_students` is xfailed against a 4.0 budget. Growing
-each domain to roughly 120 questions clears both.
+is **10 easy + 10 medium** (20 per paper, still 20 minutes — 60s a question).
+At that size two students share about **8 of 20** questions; `bank:check` flags
+it as *thin*, and `test_papers_differ_between_students` is xfailed against a
+4.0 budget. Growing each domain to roughly 160 questions clears both.
 
 ⚠️ These seed questions are **public in this repository, answers included**.
 Replace them with reviewed questions before a real event: put your CSV in

@@ -123,7 +123,7 @@ export default function Analytics() {
           <table className="w-full min-w-[560px] text-left text-sm">
             <thead className="bg-surface-2 text-xs uppercase tracking-wide text-muted">
               <tr>
-                {["Student", "College", "Signal", "Detail", "Score"].map((h) => (
+                {["Student", "Institution", "Signal", "Detail", "Score"].map((h) => (
                   <th key={h} scope="col" className="px-4 py-2">{h}</th>
                 ))}
               </tr>
@@ -154,7 +154,7 @@ export default function Analytics() {
         </div>
       )}
 
-      <h2 className="mt-10 mb-3 text-sm font-semibold">Colleges</h2>
+      <h2 className="mt-10 mb-3 text-sm font-semibold">Institutions</h2>
       {!colleges ? (
         <div className="h-40 animate-pulse rounded-2xl bg-surface-2" aria-busy="true" />
       ) : (
@@ -162,7 +162,7 @@ export default function Analytics() {
           <table className="w-full min-w-[520px] text-left text-sm">
             <thead className="bg-surface-2 text-xs uppercase tracking-wide text-muted">
               <tr>
-                {["College", "City", "Students", "Completed", "Average"].map((h) => (
+                {["Institution", "City", "Students", "Completed", "Average"].map((h) => (
                   <th key={h} scope="col" className="px-4 py-2">{h}</th>
                 ))}
               </tr>

@@ -102,7 +102,7 @@ export default function Preview() {
         <div className="overflow-hidden rounded-xl border border-line bg-surface p-5 shadow-[0_20px_50px_-24px_#00000040] sm:p-7">
         <QuestionCard
           question={question}
-          total={15}
+          total={20}
           selected={answers[question.position] ?? null}
           onSelect={(id) => setAnswers((a) => ({ ...a, [question.position]: id }))}
         />
@@ -115,7 +115,7 @@ export default function Preview() {
 
         <section className="mt-5 rounded-xl border border-line bg-surface p-5 shadow-[0_20px_50px_-24px_#00000040]">
           <ProgressRail
-            total={15}
+            total={20}
             current={question.position}
             answered={answered}
             failed={saveState === "error" ? new Set([question.position]) : new Set()}

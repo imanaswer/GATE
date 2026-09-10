@@ -12,6 +12,7 @@ import pytest
 from server.conftest import DB, make_student, psql, scalar
 
 REG = {
+    "name": "Test Student",
     "phone": "9876543210",
     "college_name": "ABC College of Engineering",
     "location": "Kochi",
@@ -45,7 +46,8 @@ def seed_bank(database):
 
 def register(client, email, name, student_id="CS21001"):
     auth = make_student(email, name)
-    r = client.post("/api/v1/register", json={**REG, "student_id": student_id},
+    r = client.post("/api/v1/register",
+                    json={**REG, "student_id": student_id, "name": name},
                     headers={"Authorization": auth})
     assert r.status_code == 200, r.text
     return auth
@@ -63,10 +65,10 @@ def test_paper_matches_the_blueprint(client):
     body = start(client, auth).json()
     qs = body["questions"]
 
-    assert len(qs) == 15
+    assert len(qs) == 20
     counts = {d: sum(1 for q in qs if q["difficulty"] == d) for d in ("easy", "medium", "hard")}
-    assert counts == {"easy": 7, "medium": 8, "hard": 0}
-    assert [q["position"] for q in qs] == list(range(1, 16))
+    assert counts == {"easy": 10, "medium": 10, "hard": 0}
+    assert [q["position"] for q in qs] == list(range(1, 21))
 
 
 def test_no_question_appears_twice_in_one_paper(client):
@@ -74,7 +76,7 @@ def test_no_question_appears_twice_in_one_paper(client):
     stem "What does this print?" while carrying different snippets."""
     auth = register(client, "dupes@example.edu", "Dupes", "CS30002")
     qs = start(client, auth).json()["questions"]
-    assert len({(q["body"], q["code"]) for q in qs}) == 15
+    assert len({(q["body"], q["code"]) for q in qs}) == 20
 
 
 def keys_anywhere(node) -> set[str]:
@@ -121,10 +123,11 @@ def test_no_response_on_the_exam_path_carries_the_answer_key(client):
         assert not leaked, f"{name} leaked {leaked}"
 
 
-@pytest.mark.xfail(reason="50 questions/domain gives ~5.7 shared of 15 against "
-                          "a 4.0 budget. The threshold is a product decision, so it "
-                          "stays; growing the bank to ~120/domain is what fixes it. "
-                          "This XPASSes when that happens — drop the marker then.",
+@pytest.mark.xfail(reason="Drawing 20 from 50 questions/domain gives ~8 shared of "
+                          "20 against a 4.0 budget — worse than the ~5.7 of 15 it "
+                          "was before the paper grew. The threshold is a product "
+                          "decision, so it stays; growing the bank is what fixes "
+                          "it. This XPASSes then — drop the marker.",
                    strict=False)
 def test_papers_differ_between_students(client):
     """If two students get the same paper, randomisation is decorative."""
@@ -334,7 +337,7 @@ def test_expired_attempt_is_auto_submitted_and_scored(client):
                    headers={"Authorization": auth}).json()
     assert r["status"] == "expired"
     assert r["score"] is not None
-    assert r["correct"] + r["wrong"] + r["skipped"] == 15
+    assert r["correct"] + r["wrong"] + r["skipped"] == 20
 
 
 # ------------------------------------------------------------------ scoring
@@ -355,7 +358,7 @@ def test_scoring_is_computed_on_the_server(client):
     attempt, qs = body["attempt"], body["questions"]
     h = {"Authorization": auth}
 
-    # 6 right, 4 deliberately wrong, 5 left blank.
+    # 6 right, 4 deliberately wrong, 10 left blank.
     for pos in range(1, 7):
         client.put(f"/api/v1/attempts/{attempt['id']}/answers/{pos}",
                    json={"option_id": correct_option_for(client, auth, attempt["id"], pos)},
@@ -367,8 +370,8 @@ def test_scoring_is_computed_on_the_server(client):
                    json={"option_id": wrong}, headers=h)
 
     r = client.post(f"/api/v1/attempts/{attempt['id']}/submit", headers=h).json()
-    assert (r["score"], r["correct"], r["wrong"], r["skipped"]) == (6, 6, 4, 5)
-    assert r["correct"] + r["wrong"] + r["skipped"] == r["total"] == 15
+    assert (r["score"], r["correct"], r["wrong"], r["skipped"]) == (6, 6, 4, 10)
+    assert r["correct"] + r["wrong"] + r["skipped"] == r["total"] == 20
 
 
 def test_a_cleared_answer_counts_as_skipped_not_wrong(client):
@@ -382,19 +385,19 @@ def test_a_cleared_answer_counts_as_skipped_not_wrong(client):
                json={"option_id": None}, headers=h)
 
     r = client.post(f"/api/v1/attempts/{attempt['id']}/submit", headers=h).json()
-    assert r["skipped"] == 15 and r["wrong"] == 0 and r["correct"] == 0
+    assert r["skipped"] == 20 and r["wrong"] == 0 and r["correct"] == 0
 
 
-def test_a_perfect_paper_scores_15(client):
+def test_a_perfect_paper_scores_20(client):
     auth = register(client, "perfect@example.edu", "Perfect", "CS37003")
     attempt = start(client, auth).json()["attempt"]
     h = {"Authorization": auth}
-    for pos in range(1, 16):
+    for pos in range(1, 21):
         client.put(f"/api/v1/attempts/{attempt['id']}/answers/{pos}",
                    json={"option_id": correct_option_for(client, auth, attempt["id"], pos)},
                    headers=h)
     r = client.post(f"/api/v1/attempts/{attempt['id']}/submit", headers=h).json()
-    assert (r["score"], r["correct"], r["skipped"]) == (15, 15, 0)
+    assert (r["score"], r["correct"], r["skipped"]) == (20, 20, 0)
 
 
 # ------------------------------------------------------------------ submission
@@ -484,7 +487,7 @@ def test_activity_never_ends_the_attempt(client):
                     json={"type": "tab_switch", "detail": {}}, headers=h)
     resumed = client.get("/api/v1/attempts/current", headers=h).json()
     assert resumed["attempt"]["status"] == "in_progress"
-    assert len(resumed["questions"]) == 15
+    assert len(resumed["questions"]) == 20
 
 
 def test_second_device_takes_over_and_is_logged_not_blocked(client):

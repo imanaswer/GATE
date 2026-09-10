@@ -247,7 +247,7 @@ def test_student_detail_shows_the_per_question_breakdown_admins_need(admin, sat_
     detail = admin.get(f"/api/v1/admin/students/{listed['id']}").json()
 
     assert detail["certificate_id"] == sat_exam["certificate_id"]
-    assert len(detail["questions"]) == 15
+    assert len(detail["questions"]) == 20
     assert detail["questions"][0]["is_correct"] is True
     assert detail["questions"][0]["response_ms"] == 4000
     assert isinstance(detail["flags"], list)

@@ -34,7 +34,7 @@ export default function StudentDetailPage({
           ["Email", s.email],
           ["Phone", s.phone],
           ["Student ID", s.student_id],
-          ["College", s.college_name],
+          ["Institution", s.college_name],
           ["Location", s.location],
           ["Domain", s.domain_name],
           ["Status", s.attempt_status ?? "not started"],

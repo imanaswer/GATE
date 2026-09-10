@@ -88,7 +88,7 @@ export default function Students() {
         <table className="w-full min-w-[900px] text-left text-sm">
           <thead className="bg-surface-2 text-xs uppercase tracking-wide text-muted">
             <tr>
-              {["Name", "College", "Domain", "Status", "Score", "Started", "Took", "Certificate"].map((h) => (
+              {["Name", "Institution", "Domain", "Status", "Score", "Started", "Took", "Certificate"].map((h) => (
                 <th key={h} scope="col" className="px-4 py-2">{h}</th>
               ))}
             </tr>

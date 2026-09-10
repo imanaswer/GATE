@@ -14,8 +14,13 @@ PHONE_RE = re.compile(r"\D")
 
 
 class RegistrationIn(BaseModel):
-    # Name and email are NOT accepted from the client: they come from the verified
-    # Google token. A student cannot register under someone else's name.
+    # Email is NOT accepted from the client — it comes from the verified Google
+    # token and is what identifies the account. The display name IS editable:
+    # Google account names are often initials, a nickname or the wrong script,
+    # and this is the name that goes on the certificate. It is therefore
+    # self-declared rather than verified; the 409 below still freezes it once
+    # the exam starts, so it cannot be re-badged after the fact.
+    name: str = Field(min_length=2, max_length=120)
     phone: str
     college_id: str | None = None
     college_name: str | None = Field(default=None, max_length=160)
@@ -33,7 +38,7 @@ class RegistrationIn(BaseModel):
             raise ValueError("phone must have 10 to 15 digits")
         return digits
 
-    @field_validator("student_id", "location")
+    @field_validator("student_id", "location", "name")
     @classmethod
     def strip(cls, v: str | None) -> str | None:
         if v is None:
@@ -43,7 +48,11 @@ class RegistrationIn(BaseModel):
 
 def ensure_user(identity: Identity) -> dict:
     """First authenticated request for a Google account creates the shell row.
-    ON CONFLICT rather than SELECT-then-INSERT: two tabs racing must not both insert."""
+    ON CONFLICT rather than SELECT-then-INSERT: two tabs racing must not both insert.
+
+    The conflict branch deliberately refreshes `email` but NOT `name`: the name
+    is editable at registration, and re-syncing it from the Google token here
+    would silently revert the student's edit on their next request."""
     return db.fetch_one(
         """
         insert into users (id, email, name) values (%s, %s, %s)
@@ -157,14 +166,14 @@ def register(payload: RegistrationIn, identity: CurrentIdentity):
         )
 
     if not payload.college_id and not payload.college_name:
-        raise HTTPException(status.HTTP_422_UNPROCESSABLE_ENTITY, "college is required")
+        raise HTTPException(status.HTTP_422_UNPROCESSABLE_ENTITY, "institution is required")
 
     with db.transaction() as cur:
         if payload.college_id:
             cur.execute("select id from colleges where id = %s", (payload.college_id,))
             row = cur.fetchone()
             if not row:
-                raise HTTPException(status.HTTP_422_UNPROCESSABLE_ENTITY, "unknown college")
+                raise HTTPException(status.HTTP_422_UNPROCESSABLE_ENTITY, "unknown institution")
             college_id = row["id"]
         else:
             # Trust-boundary write: free-text college names let an authenticated
@@ -199,12 +208,14 @@ def register(payload: RegistrationIn, identity: CurrentIdentity):
         cur.execute(
             """
             update users set
+              name = %s,
               phone = %s, college_id = %s, location_id = %s, student_id = %s,
               registered_at = coalesce(registered_at, now()), updated_at = now()
             where id = %s
             returning *
             """,
-            (payload.phone, college_id, location_id, payload.student_id, identity.id),
+            (payload.name, payload.phone, college_id, location_id,
+             payload.student_id, identity.id),
         )
         updated = cur.fetchone()
 

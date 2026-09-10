@@ -42,7 +42,7 @@ export default function AdminOverview() {
           ["Submitted", data.submitted],
           ["Timed out", data.expired],
           ["Certificates", data.certificates],
-          ["Colleges", data.colleges],
+          ["Institutions", data.colleges],
           ["Flagged", data.flagged],
         ].map(([label, value]) => (
           <div key={label as string} className="rounded-2xl border border-line bg-surface p-4">
@@ -98,7 +98,7 @@ export default function AdminOverview() {
         <span className="font-mono font-semibold text-fg">
           {data.average_score ?? "—"}
         </span>{" "}
-        / 15
+        / 20
       </p>
 
       <h2 className="mt-8 mb-3 text-sm font-semibold">By domain</h2>

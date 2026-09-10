@@ -1,9 +1,12 @@
 "use client";
 
+// Must span the whole paper: bandFor falls back to BANDS[0] for anything it
+// does not cover, so a short table would render the tail in Foundation colours
+// with no error anywhere.
 const BANDS = [
-  { from: 1, to: 5, label: "Foundation", token: "stage-1" },
-  { from: 6, to: 10, label: "Problem Solver", token: "stage-2" },
-  { from: 11, to: 15, label: "Final", token: "stage-3" },
+  { from: 1, to: 7, label: "Foundation", token: "stage-1" },
+  { from: 8, to: 14, label: "Problem Solver", token: "stage-2" },
+  { from: 15, to: 20, label: "Final", token: "stage-3" },
 ] as const;
 
 export function bandFor(position: number) {

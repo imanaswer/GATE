@@ -33,7 +33,7 @@ DURATION_SECONDS_SQL = (
 
 class BankTooSmall(Exception):
     """A domain cannot serve its blueprint. Loud on purpose: silently handing a
-    student 12 questions instead of 15 is an unfair exam, not a degraded one."""
+    student 12 questions instead of 20 is an unfair exam, not a degraded one."""
 
 
 def select_questions(cur, domain_id, blueprint: dict[str, int]) -> list[dict]:

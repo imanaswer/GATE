@@ -25,7 +25,7 @@ export function LandingDesktop({ next }: { next: string }) {
       <div className="pointer-events-none absolute inset-0 z-20 hidden md:block" aria-hidden="true">
         <Window left="3%" top="16%" width={300} caption="challenge-04.png" bob={7}>
           <div className="p-4">
-            <p className="text-[10px] text-[#8a8a86]">4 of 15 / foundation / easy</p>
+            <p className="text-[10px] text-[#8a8a86]">4 of 20 / foundation / easy</p>
             <p className="mt-1 text-sm font-semibold">What does this print?</p>
             <pre className="mt-2 rounded-md bg-[#f1f1ee] p-2 font-mono text-[11px] leading-snug">
               {"const a = [1, 2, 3]\nconst b = a\nb.push(4)\nconsole.log(a.length)"}
@@ -55,7 +55,7 @@ export function LandingDesktop({ next }: { next: string }) {
                 </div>
               ))}
             </div>
-            <p className="mt-2 text-[10px] text-[#8a8a86]">problem solver · 8 of 15</p>
+            <p className="mt-2 text-[10px] text-[#8a8a86]">problem solver · 11 of 20</p>
           </div>
         </Window>
 
@@ -63,7 +63,7 @@ export function LandingDesktop({ next }: { next: string }) {
           <div className="p-5">
             <p className="font-mono text-[10px] tracking-widest text-accent-soft">CERTIFICATE</p>
             <p className="mt-1 text-lg font-bold leading-tight">Tech Arena 2026</p>
-            <p className="mt-1 text-xs text-muted">Mathematics · 13 / 15</p>
+            <p className="mt-1 text-xs text-muted">Mathematics · 17 / 20</p>
             <div className="mt-4 flex items-center justify-between border-t border-dashed border-line pt-3">
               <span className="font-mono text-[10px] text-[#8a8a86]">TA26-8F3K-2Q</span>
               <span className="rounded-full bg-[#e6f7ec] px-2 py-0.5 text-[10px] font-medium text-[#137a3a]">
@@ -95,7 +95,7 @@ export function LandingDesktop({ next }: { next: string }) {
           <div className="p-4">
             <p className="text-[10px] text-[#8a8a86]">your score</p>
             <p className="mt-1 text-5xl font-bold tracking-tighter">
-              13<span className="text-lg text-[#8a8a86]">/15</span>
+              17<span className="text-lg text-[#8a8a86]">/20</span>
             </p>
             <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-[#ececea]">
               <div className="h-full w-[86%] bg-[#e8000f]" />
@@ -139,7 +139,7 @@ export function LandingDesktop({ next }: { next: string }) {
         </p>
         <h1 className="rise text-6xl font-bold tracking-[-0.05em] sm:text-8xl">tech arena</h1>
         <p className="rise mt-3 text-lg text-ink sm:text-2xl" style={{ animationDelay: "80ms" }}>
-          15 challenges. 20 minutes. a certificate anyone can verify.
+          20 challenges. 20 minutes. a certificate anyone can verify.
         </p>
 
         <div
@@ -164,7 +164,7 @@ export function LandingDesktop({ next }: { next: string }) {
           {[
             ["01", "sign in", "Google, one tap"],
             ["02", "pick an arena", "the domain you know best"],
-            ["03", "15 challenges", "server timer, autosave"],
+            ["03", "20 challenges", "server timer, autosave"],
             ["04", "certificate", "issued the moment you finish"],
           ].map(([n, title, sub]) => (
             <li key={n} className="rounded-2xl bg-surface-2 p-4 transition-transform duration-200 hover:-translate-y-1">

@@ -7,7 +7,7 @@ const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"]
 
 export const metadata: Metadata = {
   title: "Tech Arena",
-  description: "A 15-challenge technical aptitude arena.",
+  description: "A 20-challenge technical aptitude arena.",
 };
 
 export const viewport: Viewport = {
