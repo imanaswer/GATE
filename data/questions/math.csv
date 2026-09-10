@@ -49,3 +49,132 @@ MTH-M022,math,mcq,number theory,medium,How many prime numbers are there between 
 MTH-M023,math,mcq,number theory,medium,What is the sum of the first ten natural numbers?,,,45,50,100,55,D,Using n(n+1)/2 with n = 10 gives (10 x 11) ÷ 2 = 55.
 MTH-M024,math,mcq,probability,medium,What is the probability of rolling a number greater than 4 on a fair six-sided die?,,,1/3,1/6,1/2,2/3,A,"Only 5 and 6 qualify, so the probability is 2/6 = 1/3."
 MTH-M025,math,mcq,data interpretation,medium,"In a class of 250 students, 40% are girls. How many boys are there?",,,100,150,110,160,B,"Girls number 100, so the remaining 60% are 150 boys."
+MTH-E026,math,mcq,arithmetic,easy,What is 45 + 38?,,,73,82,83,93,C,45 + 38 = 83.
+MTH-E027,math,mcq,arithmetic,easy,What is 144 divided by 12?,,,11,13,14,12,D,12 x 12 = 144.
+MTH-E028,math,mcq,arithmetic,easy,What is 25 multiplied by 4?,,,100,75,90,125,A,25 x 4 = 100.
+MTH-E029,math,mcq,arithmetic,easy,What is 1000 minus 379?,,,611,621,631,721,B,1000 - 379 = 621.
+MTH-E030,math,mcq,arithmetic,easy,What is the value of 5 squared?,,,10,20,25,55,C,5² means 5 x 5 = 25.
+MTH-E031,math,mcq,arithmetic,easy,What is 6 cubed?,,,18,36,666,216,D,6³ = 6 x 6 x 6 = 216.
+MTH-E032,math,mcq,arithmetic,easy,What is 20% of 150?,,,30,15,25,35,A,"10% of 150 is 15, so 20% is 30."
+MTH-E033,math,mcq,arithmetic,easy,What is 0.5 written as a fraction in lowest terms?,,,1/5,1/2,5/10,2/1,B,"0.5 is five tenths, which reduces to one half."
+MTH-E034,math,mcq,arithmetic,easy,What is the square root of 64?,,,6,7,8,32,C,8 x 8 = 64.
+MTH-E035,math,mcq,arithmetic,easy,What is 3/5 written as a decimal?,,,0.35,0.53,1.67,0.6,D,3 divided by 5 equals 0.6.
+MTH-E036,math,mcq,arithmetic,easy,Which of these numbers is even?,,,38,27,41,55,A,"An even number is divisible by 2, and 38 ends in 8."
+MTH-E037,math,mcq,arithmetic,easy,What is 7 + 8 x 2?,,,30,23,22,17,B,"Multiplication comes before addition, so 8 x 2 = 16 then 7 + 16 = 23."
+MTH-E038,math,mcq,arithmetic,easy,What is 1/4 of 80?,,,16,25,20,40,C,80 divided by 4 is 20.
+MTH-E039,math,mcq,arithmetic,easy,What is 12 x 11?,,,121,122,144,132,D,12 x 11 = 132.
+MTH-E040,math,mcq,arithmetic,easy,What is 0.25 as a percentage?,,,25%,2.5%,0.25%,250%,A,Multiply a decimal by 100 to get a percentage.
+MTH-E041,math,mcq,fractions,easy,What is 2/3 + 1/3?,,,3/6,1,2/6,3/3 of 2,B,"The denominators match, so add the numerators: 2/3 + 1/3 = 3/3 = 1."
+MTH-E042,math,mcq,fractions,easy,"Which fraction is larger, 3/4 or 2/3?",,,2/3,They are equal,3/4,It cannot be compared,C,3/4 is 0.75 and 2/3 is about 0.667.
+MTH-E043,math,mcq,fractions,easy,What is 1/2 of 1/2?,,,1,1/2,2/4 of 2,1/4,D,Multiplying halves gives a quarter.
+MTH-E044,math,mcq,fractions,easy,Simplify 8/12.,,,2/3,4/6,3/4,1/2,A,Dividing both by their HCF of 4 gives 2/3.
+MTH-E045,math,mcq,fractions,easy,What is 0.75 as a fraction in lowest terms?,,,7/5,3/4,75/10,1/4,B,"0.75 is 75 hundredths, which reduces to 3/4."
+MTH-E046,math,mcq,algebra,easy,"If x - 7 = 3, what is x?",,,-4,4,10,21,C,Add 7 to both sides: x = 3 + 7 = 10.
+MTH-E047,math,mcq,algebra,easy,"If 4x = 20, what is x?",,,4,16,80,5,D,Divide both sides by 4.
+MTH-E048,math,mcq,algebra,easy,Simplify 7y - 3y.,,,4y,10y,4,21y,A,Subtract the coefficients of like terms.
+MTH-E049,math,mcq,algebra,easy,What is the value of 2x + 3 when x = 5?,,,10,13,16,25,B,"2 x 5 = 10, then 10 + 3 = 13."
+MTH-E050,math,mcq,algebra,easy,Simplify 3(x + 2).,,,3x + 2,x + 6,3x + 6,5x,C,Multiply both terms inside the bracket by 3.
+MTH-E051,math,mcq,geometry,easy,How many degrees are in a right angle?,,,45,180,360,90,D,"A right angle is a quarter turn, which is 90 degrees."
+MTH-E052,math,mcq,geometry,easy,How many sides does a pentagon have?,,,Five,Four,Six,Seven,A,Penta means five.
+MTH-E053,math,mcq,geometry,easy,What is the area of a square with side 9 cm?,,,18 square cm,81 square cm,36 square cm,72 square cm,B,"Area of a square is side², so 9 x 9 = 81. 36 would be the perimeter."
+MTH-E054,math,mcq,geometry,easy,What do the angles in a quadrilateral add up to?,,,180 degrees,270 degrees,360 degrees,540 degrees,C,"A quadrilateral splits into two triangles, so 2 x 180 = 360."
+MTH-E055,math,mcq,geometry,easy,"What is the circumference of a circle with radius 7 cm, taking pi as 22/7?",,,22 cm,88 cm,154 cm,44 cm,D,Circumference = 2 pi r = 2 x 22/7 x 7 = 44. 154 would be the area.
+MTH-E056,math,mcq,geometry,easy,A triangle with all three sides equal is called what?,,,Equilateral,Isosceles,Scalene,Right-angled,A,Isosceles has two equal sides and scalene none.
+MTH-E057,math,mcq,geometry,easy,How many faces does a cube have?,,,Four,Six,Eight,Twelve,B,"A cube has six square faces, eight vertices and twelve edges."
+MTH-E058,math,mcq,geometry,easy,What is the perimeter of a rectangle 7 cm by 3 cm?,,,10 cm,21 cm,20 cm,42 cm,C,Perimeter = 2 x (7 + 3) = 20 cm. 21 would be the area.
+MTH-E059,math,mcq,number theory,easy,Is 2 a prime number?,,,"No, primes must be odd","No, 2 is a factor of everything",Only when counted from 1,"Yes, it is the only even prime",D,"2 has exactly two factors, 1 and itself, which is the definition of prime."
+MTH-E060,math,mcq,number theory,easy,What is the LCM of 3 and 5?,,,15,8,10,30,A,"3 and 5 share no factors, so their LCM is their product."
+MTH-E061,math,mcq,number theory,easy,What is the HCF of 8 and 20?,,,2,4,8,40,B,"The common factors are 1, 2 and 4, so the highest is 4."
+MTH-E062,math,mcq,number theory,easy,Which of these is divisible by 3?,,,50,52,51,53,C,"5 + 1 = 6, which is divisible by 3, so 51 is too."
+MTH-E063,math,mcq,number theory,easy,How many factors does 10 have?,,,Two,Three,Five,Four,D,"1, 2, 5 and 10."
+MTH-E064,math,mcq,averages,easy,What is the average of 6 and 10?,,,8,4,16,60,A,(6 + 10) ÷ 2 = 8.
+MTH-E065,math,mcq,averages,easy,"What is the average of 4, 8, 12 and 16?",,,8,10,12,40,B,"The total is 40 across four values, so the mean is 10."
+MTH-E066,math,mcq,ratio,easy,Simplify the ratio 10:15.,,,3:2,5:10,2:3,1:2,C,Divide both by 5.
+MTH-E067,math,mcq,ratio,easy,"If the ratio of boys to girls is 1:2 and there are 10 boys, how many girls are there?",,,5,15,30,20,D,"Girls are twice the boys, so 2 x 10 = 20."
+MTH-E068,math,mcq,percentages,easy,What is 50% of 84?,,,42,21,34,48,A,Half of 84 is 42.
+MTH-E069,math,mcq,percentages,easy,What is 10% of 950?,,,9.5,95,90,105,B,Divide by 10.
+MTH-E070,math,mcq,percentages,easy,"If 30 out of 50 students passed, what percentage passed?",,,30%,50%,60%,70%,C,"30 ÷ 50 = 0.6, which is 60%."
+MTH-E071,math,mcq,speed and distance,easy,A car travels 120 km in 2 hours. What is its average speed?,,,40 km/h,80 km/h,240 km/h,60 km/h,D,Speed = distance ÷ time = 120 ÷ 2.
+MTH-E072,math,mcq,speed and distance,easy,How far does a cyclist travel in 3 hours at 15 km/h?,,,45 km,5 km,18 km,50 km,A,Distance = speed x time = 15 x 3.
+MTH-E073,math,mcq,mensuration,easy,What is the volume of a box 2 cm by 3 cm by 4 cm?,,,9 cubic cm,24 cubic cm,12 cubic cm,26 cubic cm,B,Volume = length x breadth x height = 2 x 3 x 4.
+MTH-E074,math,mcq,mensuration,easy,How many millilitres are in one litre?,,,10,100,1000,10000,C,The prefix milli means one thousandth.
+MTH-E075,math,mcq,mensuration,easy,How many centimetres are in 2 metres?,,,20,2000,0.02,200,D,One metre is 100 cm.
+MTH-E076,math,mcq,data interpretation,easy,"In a class of 40, 10 wear glasses. What fraction is that?",,,1/4,1/2,1/3,1/10,A,10 out of 40 reduces to 1 in 4.
+MTH-E077,math,mcq,data interpretation,easy,A shop sells 12 items on Monday and 18 on Tuesday. What is the total?,,,6,30,24,36,B,12 + 18 = 30.
+MTH-E078,math,mcq,probability,easy,How many possible outcomes are there when rolling one die?,,,One,Two,Six,Twelve,C,A standard die has faces numbered 1 to 6.
+MTH-E079,math,mcq,probability,easy,What is the probability of an impossible event?,,,1,0.5,-1,0,D,Probabilities run from 0 for impossible to 1 for certain.
+MTH-E080,math,mcq,probability,easy,What is the probability of drawing a red card from a standard 52-card deck?,,,1/2,1/4,1/13,1/26,A,"26 of the 52 cards are red, so the probability is one half."
+MTH-M026,math,mcq,percentages,medium,"A shirt costs 1,200 rupees after a 20% discount. What was the original price?",,,"1,440 rupees","1,500 rupees","1,000 rupees","1,220 rupees",B,"1200 is 80% of the original, so the original is 1200 ÷ 0.8 = 1500."
+MTH-M027,math,mcq,percentages,medium,What percentage of 250 is 40?,,,6.25%,10%,16%,62.5%,C,"40 ÷ 250 = 0.16, which is 16%."
+MTH-M028,math,mcq,percentages,medium,"A population grows from 2,000 to 2,300. What is the percentage increase?",,,13%,30%,115%,15%,D,"The increase is 300 on a base of 2000, so 300 ÷ 2000 = 15%."
+MTH-M029,math,mcq,percentages,medium,A price falls by 25% and then rises by 25%. What is the net change?,,,A 6.25% decrease,No change,A 6.25% increase,A 12.5% decrease,A,"0.75 x 1.25 = 0.9375, which is 6.25% below the start."
+MTH-M030,math,mcq,profit and loss,medium,An article bought for 250 is sold for 200. What is the loss percentage?,,,25%,20%,50%,80%,B,"The loss is 50 on a cost of 250, so 50 ÷ 250 = 20%."
+MTH-M031,math,mcq,profit and loss,medium,A trader marks goods 40% above cost and gives a 25% discount. What is the profit percentage?,,,10%,15%,5%,20%,C,"1.40 x 0.75 = 1.05, so the selling price is 105% of cost."
+MTH-M032,math,mcq,profit and loss,medium,"If the cost price of 10 pens equals the selling price of 8 pens, what is the profit percentage?",,,20%,12.5%,80%,25%,D,"Selling 8 brings in what 10 cost, so profit is 2/8 = 25% of cost."
+MTH-M033,math,mcq,interest,medium,"In how many years will 4,000 rupees earn 960 rupees of simple interest at 6% per year?",,,4 years,2 years,3 years,5 years,A,"SI = PRT/100, so T = (960 x 100) ÷ (4000 x 6) = 4."
+MTH-M034,math,mcq,interest,medium,"What is the difference between compound and simple interest on 5,000 at 10% for 2 years?",,,0 rupees,50 rupees,100 rupees,500 rupees,B,"SI is 1,000; CI is 1,050. The difference is the interest earned on the first year's interest."
+MTH-M035,math,mcq,interest,medium,"At what annual rate does 2,000 rupees earn 300 rupees of simple interest in 3 years?",,,3%,6%,5%,15%,C,R = (300 x 100) ÷ (2000 x 3) = 5.
+MTH-M036,math,mcq,algebra,medium,Solve for x: 5x - 8 = 2x + 7.,,,3,-5,15,5,D,"Rearranging gives 3x = 15, so x = 5."
+MTH-M037,math,mcq,algebra,medium,What are the roots of x² - 9 = 0?,,,3 and -3,9 and -9,3 only,0 and 9,A,"x² = 9 has two solutions, positive and negative 3."
+MTH-M038,math,mcq,algebra,medium,Factorise x² + 5x + 6.,,,(x - 2)(x - 3),(x + 2)(x + 3),(x + 1)(x + 6),(x + 5)(x + 6),B,The pair must multiply to 6 and add to 5.
+MTH-M039,math,mcq,algebra,medium,"If a + b = 10 and a - b = 4, what is a?",,,3,6,7,14,C,Adding the equations gives 2a = 14.
+MTH-M040,math,mcq,algebra,medium,What is the value of (x + y)² - (x - y)² when x = 4 and y = 3?,,,14,24,49,48,D,"The expression simplifies to 4xy, so 4 x 4 x 3 = 48."
+MTH-M041,math,mcq,algebra,medium,"If 3 notebooks cost 45 rupees, how many can be bought for 180 rupees?",,,12,9,10,15,A,"One notebook costs 15, so 180 ÷ 15 = 12."
+MTH-M042,math,mcq,algebra,medium,Solve for x: x/4 + 3 = 8.,,,5,20,11,44,B,"x/4 = 5, so x = 20."
+MTH-M043,math,mcq,geometry,medium,A right triangle has a hypotenuse of 13 and one leg of 5. What is the other leg?,,,8,9,12,18,C,"13² - 5² = 169 - 25 = 144, and the square root of 144 is 12."
+MTH-M044,math,mcq,geometry,medium,What is each interior angle of a regular pentagon?,,,72 degrees,120 degrees,144 degrees,108 degrees,D,"The interior angles sum to (5-2) x 180 = 540, shared across five angles."
+MTH-M045,math,mcq,geometry,medium,What is the sum of the exterior angles of any polygon?,,,360 degrees,180 degrees,540 degrees,It depends on the number of sides,A,"The exterior angles always total one full turn, whatever the polygon."
+MTH-M046,math,mcq,geometry,medium,Two angles of a triangle are 55 and 65 degrees. What is the third?,,,50 degrees,60 degrees,70 degrees,120 degrees,B,"The angles sum to 180, so 180 - 120 = 60."
+MTH-M047,math,mcq,geometry,medium,"What is the area of a circle with diameter 14 cm, taking pi as 22/7?",,,44 square cm,88 square cm,154 square cm,616 square cm,C,"The radius is 7, so area = 22/7 x 49 = 154. Using the diameter as the radius gives 616."
+MTH-M048,math,mcq,geometry,medium,A rectangle has area 48 and length 8. What is its perimeter?,,,14,24,56,28,D,"The breadth is 48 ÷ 8 = 6, so the perimeter is 2 x (8 + 6) = 28."
+MTH-M049,math,mcq,mensuration,medium,What is the total surface area of a cube with side 5 cm?,,,150 square cm,25 square cm,125 square cm,100 square cm,A,Six faces of 25 each. 125 would be the volume.
+MTH-M050,math,mcq,mensuration,medium,"A cylinder has radius 7 cm and height 5 cm. What is its curved surface area, taking pi as 22/7?",,,110 square cm,220 square cm,154 square cm,770 square cm,B,Curved surface = 2 pi r h = 2 x 22/7 x 7 x 5 = 220.
+MTH-M051,math,mcq,mensuration,medium,How many cubes of side 2 cm fit inside a cube of side 6 cm?,,,3,9,27,18,C,"Volumes are 216 and 8, and 216 ÷ 8 = 27."
+MTH-M052,math,mcq,averages,medium,"The average of 6 numbers is 15. If a seventh number 22 is added, what is the new average?",,,15.5,17,18.5,16,D,"The total becomes 90 + 22 = 112 across seven numbers, and 112 ÷ 7 = 16."
+MTH-M053,math,mcq,averages,medium,"The average age of 5 boys is 12. If one aged 16 leaves, what is the average of the rest?",,,11,10,11.5,12,A,"Total 60 minus 16 is 44 across four boys, so 11."
+MTH-M054,math,mcq,averages,medium,The average of the first 5 odd numbers is what?,,,3,5,4,9,B,"The numbers are 1, 3, 5, 7 and 9, totalling 25, so the mean is 5."
+MTH-M055,math,mcq,ratio,medium,Divide 720 in the ratio 3:5. What is the smaller share?,,,240,288,270,450,C,"Eight parts of 90 each, so the smaller share is 3 x 90."
+MTH-M056,math,mcq,ratio,medium,"If a:b = 2:3 and b:c = 4:5, what is a:c?",,,2:5,6:15,8:12,8:15,D,"Match b: a:b = 8:12 and b:c = 12:15, so a:c = 8:15."
+MTH-M057,math,mcq,ratio,medium,A mixture of 40 litres has milk and water in the ratio 3:1. How much water is there?,,,10 litres,8 litres,13.3 litres,30 litres,A,"Four parts of 10 litres each, and water is one part."
+MTH-M058,math,mcq,time and work,medium,A does a job in 12 days and B in 6 days. How long together?,,,3 days,4 days,6 days,9 days,B,Combined rate is 1/12 + 1/6 = 3/12 = 1/4 of the job per day.
+MTH-M059,math,mcq,time and work,medium,"If 6 workers build a wall in 10 days, how long do 12 workers take?",,,8 days,15 days,5 days,20 days,C,"Twice the workers halve the time, assuming the work divides evenly."
+MTH-M060,math,mcq,time and work,medium,A pipe fills a tank in 8 hours and another empties it in 12. How long to fill with both open?,,,4 hours,10 hours,20 hours,24 hours,D,Net rate is 1/8 - 1/12 = 1/24 of the tank per hour.
+MTH-M061,math,mcq,speed and distance,medium,A train 150 m long travelling at 25 m/s crosses a 100 m bridge in how long?,,,10 seconds,4 seconds,6 seconds,14 seconds,A,It must cover its own length plus the bridge: 250 ÷ 25 = 10.
+MTH-M062,math,mcq,speed and distance,medium,A man walks 6 km at 3 km/h and returns at 6 km/h. What is his average speed?,,,4.5 km/h,4 km/h,5 km/h,9 km/h,B,Total distance 12 km over 2 + 1 = 3 hours. Averaging the speeds directly would wrongly give 4.5.
+MTH-M063,math,mcq,speed and distance,medium,Two cars start 300 km apart and drive towards each other at 40 and 60 km/h. When do they meet?,,,After 2.5 hours,After 5 hours,After 3 hours,After 6 hours,C,"Closing speed is 100 km/h, so 300 ÷ 100 = 3."
+MTH-M064,math,mcq,number theory,medium,"What is the smallest number divisible by 2, 3 and 5?",,,10,15,60,30,D,"The LCM of 2, 3 and 5 is their product, 30."
+MTH-M065,math,mcq,number theory,medium,What is the remainder when 2^10 is divided by 3?,,,1,0,2,3,A,"2^10 = 1024, and 1024 = 3 x 341 + 1."
+MTH-M066,math,mcq,number theory,medium,How many two-digit numbers are divisible by 7?,,,12,13,14,15,B,From 14 to 98 inclusive: (98 - 14) ÷ 7 + 1 = 13.
+MTH-M067,math,mcq,number theory,medium,What is the sum of the first 20 natural numbers?,,,200,220,210,400,C,Using n(n+1)/2 with n = 20 gives (20 x 21) ÷ 2.
+MTH-M068,math,mcq,probability,medium,Two dice are rolled. What is the probability the total is 7?,,,1/12,1/9,7/36,1/6,D,"Six of the 36 combinations total 7, so 6/36 = 1/6."
+MTH-M069,math,mcq,probability,medium,A bag has 4 red and 6 green balls. What is the probability of not drawing red?,,,0.6,0.4,0.24,0.46,A,"Six of ten balls are green, so the probability is 6/10."
+MTH-M070,math,mcq,probability,medium,What is the probability of drawing an ace from a standard deck?,,,1/4,1/13,1/52,4/13,B,"There are 4 aces among 52 cards, and 4/52 reduces to 1/13."
+MTH-M071,math,mcq,probability,medium,Three coins are tossed. What is the probability of exactly two heads?,,,1/8,1/4,3/8,1/2,C,"Of the 8 equally likely outcomes, HHT, HTH and THH have exactly two heads."
+MTH-M072,math,mcq,data interpretation,medium,A pie chart slice covers 72 degrees. What percentage is that?,,,7.2%,18%,72%,20%,D,72 ÷ 360 = 0.2.
+MTH-M073,math,mcq,data interpretation,medium,"Sales rose from 400 to 500, then fell back to 400. What was the percentage fall?",,,20%,25%,10%,100%,A,"The fall of 100 is measured against the new base of 500, so 100 ÷ 500 = 20%."
+MTH-M074,math,mcq,data interpretation,medium,"Of 600 people, 45% chose tea and the rest coffee. How many chose coffee?",,,270,330,300,355,B,"45% is 270, so the remaining 55% is 330."
+MTH-M075,math,mcq,data interpretation,medium,"A bar chart shows 15, 25, 30 and 30. What is the mode?",,,15,25,30,25 and 30,C,"30 appears twice, more than any other value."
+MTH-M076,math,mcq,mensuration,medium,A square and a circle have the same perimeter of 88 cm. Which has the greater area?,,,The square,They are equal,It cannot be determined,The circle,D,For a fixed perimeter the circle always encloses the most area.
+MTH-M077,math,mcq,algebra,medium,"If f(x) = 2x + 1, what is f(3)?",,,7,5,6,9,A,Substituting gives 2 x 3 + 1 = 7.
+MTH-M078,math,mcq,geometry,medium,What is the length of the diagonal of a square with side 6 cm?,,,12 cm,6 times the square root of 2,6 cm,36 cm,B,"By Pythagoras the diagonal is side x root 2, about 8.49 cm."
+MTH-M079,math,mcq,arithmetic,medium,What is the value of 2^5 x 2^3?,,,64,128,256,1024,C,Adding the indices gives 2^8 = 256.
+MTH-M080,math,mcq,arithmetic,medium,"Which is greatest: 2/3, 0.66, or 65%?",,,0.66,65%,They are equal,2/3,D,"2/3 is 0.6667, just above 0.66 and 0.65."
+MTH-E081,math,mcq,data interpretation,easy,"A chart shows 20, 30 and 50. What percentage is the largest of the total?",,,50%,20%,30%,45%,A,"The total is 100, so 50 out of 100 is 50%."
+MTH-E082,math,mcq,data interpretation,easy,"If 3 out of 12 apples are rotten, what fraction is that?",,,1/3,1/4,1/2,3/4,B,3/12 reduces to 1/4.
+MTH-E083,math,mcq,data interpretation,easy,"A table lists 5, 10, 15 and 20. What is the mean?",,,10,15,12.5,50,C,The total is 50 across four values.
+MTH-E084,math,mcq,averages,easy,"What is the average of 7, 7 and 7?",,,3,14,21,7,D,"All values are identical, so the mean is that value."
+MTH-E085,math,mcq,averages,easy,What is the average of 0 and 10?,,,5,0,10,20,A,(0 + 10) ÷ 2 = 5.
+MTH-E086,math,mcq,ratio,easy,Simplify the ratio 20:30.,,,3:2,2:3,1:2,20:3,B,Divide both terms by 10.
+MTH-E087,math,mcq,ratio,easy,"If 2 pens cost 30 rupees, what do 6 cost?",,,45 rupees,60 rupees,90 rupees,180 rupees,C,Three times as many pens cost three times as much.
+MTH-E088,math,mcq,speed and distance,easy,How long does 100 km take at 50 km/h?,,,1 hour,1.5 hours,5 hours,2 hours,D,Time = distance ÷ speed.
+MTH-E089,math,mcq,speed and distance,easy,What distance is covered in 30 minutes at 40 km/h?,,,20 km,10 km,40 km,80 km,A,Half an hour at 40 km/h covers half of 40.
+MTH-E090,math,mcq,mensuration,easy,How many grams are in 2 kilograms?,,,20,2000,200,20000,B,One kilogram is 1000 grams.
+MTH-E091,math,mcq,mensuration,easy,What is the area of a triangle with base 8 and height 5?,,,13,40,20,80,C,Area = ½ x base x height.
+MTH-E092,math,mcq,probability,easy,"What is the probability of picking a vowel at random from the letters A, B, C, D?",,,1/2,1/3,3/4,1/4,D,"Only A is a vowel, out of four letters."
+MTH-E093,math,mcq,probability,easy,A spinner has 4 equal colours. What is the chance of landing on red?,,,1/4,1/2,1/3,4/1,A,"Four equally likely outcomes, one of them red."
+MTH-E094,math,mcq,percentages,easy,What is 100% of 63?,,,0,63,6.3,126,B,100% of a number is the number itself.
+MTH-M081,math,mcq,arithmetic,medium,What is the value of 3 + 4 x 2 - 6 ÷ 3?,,,6,7,9,12,C,Multiplication and division first: 3 + 8 - 2 = 9.
+MTH-M082,math,mcq,arithmetic,medium,What is 0.2 x 0.3?,,,0.6,0.5,0.006,0.06,D,Two decimal places in the inputs give two in the answer.
+MTH-M083,math,mcq,arithmetic,medium,Which is larger: 3/8 or 0.4?,,,0.4,3/8,They are equal,It cannot be compared,A,"3/8 is 0.375, just below 0.4."
+MTH-M084,math,mcq,ratio,medium,"If a:b = 3:4 and a = 12, what is b?",,,9,16,14,48,B,"Each part is 4, so b is 4 parts of 4."
+MTH-M085,math,mcq,time and work,medium,"If 4 machines fill 200 bottles an hour, how many do 6 fill?",,,250,280,300,400,C,"Each machine fills 50 an hour, so 6 fill 300."

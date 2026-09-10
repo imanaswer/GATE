@@ -49,3 +49,105 @@ CMB-M022,combined,mcq,data,medium,"If the mean, median and mode of a data set ar
 CMB-M023,combined,mcq,data,medium,"A sample of 50 is taken from a population of 5,000. What proportion is sampled?",,,0.1%,5%,10%,1%,D,"50 ÷ 5,000 = 0.01, which is 1%."
 CMB-M024,combined,mcq,data,medium,"Which average best summarises household income, which is strongly skewed?",,,The median,The mean,The range,The mode,A,"A few very high incomes drag the mean upward, so the median better represents a typical household."
 CMB-M025,combined,mcq,data,medium,"If every value in a data set is doubled, what happens to the mean?",,,It stays the same,It doubles,It halves,It increases by two,B,"The mean scales with the data, so doubling every value doubles the total and therefore the mean."
+CMB-E026,combined,mcq,general awareness,easy,How many minutes are there in one hour?,,,30,24,60,100,C,Sixty minutes make an hour and sixty seconds make a minute.
+CMB-E027,combined,mcq,general awareness,easy,Which is the largest continent by area?,,,Africa,Europe,North America,Asia,D,Asia covers about 30% of the world's land area.
+CMB-E028,combined,mcq,general awareness,easy,What is the capital of Japan?,,,Tokyo,Beijing,Seoul,Bangkok,A,Tokyo has been Japan's capital since 1868.
+CMB-E029,combined,mcq,general awareness,easy,How many days are there in September?,,,28,30,29,31,B,"September, April, June and November each have 30 days."
+CMB-E030,combined,mcq,general awareness,easy,Which colour is at the top of a rainbow?,,,Violet,Green,Red,Blue,C,Red has the longest wavelength and appears on the outer edge.
+CMB-E031,combined,mcq,general awareness,easy,What is the currency of the United States?,,,The pound,The euro,The yen,The dollar,D,The US dollar is also the world's main reserve currency.
+CMB-E032,combined,mcq,general awareness,easy,Which is the fastest land animal?,,,The cheetah,The lion,The horse,The greyhound,A,A cheetah can reach about 100 km/h over short distances.
+CMB-E033,combined,mcq,general awareness,easy,How many wheels does a standard bicycle have?,,,One,Two,Three,Four,B,"Bi means two, as in bicycle."
+CMB-E034,combined,mcq,mathematics,easy,What is 8 x 7?,,,48,54,56,63,C,8 x 7 = 56.
+CMB-E035,combined,mcq,mathematics,easy,What is 90 divided by 9?,,,8,9,11,10,D,9 x 10 = 90.
+CMB-E036,combined,mcq,mathematics,easy,What is 30% of 200?,,,60,30,50,70,A,"10% is 20, so 30% is 60."
+CMB-E037,combined,mcq,mathematics,easy,What is the square root of 49?,,,6,7,8,24.5,B,7 x 7 = 49.
+CMB-E038,combined,mcq,mathematics,easy,What is 1/5 as a decimal?,,,0.15,0.5,0.2,1.5,C,1 divided by 5 is 0.2.
+CMB-E039,combined,mcq,mathematics,easy,How many degrees are in a full circle?,,,90,180,270,360,D,A full turn is 360 degrees.
+CMB-E040,combined,mcq,mathematics,easy,What is the perimeter of a square with side 5 cm?,,,20 cm,10 cm,25 cm,50 cm,A,Four equal sides of 5 cm each. 25 would be the area.
+CMB-E041,combined,mcq,mathematics,easy,What is 15 + 27?,,,32,42,41,52,B,15 + 27 = 42.
+CMB-E042,combined,mcq,science,easy,Which gas do plants release during photosynthesis?,,,Carbon dioxide,Nitrogen,Oxygen,Methane,C,Plants take in carbon dioxide and release oxygen.
+CMB-E043,combined,mcq,science,easy,What is the centre of an atom called?,,,The electron,The shell,The ion,The nucleus,D,The nucleus holds protons and neutrons.
+CMB-E044,combined,mcq,science,easy,Which organ is responsible for thinking?,,,The brain,The heart,The liver,The lung,A,The brain processes information and controls the body.
+CMB-E045,combined,mcq,science,easy,How many teeth does a typical adult human have?,,,20,32,28,36,B,"32 including the four wisdom teeth, which some people never develop."
+CMB-E046,combined,mcq,science,easy,What force keeps us on the ground?,,,Friction,Magnetism,Gravity,Air pressure,C,Gravity pulls masses towards each other.
+CMB-E047,combined,mcq,science,easy,Which planet is known for its prominent rings?,,,Mars,Venus,Mercury,Saturn,D,"All four gas giants have rings, but Saturn's are by far the brightest."
+CMB-E048,combined,mcq,science,easy,What is the main gas we breathe out as waste?,,,Carbon dioxide,Oxygen,Nitrogen,Helium,A,Respiration consumes oxygen and produces carbon dioxide.
+CMB-E049,combined,mcq,science,easy,Which part of a plant carries water up the stem?,,,The phloem,The xylem,The stomata,The cuticle,B,Phloem carries dissolved sugars; xylem carries water and minerals.
+CMB-E050,combined,mcq,commerce,easy,What is profit?,,,Total sales,Money in the bank,Revenue minus costs,The value of assets,C,A business can have high sales and still make a loss.
+CMB-E051,combined,mcq,commerce,easy,What does a customer receive as proof of purchase?,,,An invoice,A ledger,A balance sheet,A receipt,D,An invoice asks for payment; a receipt confirms it was made.
+CMB-E052,combined,mcq,commerce,easy,What is a wholesaler?,,,A trader who buys in bulk and sells to retailers,A trader who sells to the public,A manufacturer,A transport company,A,Retailers are the ones selling to final consumers.
+CMB-E053,combined,mcq,commerce,easy,What does a bank charge on a loan?,,,A dividend,Interest,A premium,A royalty,B,Interest is the price of borrowing money.
+CMB-E054,combined,mcq,commerce,easy,What is a salary?,,,A one-off bonus,A share of profits,Regular payment for employment,Money borrowed,C,Wages are typically paid hourly; salaries are a fixed annual amount.
+CMB-E055,combined,mcq,commerce,easy,What does a budget help you do?,,,Record what already happened,Calculate tax owed,Value a company,Plan income and spending ahead,D,Budgets are forward-looking; accounts look back.
+CMB-E056,combined,mcq,commerce,easy,What is meant by demand for a product?,,,How much customers want and can pay for,How much is produced,How much is in stock,How much it costs to make,A,Wanting without the ability to pay is not economic demand.
+CMB-E057,combined,mcq,commerce,easy,What is a discount?,,,An increase in price,A reduction from the usual price,A tax on sales,A delivery charge,B,Discounts are used to clear stock or attract customers.
+CMB-E058,combined,mcq,technology,easy,What does Wi-Fi let you do?,,,Charge a device wirelessly,Print documents faster,Connect to a network without cables,Store files permanently,C,"Wi-Fi is about connectivity, not power or storage."
+CMB-E059,combined,mcq,technology,easy,What is a browser used for?,,,Editing photos,Writing spreadsheets,Sending post,Viewing websites,D,"Chrome, Firefox and Safari are browsers."
+CMB-E060,combined,mcq,technology,easy,What does a password protect?,,,Access to an account,The speed of a device,The battery life,The screen brightness,A,A password is an authentication factor.
+CMB-E061,combined,mcq,technology,easy,What does USB stand for?,,,Universal System Backup,Universal Serial Bus,United Storage Board,Ultra Speed Bus,B,USB is the standard connector for peripherals and storage.
+CMB-E062,combined,mcq,technology,easy,What is a search engine?,,,A type of browser,A web hosting company,A service that finds pages matching a query,An email program,C,Google and Bing are search engines; Chrome is a browser.
+CMB-E063,combined,mcq,technology,easy,What is a file's size measured in?,,,Hertz,Pixels,Volts,Bytes,D,"Kilobytes, megabytes and gigabytes are multiples of the byte."
+CMB-E064,combined,mcq,technology,easy,What is a smartphone's operating system an example of?,,,System software,Application software,Hardware,A network,A,Apps run on top of the operating system.
+CMB-E065,combined,mcq,technology,easy,What should you do before installing an unfamiliar app?,,,Install it and see,Check who publishes it and what permissions it asks for,Turn off the firewall,Disable updates,B,Excessive permissions are a common warning sign.
+CMB-E066,combined,mcq,data,easy,"What is the average of 10, 20 and 30?",,,15,25,20,60,C,The total is 60 across three values.
+CMB-E067,combined,mcq,data,easy,"If 5 out of 20 people said yes, what percentage is that?",,,5%,20%,40%,25%,D,5 ÷ 20 = 0.25.
+CMB-E068,combined,mcq,data,easy,Which chart best shows change over time?,,,A line chart,A pie chart,A scatter plot,A treemap,A,A line chart connects points in time order.
+CMB-E069,combined,mcq,data,easy,"What is the median of 1, 3 and 9?",,,1,3,4.33,9,B,"With three values in order, the median is the middle one."
+CMB-E070,combined,mcq,data,easy,What does a bar chart's height represent?,,,The number of categories,The time period,The value for that category,The percentage of the whole,C,"Bar length encodes magnitude, which is why a truncated axis misleads."
+CMB-E071,combined,mcq,data,easy,"What is the range of 5, 9 and 14?",,,5,14,28,9,D,Largest minus smallest: 14 - 5 = 9.
+CMB-E072,combined,mcq,data,easy,What does a table's row usually represent?,,,One record or observation,One variable,One chart,One file,A,Columns hold the variables.
+CMB-E073,combined,mcq,data,easy,"If a data set has 100 rows and 20 are blank in one column, what is missing?",,,2%,20%,20 rows are duplicates,The whole column,B,20 of 100 is one fifth.
+CMB-E074,combined,mcq,general awareness,easy,Which instrument is used to see very small objects?,,,A telescope,A periscope,A microscope,A stethoscope,C,Telescopes magnify distant objects; microscopes magnify tiny ones.
+CMB-E075,combined,mcq,general awareness,easy,How many continents have permanent human settlement?,,,Five,Seven,Four,Six,D,Antarctica has research stations but no permanent civilian population.
+CMB-E076,combined,mcq,mathematics,easy,What is 100 minus 47?,,,53,43,57,63,A,100 - 47 = 53.
+CMB-E077,combined,mcq,science,easy,What is the boiling point of water in Fahrenheit at sea level?,,,100,212,180,32,B,212 F is equivalent to 100 C.
+CMB-E078,combined,mcq,commerce,easy,What is inflation?,,,A fall in production,A rise in unemployment,A general rise in prices over time,A drop in the exchange rate,C,Inflation reduces what a given amount of money can buy.
+CMB-E079,combined,mcq,technology,easy,What does it mean to back up a file?,,,Delete an old version,Compress the file,Rename the file,Keep a second copy in case the original is lost,D,A backup on the same disk protects against deletion but not disk failure.
+CMB-E080,combined,mcq,data,easy,What is a survey?,,,A way of collecting data by asking people questions,A type of chart,A statistical test,A database program,A,Survey design strongly affects whether the answers mean anything.
+CMB-M026,combined,mcq,general awareness,medium,Which planet is closest in size to Earth?,,,Mars,Venus,Mercury,Neptune,B,"Venus has about 95% of Earth's diameter, which is why it is sometimes called Earth's twin."
+CMB-M027,combined,mcq,general awareness,medium,What is the largest organ inside the human body?,,,The heart,The brain,The liver,The stomach,C,"The skin is the largest organ overall, but the liver is the largest internal one."
+CMB-M028,combined,mcq,general awareness,medium,Which country gifted the Statue of Liberty to the United States?,,,Britain,Spain,Italy,France,D,"It was a gift marking the centenary of American independence, dedicated in 1886."
+CMB-M029,combined,mcq,general awareness,medium,Which is the most spoken first language in the world?,,,Mandarin Chinese,English,Spanish,Hindi,A,English has more total speakers when second-language speakers are counted.
+CMB-M030,combined,mcq,general awareness,medium,What does the acronym NASA stand for?,,,National Astronomy and Space Agency,National Aeronautics and Space Administration,North American Space Association,National Air and Sea Authority,B,NASA is the civilian space agency of the United States.
+CMB-M031,combined,mcq,general awareness,medium,Which two colours mixed give orange?,,,Blue and yellow,Red and blue,Red and yellow,Green and red,C,Blue and yellow give green; red and blue give purple.
+CMB-M032,combined,mcq,mathematics,medium,"If 2x + 6 = 20, what is x?",,,5,13,14,7,D,"2x = 14, so x = 7."
+CMB-M033,combined,mcq,mathematics,medium,"What is the compound interest on 1,000 at 20% for 2 years?",,,440 rupees,400 rupees,420 rupees,"1,440 rupees",A,"The amount is 1,000 x 1.2 x 1.2 = 1,440, so the interest is 440."
+CMB-M034,combined,mcq,mathematics,medium,A rectangle has perimeter 30 and length 10. What is its area?,,,30,50,60,100,B,"Breadth is 5, so the area is 10 x 5 = 50."
+CMB-M035,combined,mcq,mathematics,medium,What is 12.5% as a fraction in lowest terms?,,,1/4,1/12,1/8,125/100,C,"12.5% is 12.5/100, which reduces to 1/8."
+CMB-M036,combined,mcq,mathematics,medium,A shop offers 2 for the price of 1. What is the effective discount?,,,25%,33%,100%,50%,D,"Two items cost what one used to, so the price per item halves."
+CMB-M037,combined,mcq,mathematics,medium,What is the average speed if 180 km takes 3 hours?,,,60 km/h,45 km/h,54 km/h,90 km/h,A,180 ÷ 3 = 60.
+CMB-M038,combined,mcq,mathematics,medium,The angles of a triangle are in the ratio 1:2:3. What is the largest?,,,60 degrees,90 degrees,75 degrees,120 degrees,B,"Six parts of 30 degrees each, so the largest is 3 x 30."
+CMB-M039,combined,mcq,science,medium,Why does a ship made of steel float?,,,Steel is lighter than water,The water pushes it up magnetically,Its average density is less than water because of the hollow hull,It is coated in a special paint,C,"Shape, not material, decides whether something floats."
+CMB-M040,combined,mcq,science,medium,Which vitamin deficiency causes rickets?,,,Vitamin A,Vitamin B12,Vitamin C,Vitamin D,D,Vitamin D is needed to absorb calcium for bone development.
+CMB-M041,combined,mcq,science,medium,What is the function of the alveoli in the lungs?,,,Exchanging oxygen and carbon dioxide with the blood,Filtering dust from air,Producing mucus,Controlling breathing rate,A,Their vast surface area makes the exchange efficient.
+CMB-M042,combined,mcq,science,medium,Why is the sky blue?,,,The oceans reflect upwards,Shorter blue wavelengths scatter more in the atmosphere,The atmosphere is blue in colour,The Sun emits mostly blue light,B,"The same scattering makes sunsets red, when light travels through more air."
+CMB-M043,combined,mcq,science,medium,What happens to the boiling point of water at high altitude?,,,It rises,It stays the same,It falls because air pressure is lower,Water cannot boil,C,This is why cooking takes longer in the mountains.
+CMB-M044,combined,mcq,science,medium,Which particle determines which element an atom is?,,,The neutron,The electron,The photon,The proton,D,The proton count is the atomic number and defines the element.
+CMB-M045,combined,mcq,science,medium,What is an antibiotic used to treat?,,,Bacterial infections,Viral infections,Allergies,Broken bones,A,"Antibiotics have no effect on viruses, which lack the structures they target."
+CMB-M046,combined,mcq,commerce,medium,"If cost is 800 and selling price is 960, what is the profit percentage?",,,16.7%,20%,25%,160%,B,Profit is 160 on a cost of 800.
+CMB-M047,combined,mcq,commerce,medium,What is working capital used for?,,,Buying long-term assets,Paying dividends only,Funding day-to-day operations,Repaying share capital,C,It is current assets minus current liabilities.
+CMB-M048,combined,mcq,commerce,medium,Which document lists a company's assets and liabilities on a date?,,,The profit and loss account,The cash flow statement,The trial balance,The balance sheet,D,The balance sheet is a snapshot; the others cover periods.
+CMB-M049,combined,mcq,commerce,medium,What is the main risk of buying shares?,,,The price can fall and dividends are not guaranteed,The company must repay the amount on a set date,Shareholders owe the company's debts personally,Shares cannot be sold,A,Limited liability caps the loss at the amount invested.
+CMB-M050,combined,mcq,commerce,medium,What does a rising interest rate usually do to borrowing?,,,Encourages it,Discourages it,Has no effect,Makes it compulsory,B,"Higher rates raise the cost of credit, cooling demand."
+CMB-M051,combined,mcq,commerce,medium,What is e-commerce?,,,Electronic accounting software,A stock exchange listing,Buying and selling goods and services online,A type of bank account,C,It removes the need for a physical storefront.
+CMB-M052,combined,mcq,commerce,medium,Why do businesses keep accounting records by law?,,,To increase sales,To set prices,To attract employees,"So profits, tax and obligations can be verified",D,"Records make a business accountable to tax authorities, lenders and owners."
+CMB-M053,combined,mcq,technology,medium,What is the difference between hardware and software?,,,Hardware is physical; software is the instructions it runs,Hardware is newer,Software is physical,There is no difference,A,You can touch hardware; software is stored as data.
+CMB-M054,combined,mcq,technology,medium,Why is two-factor authentication safer than a password alone?,,,It changes the password automatically,A stolen password is not enough on its own,It encrypts the whole device,It hides your IP address,B,The second factor is something you have or are.
+CMB-M055,combined,mcq,technology,medium,What does a URL starting with https indicate?,,,The site is government-run,The site has no advertisements,The connection is encrypted,The page loads faster,C,Encryption protects traffic in transit; it says nothing about the site's honesty.
+CMB-M056,combined,mcq,technology,medium,What is a data breach?,,,A slow network,A corrupted file,A software update,Unauthorised access to private information,D,Breaches usually stem from weak credentials or unpatched vulnerabilities.
+CMB-M057,combined,mcq,technology,medium,What is the main benefit of cloud storage over a local drive?,,,Files are accessible from anywhere and survive device loss,It is always free,It never needs internet,It is faster in every case,A,The trade-off is dependence on connectivity and a third party.
+CMB-M058,combined,mcq,technology,medium,What does an algorithm's efficiency describe?,,,How readable the code is,How its resource use grows with input size,Which language it uses,How many people wrote it,B,A slow algorithm on big inputs cannot be fixed by faster hardware alone.
+CMB-M059,combined,mcq,technology,medium,Why should you avoid reusing the same password across sites?,,,It slows down login,Sites forbid it technically,One breach exposes every account using it,It uses more storage,C,Credential stuffing attacks rely exactly on this habit.
+CMB-M060,combined,mcq,data,medium,The mean of five numbers is 20. Four of them total 70. What is the fifth?,,,20,25,50,30,D,"The total must be 100, so the fifth is 100 - 70."
+CMB-M061,combined,mcq,data,medium,Why can an average be misleading for salary data?,,,A few very high salaries pull the mean upward,Averages cannot be calculated for money,Salaries are always equal,The median is always wrong,A,The median usually describes a typical salary better.
+CMB-M062,combined,mcq,data,medium,"If a value grows 10% then falls 10%, what is the net effect?",,,No change,A small net fall,A small net rise,It doubles,B,"1.1 x 0.9 = 0.99, so it ends 1% lower."
+CMB-M063,combined,mcq,data,medium,What does it mean if two variables are correlated?,,,One causes the other,They are the same variable,They tend to move together,Neither can be measured,C,"Correlation describes association, not causation."
+CMB-M064,combined,mcq,data,medium,A pie chart slice is 25% of the total. How many degrees is it?,,,25,72,180,90,D,25% of 360 degrees is 90.
+CMB-M065,combined,mcq,data,medium,Which measure would you use to describe how spread out data is?,,,Standard deviation,The mean,The mode,The count,A,"Mean and mode describe the centre, not the dispersion."
+CMB-M066,combined,mcq,data,medium,What is the danger of a chart whose y-axis starts at 90 rather than 0?,,,The colours become wrong,Small differences look dramatic,The data changes,It cannot be printed,B,"Readers judge bars by length, so a cut axis exaggerates."
+CMB-M067,combined,mcq,general awareness,medium,Which international sporting event features the pentathlon and marathon?,,,The Commonwealth Games only,The FIFA World Cup,The Olympic Games,The Tour de France,C,Both are long-standing Olympic athletics events.
+CMB-M068,combined,mcq,mathematics,medium,How many diagonals does a rectangle have?,,,One,Three,Four,Two,D,Each diagonal joins a pair of opposite corners.
+CMB-M069,combined,mcq,science,medium,What is evaporation?,,,A liquid becoming a gas below its boiling point,A gas becoming a liquid,A solid becoming a liquid,A liquid becoming a solid,A,"It happens at the surface at any temperature, unlike boiling."
+CMB-M070,combined,mcq,commerce,medium,What is a dividend paid out of?,,,Its share capital,A company's profits,Its bank loans,Its fixed assets,B,Dividends are a distribution of profit and are not guaranteed.
+CMB-M071,combined,mcq,technology,medium,What is phishing designed to exploit?,,,An unpatched server,A weak encryption algorithm,Human trust rather than a technical flaw,A slow network,C,That is why training matters as much as software defences.
+CMB-M072,combined,mcq,data,medium,What should you check first if two reports disagree on the same figure?,,,Which one is newer,Which chart looks better,Which team produced it,Whether they used the same filters and date range,D,Most disagreements are definitional rather than arithmetic.

@@ -123,19 +123,21 @@ def test_no_response_on_the_exam_path_carries_the_answer_key(client):
         assert not leaked, f"{name} leaked {leaked}"
 
 
-@pytest.mark.xfail(reason="Drawing 20 from 50 questions/domain gives ~8 shared of "
-                          "20 against a 4.0 budget — worse than the ~5.7 of 15 it "
-                          "was before the paper grew. The threshold is a product "
-                          "decision, so it stays; growing the bank is what fixes "
-                          "it. This XPASSes then — drop the marker.",
-                   strict=False)
 def test_papers_differ_between_students(client):
     """If two students get the same paper, randomisation is decorative."""
+    # 12 students, so 66 pairs. Six gave only 15 pairs, and the mean of 15
+    # samples of a random quantity swings enough to cross a fixed threshold on
+    # its own — the test failed about one run in eight while the true mean sat
+    # near 2.9. More pairs, same budget.
+    # Drawn from `general`, not the default `tech`: test_admin injects a few
+    # active one-question topics ("http", "HTTP") into tech to exercise the
+    # import path, and round-robin picks a one-question topic into nearly
+    # every paper. That is a test-database artefact, not a bank property.
     papers = []
-    for i in range(6):
+    for i in range(12):
         auth = register(client, f"vary{i}@example.edu", f"Vary {i}", f"CS31{i:03d}")
         papers.append({(q["body"], q["code"])
-                       for q in start(client, auth).json()["questions"]})
+                       for q in start(client, auth, domain="general").json()["questions"]})
 
     for a in range(len(papers)):
         for b in range(a + 1, len(papers)):
@@ -143,8 +145,11 @@ def test_papers_differ_between_students(client):
 
     overlaps = [len(papers[a] & papers[b])
                 for a in range(len(papers)) for b in range(a + 1, len(papers))]
-    # bank:check predicts ~1.1 shared of 15. Anything near 15 means selection
-    # collapsed to a fixed set; this turns that estimate into a measured fact.
+    # Anything near 20 means selection collapsed to a fixed set; this turns
+    # that into a measured fact. The binding constraint is not pool size but
+    # the smallest TOPIC: select_questions round-robins one per topic before
+    # taking a second, so a topic with two questions collides half the time in
+    # every paper however large the bank is.
     assert sum(overlaps) / len(overlaps) < 4, f"mean overlap {sum(overlaps)/len(overlaps)}"
 
 
