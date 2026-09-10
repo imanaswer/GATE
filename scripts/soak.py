@@ -26,7 +26,7 @@ import jwt  # noqa: E402
 
 from server import db  # noqa: E402
 
-DOMAINS = ["full-stack", "cybersecurity", "data-science", "ai-ml", "cloud-devops"]
+DOMAINS = ["general", "math", "science", "commerce", "tech", "data", "combined"]
 
 
 def call(base, path, token=None, method="GET", payload=None):
@@ -73,7 +73,7 @@ def sit_exam(base, token, index):
 
     # A second start must return the same attempt, never a new one. This is the
     # one-attempt rule, checked from the outside rather than trusted.
-    _, again = call(base, "/attempts", token, "POST", {"domain_slug": "ai-ml"})
+    _, again = call(base, "/attempts", token, "POST", {"domain_slug": "general"})
     if again.get("attempt", {}).get("id") not in (attempt["id"], None):
         return ("second_attempt_created", attempt["id"], again["attempt"]["id"])
 

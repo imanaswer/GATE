@@ -62,7 +62,7 @@ export default function Domains() {
 
       {!domains ? (
         <ul className="grid gap-3 sm:grid-cols-2" aria-busy="true" aria-label="Loading challenges">
-          {[...Array(5)].map((_, i) => (
+          {[...Array(7)].map((_, i) => (
             <li key={i} className="h-28 animate-pulse rounded-2xl bg-surface-2" />
           ))}
         </ul>

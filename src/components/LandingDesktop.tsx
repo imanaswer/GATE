@@ -64,7 +64,7 @@ export function LandingDesktop({ next }: { next: string }) {
           <div className="p-5">
             <p className="font-mono text-[10px] tracking-widest text-[#e8000f]">CERTIFICATE</p>
             <p className="mt-1 text-lg font-bold leading-tight">Tech Arena 2026</p>
-            <p className="mt-1 text-xs text-[#6b6b68]">Full Stack Development · 13 / 15</p>
+            <p className="mt-1 text-xs text-[#6b6b68]">Mathematics · 13 / 15</p>
             <div className="mt-4 flex items-center justify-between border-t border-dashed border-[#d9d9d6] pt-3">
               <span className="font-mono text-[10px] text-[#8a8a86]">TA26-8F3K-2Q</span>
               <span className="rounded-full bg-[#e6f7ec] px-2 py-0.5 text-[10px] font-medium text-[#137a3a]">
@@ -77,11 +77,13 @@ export function LandingDesktop({ next }: { next: string }) {
         <Window left="6%" top="62%" width={270} caption="arenas.txt" bob={6}>
           <ul className="grid grid-cols-2 gap-1.5 p-3 text-xs">
             {[
-              ["🧩", "Full Stack"],
-              ["📊", "Data Analytics"],
-              ["🤖", "AI & ML"],
-              ["☁️", "DevOps"],
-              ["🔐", "Cyber Security"],
+              ["🧭", "General"],
+              ["➗", "Math"],
+              ["🔬", "Science"],
+              ["📈", "Commerce"],
+              ["💻", "Tech"],
+              ["📊", "Data"],
+              ["🎯", "Combined"],
             ].map(([icon, name]) => (
               <li key={name} className="flex items-center gap-2 rounded-md bg-[#f7f7f5] px-2 py-1.5">
                 <span>{icon}</span> {name}

@@ -289,6 +289,16 @@ pnpm admin:create you@example.com --role admin   # or --role viewer
 pnpm admin:list
 ```
 
+**Current admin account** (change the password before the event — it is in
+version control):
+
+| Email | Password |
+|---|---|
+| `gtm@gteceducation.com` | `GtecArena@2026!` |
+
+Sign in at `/admin`. Reset it by re-running `pnpm admin:create` with the same
+email — `create` upserts.
+
 `ADMIN_SECRET` must be set or the panel refuses to issue a session — never
 falls back to a default anyone could forge. Admins sign in at `/admin` against
 `admin_users`, not Google: an admin account must not depend on an OAuth app
@@ -435,7 +445,7 @@ you should not be able to point these at the real event.
 pnpm bank:check                          # can each domain serve the blueprint?
 pnpm bank:audit                          # measure what selection actually does
 pnpm bank:import data/questions/*.csv    # all-or-nothing per file
-pnpm bank:export ai-ml > ai-ml.csv       # round-trips back into import
+pnpm bank:export math > math.csv       # round-trips back into import
 ```
 
 Import validates before it writes: a file with one bad row imports nothing, so

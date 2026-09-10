@@ -105,7 +105,7 @@ def test_colleges_are_deduplicated_by_name(client):
 def test_domains_listed(client):
     rows = client.get("/api/v1/domains").json()
     assert {r["slug"] for r in rows} == {
-        "ai-ml", "data-science", "full-stack", "cybersecurity", "cloud-devops"}
+        "general", "math", "science", "commerce", "tech", "data", "combined"}
 
 
 def test_profile_frozen_once_exam_starts(client):
