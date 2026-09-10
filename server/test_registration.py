@@ -119,7 +119,7 @@ def test_profile_frozen_once_exam_starts(client):
          f"""insert into exam_attempts (user_id, event_id, domain_id, expires_at)
              select '{me["profile"]["id"]}', e.id, d.id, now() + interval '20 min'
              from exam_events e, domains d
-             where e.slug='tech-arena-2026' and d.slug='ai-ml'"""],
+             where e.slug='tech-arena-2026' and d.slug='tech'"""],
         check=True,
     )
 
@@ -133,7 +133,7 @@ def test_profile_frozen_once_exam_starts(client):
          f"""insert into exam_attempts (user_id, event_id, domain_id, expires_at)
              select '{me["profile"]["id"]}', e.id, d.id, now() + interval '20 min'
              from exam_events e, domains d
-             where e.slug='tech-arena-2026' and d.slug='full-stack'"""],
+             where e.slug='tech-arena-2026' and d.slug='math'"""],
         capture_output=True, text=True,
     )
     assert second.returncode != 0

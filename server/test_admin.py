@@ -155,7 +155,7 @@ def test_a_viewer_can_read_everything_and_write_nothing(client):
     assert client.get("/api/v1/admin/questions").status_code == 200
 
     blocked = client.post("/api/v1/admin/questions", json={
-        "domain_slug": "full-stack", "type": "mcq", "body": "Should not be created?",
+        "domain_slug": "tech", "type": "mcq", "body": "Should not be created?",
         "topic": "x", "difficulty": "easy", "options": ["a", "b"], "correct_index": 0,
     })
     assert blocked.status_code == 403
@@ -262,7 +262,7 @@ def test_student_detail_404s_for_an_unknown_id(admin):
 
 def test_question_crud_round_trips(admin):
     payload = {
-        "domain_slug": "full-stack", "type": "mcq",
+        "domain_slug": "tech", "type": "mcq",
         "body": "Which HTTP status means the request conflicts with server state?",
         "topic": "HTTP", "difficulty": "easy", "status": "draft",
         "options": ["409 Conflict", "402 Payment Required", "418 Teapot"],
@@ -291,7 +291,7 @@ def test_a_question_is_retired_never_deleted(admin):
     """Deleting one would cascade away the attempt_questions rows that explain
     the score of every student who was given it."""
     payload = {
-        "domain_slug": "full-stack", "type": "mcq", "body": "Retire me please, thanks?",
+        "domain_slug": "tech", "type": "mcq", "body": "Retire me please, thanks?",
         "topic": "Misc", "difficulty": "easy", "options": ["a", "b"], "correct_index": 0,
     }
     qid = admin.post("/api/v1/admin/questions", json=payload).json()["id"]
@@ -304,7 +304,7 @@ def test_a_correct_index_outside_the_options_is_refused(admin):
     """Accepting it would create a question with no correct answer — every
     student who drew it would be marked wrong whatever they picked."""
     r = admin.post("/api/v1/admin/questions", json={
-        "domain_slug": "full-stack", "type": "mcq", "body": "Broken question here?",
+        "domain_slug": "tech", "type": "mcq", "body": "Broken question here?",
         "topic": "Misc", "difficulty": "easy", "options": ["a", "b"], "correct_index": 4,
     })
     assert r.status_code == 422
@@ -324,7 +324,7 @@ def test_csv_import_dry_run_changes_nothing(admin):
     csv_text = (
         "external_id,domain,type,topic,difficulty,question,code,language,"
         "option_a,option_b,option_c,option_d,correct,explanation\n"
-        "ADM-I001,full-stack,mcq,http,easy,"
+        "ADM-I001,tech,mcq,http,easy,"
         "What does CORS stand for in this import test?,,,"
         "Cross-Origin Resource Sharing,Cross Origin Route Skipping,"
         "Client Origin Request Scope,Crossed Over Router Setup,A,"
@@ -346,7 +346,7 @@ def test_a_bad_csv_is_rejected_whole_not_partially_applied(admin):
     bad = admin.post("/api/v1/admin/questions/import", content=(
         "external_id,domain,type,topic,difficulty,question,code,language,"
         "option_a,option_b,option_c,option_d,correct,explanation\n"
-        "ADM-B001,full-stack,mcq,http,easy,A fine row for the partial import test?,,,"
+        "ADM-B001,tech,mcq,http,easy,A fine row for the partial import test?,,,"
         "a,b,c,d,A,Because.\n"
         "ADM-B002,no-such-domain,mcq,http,easy,A broken row in the same file?,,,"
         "a,b,c,d,A,Because.\n"

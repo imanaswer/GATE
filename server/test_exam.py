@@ -36,7 +36,7 @@ def seed_bank(database):
     with dbmod.cursor() as cur:
         cur.execute("select slug from domains")
         known = {r["slug"] for r in cur.fetchall()}
-    for name in sorted(os.listdir("data/questions")):
+    for name in sorted(f for f in os.listdir("data/questions") if f.endswith(".csv")):
         report = parse_csv(open(f"data/questions/{name}").read(), known)
         assert report.ok, report.errors[:3]
         with dbmod.transaction() as cur:
@@ -51,7 +51,7 @@ def register(client, email, name, student_id="CS21001"):
     return auth
 
 
-def start(client, auth, domain="ai-ml"):
+def start(client, auth, domain="tech"):
     return client.post("/api/v1/attempts", json={"domain_slug": domain},
                        headers={"Authorization": auth})
 
