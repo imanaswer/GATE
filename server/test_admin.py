@@ -285,6 +285,61 @@ def test_attempt_timings_are_reported_and_capped_at_the_deadline(admin, sat_exam
         """)
 
 
+def test_a_viewer_cannot_delete_a_student_or_an_attempt(client, sat_exam):
+    """The destructive pair must be writer-only. A viewer watching the
+    dashboard on event day must not be able to erase someone's exam."""
+    signin(client)
+    sid = client.get(
+        f"/api/v1/admin/students?q={sat_exam['email']}").json()["students"][0]["id"]
+    client.cookies.clear()
+
+    signin(client, "watcher@arena.test")
+    assert client.delete(f"/api/v1/admin/students/{sid}/attempt").status_code == 403
+    assert client.delete(f"/api/v1/admin/students/{sid}").status_code == 403
+    client.cookies.clear()
+
+    # And nothing was destroyed on the way past.
+    assert scalar(
+        f"select count(*) from exam_attempts where id = '{sat_exam['attempt_id']}'") == "1"
+
+
+def test_deleting_an_attempt_reopens_the_exam_and_takes_the_certificate_with_it(admin):
+    """One attempt per student is a database constraint, so clearing the row is
+    the only way to let someone re-sit. The certificate cascading away is the
+    consequence the panel warns about — pinned here as intended, not a
+    surprise."""
+    from server.test_exam import register, start
+
+    auth = register(admin, "resit@example.edu", "Re Sit", "RS0001")
+    attempt_id = start(admin, auth).json()["attempt"]["id"]
+    admin.post(f"/api/v1/attempts/{attempt_id}/submit", headers={"Authorization": auth})
+    assert scalar(f"select count(*) from certificates where attempt_id = '{attempt_id}'") == "1"
+
+    sid = admin.get("/api/v1/admin/students?q=resit@example.edu").json()["students"][0]["id"]
+    assert admin.delete(f"/api/v1/admin/students/{sid}/attempt").status_code == 200
+
+    assert scalar(f"select count(*) from exam_attempts where id = '{attempt_id}'") == "0"
+    assert scalar(f"select count(*) from certificates where attempt_id = '{attempt_id}'") == "0"
+    assert scalar(f"select count(*) from attempt_questions where attempt_id = '{attempt_id}'") == "0"
+    # The student survives, so they can sit it again — which is the whole point.
+    assert scalar(f"select count(*) from users where id = '{sid}'") == "1"
+    assert start(admin, auth).status_code == 201
+    assert admin.delete(f"/api/v1/admin/students/{sid}").status_code == 200
+
+
+def test_deleting_a_student_removes_everything_attached(admin):
+    from server.test_exam import register, start
+
+    auth = register(admin, "purge@example.edu", "Purge Me", "PM0001")
+    start(admin, auth)
+    sid = admin.get("/api/v1/admin/students?q=purge@example.edu").json()["students"][0]["id"]
+
+    assert admin.delete(f"/api/v1/admin/students/{sid}").status_code == 200
+    assert scalar(f"select count(*) from users where id = '{sid}'") == "0"
+    assert scalar(f"select count(*) from exam_attempts where user_id = '{sid}'") == "0"
+    assert admin.delete(f"/api/v1/admin/students/{sid}").status_code == 404
+
+
 def test_student_detail_404s_for_an_unknown_id(admin):
     assert admin.get(
         "/api/v1/admin/students/00000000-0000-0000-0000-000000000000").status_code == 404

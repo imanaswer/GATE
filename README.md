@@ -313,6 +313,16 @@ JavaScript and enforcement stays in one place — the Next middleware deliberate
 does **not** gate `/admin`, because that would mean putting `ADMIN_SECRET` into
 the Next runtime too.
 
+Two deletions live on the student detail page, both writer-only and both
+logged with the admin's email. **Delete attempt** clears one student's exam so
+they can re-sit — one attempt per student is `unique (user_id, event_id)`, a
+database constraint, so removing the row is the only way to reopen it. It
+cascades away their answers *and their certificate*, so a verification link
+already in someone's hands stops working; the panel names the certificate
+before you confirm. **Delete student** additionally removes the profile, but
+not their Supabase auth account — they can sign in and register again, because
+this undoes a mistaken registration rather than banning anyone.
+
 `admin` can write, `viewer` can only read. Questions are **retired, never
 deleted** — deleting one would cascade away the `attempt_questions` rows that
 explain the score of every student who was given it.

@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { use, useEffect, useState } from "react";
 import { adminApi, type StudentDetail } from "@/lib/adminApi";
 
@@ -8,6 +9,7 @@ export default function StudentDetailPage({
   params,
 }: PageProps<"/admin/students/[id]">) {
   const { id } = use(params);
+  const router = useRouter();
   const [s, setS] = useState<StudentDetail | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -102,6 +104,14 @@ export default function StudentDetailPage({
         </>
       )}
 
+      <DangerZone
+        student={s}
+        onAttemptDeleted={() =>
+          adminApi<StudentDetail>(`/students/${id}`).then(setS)
+        }
+        onStudentDeleted={() => router.push("/admin/students")}
+      />
+
       <h2 className="mt-8 mb-3 text-sm font-semibold">Integrity flags</h2>
       {s.flags.length === 0 ? (
         <p className="text-sm text-muted">None recorded.</p>
@@ -138,4 +148,119 @@ function took(seconds: number | null) {
   if (seconds === null) return "—";
   const m = Math.floor(seconds / 60);
   return `${m}:${String(seconds % 60).padStart(2, "0")}`;
+}
+
+/**
+ * Both of these are irreversible and one of them silently breaks a public URL,
+ * so each says what it destroys and asks a second time in place. An inline
+ * confirm rather than window.confirm: a native dialog is easy to dismiss by
+ * reflex and cannot name the consequence.
+ */
+function DangerZone({
+  student,
+  onAttemptDeleted,
+  onStudentDeleted,
+}: {
+  student: StudentDetail;
+  onAttemptDeleted: () => void;
+  onStudentDeleted: () => void;
+}) {
+  const [arming, setArming] = useState<"attempt" | "student" | null>(null);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  async function run(what: "attempt" | "student") {
+    setBusy(true);
+    setError(null);
+    try {
+      if (what === "attempt") {
+        await adminApi(`/students/${student.id}/attempt`, { method: "DELETE" });
+        onAttemptDeleted();
+      } else {
+        await adminApi(`/students/${student.id}`, { method: "DELETE" });
+        onStudentDeleted();
+      }
+      setArming(null);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "That did not work.");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  const actions = [
+    {
+      key: "attempt" as const,
+      label: "Delete attempt",
+      available: student.attempt_id !== null,
+      blurb: "Lets them sit the exam again. One attempt per student is a database rule, so this is the only way to reopen it.",
+      destroys: student.certificate_id
+        ? `Erases their answers, their score and certificate ${student.certificate_id} — that verification link stops working for anyone holding it.`
+        : "Erases their answers, their score and their integrity flags.",
+    },
+    {
+      key: "student" as const,
+      label: "Delete student",
+      available: true,
+      blurb: "For a test or mistaken registration.",
+      destroys:
+        "Erases the profile, the attempt, any certificate and the integrity flags. They can sign in and register again — this is not a ban.",
+    },
+  ];
+
+  return (
+    <section className="mt-10 rounded-2xl border border-danger/40 p-5">
+      <h2 className="text-sm font-semibold text-danger">Danger zone</h2>
+      <p className="mt-1 text-xs text-muted">Neither of these can be undone.</p>
+
+      {error && (
+        <p role="alert" className="mt-3 text-sm text-danger">
+          {error}
+        </p>
+      )}
+
+      <div className="mt-4 grid gap-3 sm:grid-cols-2">
+        {actions.map((a) => (
+          <div key={a.key} className="rounded-xl bg-surface-2 p-4">
+            <p className="text-sm font-medium">{a.label}</p>
+            <p className="mt-1 text-xs text-muted">{a.blurb}</p>
+
+            {!a.available ? (
+              <p className="mt-3 text-xs text-muted">No attempt to delete.</p>
+            ) : arming === a.key ? (
+              <>
+                <p className="mt-3 text-xs text-danger">{a.destroys}</p>
+                <div className="mt-3 flex gap-2">
+                  <button
+                    onClick={() => run(a.key)}
+                    disabled={busy}
+                    className="rounded-lg bg-accent px-3 py-1.5 text-xs font-semibold text-accent-ink disabled:opacity-60"
+                  >
+                    {busy ? "Deleting…" : "Yes, delete"}
+                  </button>
+                  <button
+                    onClick={() => setArming(null)}
+                    disabled={busy}
+                    className="rounded-lg border border-line px-3 py-1.5 text-xs font-semibold"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </>
+            ) : (
+              <button
+                onClick={() => {
+                  setArming(a.key);
+                  setError(null);
+                }}
+                className="mt-3 rounded-lg border border-danger/60 px-3 py-1.5 text-xs font-semibold text-danger"
+              >
+                {a.label}
+              </button>
+            )}
+          </div>
+        ))}
+      </div>
+    </section>
+  );
 }

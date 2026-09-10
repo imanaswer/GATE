@@ -9,6 +9,7 @@ Every endpoint below is behind `CurrentAdmin`; writes are behind `CurrentWriter`
 import csv
 import io
 import json
+import logging
 import zipfile
 from datetime import datetime, timezone
 
@@ -313,6 +314,9 @@ def _student_row(r) -> dict:
     }
 
 
+log = logging.getLogger("tech-arena")
+
+
 @router.get("/students/{student_id}")
 def student_detail(student_id: str, admin: CurrentAdmin):
     row = db.fetch_one(f"{STUDENT_SELECT} where u.id = %s", (student_id,))
@@ -376,6 +380,54 @@ class QuestionIn(BaseModel):
     status: str = Field(default="active", pattern="^(draft|active|retired)$")
     options: list[str] = Field(min_length=2, max_length=6)
     correct_index: int = Field(ge=0, le=5)
+
+
+@router.delete("/students/{student_id}/attempt")
+def delete_attempt(student_id: str, admin: CurrentWriter):
+    """Clear a student's exam so they can sit it again.
+
+    The one-attempt rule is `unique (user_id, event_id)`, a database constraint
+    rather than app logic, so removing the row is the only way to give someone
+    a second go after a genuine failure. Cascades take the frozen questions,
+    the answers, the integrity flags and any certificate with it — a
+    certificate that has already been shared stops verifying, which is why the
+    panel says so before you click.
+
+    Writer-only: a viewer can read the whole dashboard and change nothing.
+    """
+    with db.cursor() as cur:
+        cur.execute(
+            """
+            delete from exam_attempts a using users u
+            where a.user_id = u.id and u.id = %s
+            returning a.id, u.email
+            """,
+            (student_id,),
+        )
+        row = cur.fetchone()
+    if not row:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "That student has no attempt to delete.")
+    log.warning("admin %s deleted attempt %s for %s", admin.email, row["id"], row["email"])
+    return {"deleted_attempt": str(row["id"])}
+
+
+@router.delete("/students/{student_id}")
+def delete_student(student_id: str, admin: CurrentWriter):
+    """Remove a student and everything attached to them.
+
+    Cascades from `users` clear the attempt, its answers, the certificate and
+    the integrity flags. It does NOT remove their Supabase auth account —
+    `users.id references auth.users on delete cascade` runs the other way — so
+    the person can sign in and register again. That is the right default: this
+    undoes a mistaken or test registration, it is not a ban.
+    """
+    with db.cursor() as cur:
+        cur.execute("delete from users where id = %s returning email", (student_id,))
+        row = cur.fetchone()
+    if not row:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "No such student.")
+    log.warning("admin %s deleted student %s (%s)", admin.email, student_id, row["email"])
+    return {"deleted_student": student_id}
 
 
 @router.get("/questions")
