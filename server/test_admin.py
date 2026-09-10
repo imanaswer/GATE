@@ -253,6 +253,38 @@ def test_student_detail_shows_the_per_question_breakdown_admins_need(admin, sat_
     assert isinstance(detail["flags"], list)
 
 
+def test_attempt_timings_are_reported_and_capped_at_the_deadline(admin, sat_exam):
+    """When they sat it, and how long they were on the paper.
+
+    The cap is the part worth testing. Finalisation stamps submitted_at = now(),
+    expiry is lazy-on-access and the sweep is daily, so an attempt abandoned on
+    Tuesday and swept on Thursday would report a two-day exam without it.
+    """
+    listed = admin.get(f"/api/v1/admin/students?q={sat_exam['email']}").json()["students"][0]
+    assert listed["started_at"] is not None
+    assert 0 <= listed["duration_seconds"] <= 1200      # the event is 20 minutes
+
+    # Simulate the late sweep: finalised two days after the deadline passed.
+    # sat_exam is module-scoped, so this has to be put back.
+    original = scalar(
+        f"select submitted_at from exam_attempts where id = '{sat_exam['attempt_id']}'")
+    psql("-c", f"""
+        update exam_attempts set submitted_at = expires_at + interval '2 days'
+        where id = '{sat_exam["attempt_id"]}'
+    """)
+    try:
+        after = admin.get(
+            f"/api/v1/admin/students?q={sat_exam['email']}").json()["students"][0]
+        assert after["duration_seconds"] <= 1200, (
+            f"duration ran away to {after['duration_seconds']}s — the cap is not applied"
+        )
+    finally:
+        psql("-c", f"""
+            update exam_attempts set submitted_at = '{original}'
+            where id = '{sat_exam["attempt_id"]}'
+        """)
+
+
 def test_student_detail_404s_for_an_unknown_id(admin):
     assert admin.get(
         "/api/v1/admin/students/00000000-0000-0000-0000-000000000000").status_code == 404

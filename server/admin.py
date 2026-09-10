@@ -18,7 +18,7 @@ from fastapi import (
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, Field
 
-from server import certificates, db, integrity, questions, ratelimit
+from server import certificates, db, exam, integrity, questions, ratelimit
 from server.adminauth import (
     COOKIE,
     SESSION_HOURS,
@@ -237,12 +237,14 @@ def _student_filters(q, college_id, domain, attempt_status):
     return " and ".join(where), params
 
 
-STUDENT_SELECT = """
+STUDENT_SELECT = f"""
     select u.id, u.name, u.email, u.phone, u.student_id,
            u.registered_at, u.created_at,
            co.name as college_name, lo.name as location_name,
            a.id as attempt_id, a.status as attempt_status, a.score,
-           a.correct_count, a.wrong_count, a.skipped_count, a.submitted_at,
+           a.correct_count, a.wrong_count, a.skipped_count,
+           a.started_at, a.submitted_at,
+           {exam.DURATION_SECONDS_SQL} as duration_seconds,
            d.name as domain_name, d.slug as domain_slug,
            c.certificate_id, c.verify_hash, c.issued_at
     from users u
@@ -303,7 +305,11 @@ def _student_row(r) -> dict:
         "domain_name": r["domain_name"],
         "score": r["score"],
         "certificate_id": r["certificate_id"],
+        "started_at": r["started_at"].isoformat() if r["started_at"] else None,
         "submitted_at": r["submitted_at"].isoformat() if r["submitted_at"] else None,
+        # Wall clock on the paper. For an expired attempt this is the cap, not
+        # an achievement — attempt_status is what says which.
+        "duration_seconds": r["duration_seconds"],
     }
 
 
@@ -627,7 +633,8 @@ def college_analytics(admin: CurrentAdmin, limit: int = Query(default=200, ge=1,
 CSV_COLUMNS = [
     "name", "email", "phone", "student_id", "college_name", "location",
     "domain_name", "attempt_status", "score", "correct",
-    "wrong", "skipped", "submitted_at", "certificate_id",
+    "wrong", "skipped", "started_at", "submitted_at", "duration_seconds",
+    "certificate_id",
 ]
 
 
@@ -670,7 +677,9 @@ def export_csv(
                     r["college_name"], r["location_name"],
                     r["domain_name"], r["attempt_status"], r["score"],
                     r["correct_count"], r["wrong_count"], r["skipped_count"],
+                    r["started_at"].isoformat() if r["started_at"] else "",
                     r["submitted_at"].isoformat() if r["submitted_at"] else "",
+                    r["duration_seconds"] if r["duration_seconds"] is not None else "",
                     r["certificate_id"],
                 ])
             yield buffer.getvalue()

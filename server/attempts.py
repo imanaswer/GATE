@@ -308,11 +308,11 @@ def _result(cur, attempt_id) -> dict:
     # certificates existed. Every caller of _result is inside a transaction.
     certificate_id = certificates.issue(cur, attempt_id)
     cur.execute(
-        """
+        f"""
         select a.id, a.status, a.score, a.correct_count, a.wrong_count, a.skipped_count,
                a.started_at, a.submitted_at, d.name as domain_name, d.slug as domain_slug,
                (select count(*) from attempt_questions where attempt_id = a.id) as total,
-               extract(epoch from (a.submitted_at - a.started_at))::int as duration_seconds
+               {exam.DURATION_SECONDS_SQL} as duration_seconds
         from exam_attempts a join domains d on d.id = a.domain_id
         where a.id = %s
         """,

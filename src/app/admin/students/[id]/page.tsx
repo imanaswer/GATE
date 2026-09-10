@@ -36,6 +36,10 @@ export default function StudentDetailPage({
           ["Location", s.location],
           ["Domain", s.domain_name],
           ["Status", s.attempt_status ?? "not started"],
+          ["Started", when(s.started_at)],
+          ["Submitted", when(s.submitted_at)],
+          ["Took", s.duration_seconds === null ? "—"
+            : `${took(s.duration_seconds)}${s.attempt_status === "expired" ? " (ran out of time)" : ""}`],
           ["Certificate", s.certificate_id],
         ].map(([label, value]) => (
           <div key={label as string} className="flex gap-2 text-sm">
@@ -58,6 +62,11 @@ export default function StudentDetailPage({
                 publishes the answer key to everyone still to sit the exam. */}
             <span className="ml-2 font-normal text-muted">(admin only)</span>
           </h2>
+          <p className="mb-3 text-xs text-muted">
+            <b>Took</b> above is wall clock measured on our server. The per-question
+            <b> Time</b> below is reported by the browser and is advisory — it excludes
+            idle time and a determined student can fake it, so the two will not add up.
+          </p>
           <div className="overflow-x-auto rounded-2xl border border-line">
             <table className="w-full min-w-[520px] text-left text-sm">
               <thead className="bg-surface-2 text-xs uppercase tracking-wide text-muted">
@@ -117,4 +126,16 @@ export default function StudentDetailPage({
       )}
     </>
   );
+}
+
+/** Local time, not the raw UTC the API returns. */
+function when(iso: string | null) {
+  return iso ? new Date(iso).toLocaleString() : "—";
+}
+
+/** m:ss. Null while an attempt is still running. */
+function took(seconds: number | null) {
+  if (seconds === null) return "—";
+  const m = Math.floor(seconds / 60);
+  return `${m}:${String(seconds % 60).padStart(2, "0")}`;
 }

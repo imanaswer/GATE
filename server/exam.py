@@ -22,6 +22,15 @@ meaningful advantage on a twenty-minute exam, and without it a student on a slow
 connection loses the answer they submitted in time."""
 
 
+# Wall-clock seconds on the paper, for any query that aliases exam_attempts as
+# `a`. Capped at expires_at because finalisation stamps submitted_at = now():
+# expiry is lazy-on-access and the sweep is daily, so an attempt abandoned on
+# Tuesday and swept on Thursday would otherwise report a two-day exam.
+DURATION_SECONDS_SQL = (
+    "extract(epoch from (least(a.submitted_at, a.expires_at) - a.started_at))::int"
+)
+
+
 class BankTooSmall(Exception):
     """A domain cannot serve its blueprint. Loud on purpose: silently handing a
     student 12 questions instead of 15 is an unfair exam, not a degraded one."""

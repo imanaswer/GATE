@@ -67,7 +67,11 @@ export type AdminStudent = {
   domain_name: string | null;
   score: number | null;
   certificate_id: string | null;
+  started_at: string | null;
   submitted_at: string | null;
+  /** Wall clock on the paper, capped at the deadline. For an expired attempt
+   *  this is the cap rather than an achievement — read attempt_status too. */
+  duration_seconds: number | null;
 };
 
 export type StudentDetail = AdminStudent & {

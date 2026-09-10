@@ -85,10 +85,10 @@ export default function Students() {
       </div>
 
       <div className="overflow-x-auto rounded-2xl border border-line">
-        <table className="w-full min-w-[720px] text-left text-sm">
+        <table className="w-full min-w-[900px] text-left text-sm">
           <thead className="bg-surface-2 text-xs uppercase tracking-wide text-muted">
             <tr>
-              {["Name", "College", "Domain", "Status", "Score", "Certificate"].map((h) => (
+              {["Name", "College", "Domain", "Status", "Score", "Started", "Took", "Certificate"].map((h) => (
                 <th key={h} scope="col" className="px-4 py-2">{h}</th>
               ))}
             </tr>
@@ -106,12 +106,19 @@ export default function Students() {
                 <td className="px-4 py-2 text-muted">{s.domain_name ?? "—"}</td>
                 <td className="px-4 py-2">{s.attempt_status ?? "not started"}</td>
                 <td className="px-4 py-2 font-mono tabular-nums">{s.score ?? "—"}</td>
+                <td className="px-4 py-2 text-xs text-muted">{when(s.started_at)}</td>
+                <td className="px-4 py-2 font-mono tabular-nums" title={
+                  s.attempt_status === "expired" ? "Ran out of time — this is the limit, not a finish time" : undefined
+                }>
+                  {took(s.duration_seconds)}
+                  {s.attempt_status === "expired" && <span className="ml-1 text-xs text-muted">(ran out)</span>}
+                </td>
                 <td className="px-4 py-2 font-mono text-xs">{s.certificate_id ?? "—"}</td>
               </tr>
             ))}
             {!loading && rows.length === 0 && (
               <tr>
-                <td colSpan={6} className="px-4 py-8 text-center text-muted">
+                <td colSpan={8} className="px-4 py-8 text-center text-muted">
                   No students match those filters.
                 </td>
               </tr>
@@ -130,4 +137,17 @@ export default function Students() {
       )}
     </>
   );
+}
+
+/** Local time, not the raw UTC the API returns — organisers read this at a
+ *  glance and an ISO string is 5.5 hours wrong for them. */
+function when(iso: string | null) {
+  return iso ? new Date(iso).toLocaleString() : "—";
+}
+
+/** m:ss. Null while an attempt is still running. */
+function took(seconds: number | null) {
+  if (seconds === null) return "—";
+  const m = Math.floor(seconds / 60);
+  return `${m}:${String(seconds % 60).padStart(2, "0")}`;
 }
