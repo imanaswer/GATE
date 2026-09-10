@@ -1,0 +1,51 @@
+external_id,domain,type,topic,difficulty,question,code,language,option_a,option_b,option_c,option_d,correct,explanation
+MTH-E001,math,mcq,arithmetic,easy,What is 15% of 200?,,,30,15,20,35,A,15% of 200 is 0.15 x 200 = 30.
+MTH-E002,math,mcq,arithmetic,easy,What is the value of 3 squared plus 4 squared?,,,12,25,14,49,B,"3² = 9 and 4² = 16, so the sum is 25. Note that (3+4)² would be 49."
+MTH-E003,math,mcq,arithmetic,easy,What is the sum of the first five natural numbers?,,,10,12,15,20,C,1 + 2 + 3 + 4 + 5 = 15.
+MTH-E004,math,mcq,arithmetic,easy,What is 100 divided by 4?,,,20,24,40,25,D,100 ÷ 4 = 25.
+MTH-E005,math,mcq,arithmetic,easy,What is the value of 2 cubed?,,,8,6,9,16,A,2³ means 2 x 2 x 2 = 8. A common slip is to compute 2 x 3 = 6.
+MTH-E006,math,mcq,arithmetic,easy,What is 0.1 multiplied by 0.1?,,,0.1,0.01,0.2,1.0,B,Multiplying two tenths gives a hundredth: 0.1 x 0.1 = 0.01.
+MTH-E007,math,mcq,arithmetic,easy,Which of these decimals is the largest?,,,0.5,0.45,0.505,0.4,C,"Comparing place by place, 0.505 exceeds 0.500, which exceeds 0.450 and 0.400."
+MTH-E008,math,mcq,fractions,easy,What is 3/4 written as a decimal?,,,0.34,0.43,1.33,0.75,D,3 divided by 4 equals 0.75.
+MTH-E009,math,mcq,fractions,easy,What is 1/2 + 1/4?,,,3/4,1/6,2/6,1/8,A,"Rewrite 1/2 as 2/4, then 2/4 + 1/4 = 3/4. Denominators are not added."
+MTH-E010,math,mcq,percentages,easy,A shirt priced at 800 rupees is sold at a 25% discount. What is the selling price?,,,575 rupees,600 rupees,625 rupees,775 rupees,B,"A 25% discount removes 200 rupees, leaving 800 - 200 = 600."
+MTH-E011,math,mcq,algebra,easy,"If x + 5 = 12, what is x?",,,5,8,7,17,C,Subtract 5 from both sides: x = 12 - 5 = 7.
+MTH-E012,math,mcq,algebra,easy,Simplify 2x + 3x.,,,6x,5x²,23x,5x,D,"Like terms add their coefficients: 2 + 3 = 5, so the result is 5x."
+MTH-E013,math,mcq,algebra,easy,What is the value of 5x when x = 4?,,,20,9,16,54,A,Substituting gives 5 x 4 = 20.
+MTH-E014,math,mcq,geometry,easy,What do the interior angles of a triangle add up to?,,,90 degrees,180 degrees,270 degrees,360 degrees,B,The interior angles of any triangle sum to 180 degrees. A quadrilateral sums to 360.
+MTH-E015,math,mcq,geometry,easy,What is the area of a rectangle measuring 8 cm by 5 cm?,,,13 square cm,26 square cm,40 square cm,80 square cm,C,Area of a rectangle is length x breadth = 8 x 5 = 40. 26 would be the perimeter.
+MTH-E016,math,mcq,geometry,easy,What is the perimeter of a square with a side of 6 cm?,,,12 cm,18 cm,36 cm,24 cm,D,Perimeter is 4 x side = 4 x 6 = 24 cm. 36 would be the area.
+MTH-E017,math,mcq,geometry,easy,How many sides does a hexagon have?,,,Six,Five,Seven,Eight,A,A hexagon has six sides. A pentagon has five and an octagon eight.
+MTH-E018,math,mcq,geometry,easy,"What is the area of a circle of radius 7 cm, taking pi as 22/7?",,,44 square cm,154 square cm,77 square cm,308 square cm,B,Area = pi r² = (22/7) x 49 = 154. 44 cm would be the circumference.
+MTH-E019,math,mcq,number theory,easy,Which of these is a prime number?,,,15,21,17,27,C,"17 has no factors other than 1 and itself. 15 = 3x5, 21 = 3x7 and 27 = 3x9."
+MTH-E020,math,mcq,number theory,easy,What is the lowest common multiple of 4 and 6?,,,2,10,24,12,D,"Multiples of 4 are 4, 8, 12; multiples of 6 are 6, 12. The smallest shared multiple is 12."
+MTH-E021,math,mcq,number theory,easy,What is the highest common factor of 12 and 18?,,,6,2,3,36,A,"Factors shared by both are 1, 2, 3 and 6, so the highest is 6. 36 is their LCM."
+MTH-E022,math,mcq,averages,easy,"What is the average of 10, 20 and 30?",,,15,20,25,60,B,The mean is (10 + 20 + 30) ÷ 3 = 60 ÷ 3 = 20.
+MTH-E023,math,mcq,ratio,easy,Express the ratio 12:18 in its simplest form.,,,3:2,4:6,2:3,6:9,C,Dividing both terms by their HCF of 6 gives 2:3.
+MTH-E024,math,mcq,speed and distance,easy,A train covers 60 km in one hour. How far does it travel in 2.5 hours at the same speed?,,,120 km,125 km,180 km,150 km,D,Distance = speed x time = 60 x 2.5 = 150 km.
+MTH-E025,math,mcq,arithmetic,easy,What is 7 multiplied by 8?,,,56,48,54,64,A,7 x 8 = 56.
+MTH-M001,math,mcq,percentages,medium,A number increased by 20% becomes 96. What was the original number?,,,76,80,76.8,115.2,B,If 1.2x = 96 then x = 96 ÷ 1.2 = 80. Subtracting 20% of 96 gives the wrong answer.
+MTH-M002,math,mcq,percentages,medium,A price rises by 10% and then falls by 10%. What is the net change?,,,No change,A 1% increase,A 1% decrease,A 2% decrease,C,"The factors multiply: 1.10 x 0.90 = 0.99, so the price ends 1% below where it started."
+MTH-M003,math,mcq,profit and loss,medium,An item bought for 400 rupees is sold for 500 rupees. What is the profit percentage?,,,20%,22%,100%,25%,D,"Profit is 100 rupees on a cost of 400, so 100/400 = 25%. Dividing by the selling price gives 20%, which is the common error."
+MTH-M004,math,mcq,profit and loss,medium,An article is sold for 270 rupees at a loss of 10%. What was the cost price?,,,300 rupees,243 rupees,280 rupees,297 rupees,A,"Selling price is 90% of cost, so cost = 270 ÷ 0.9 = 300."
+MTH-M005,math,mcq,interest,medium,"What is the simple interest on 5,000 rupees at 8% per year for 3 years?",,,400 rupees,"1,200 rupees","1,000 rupees","1,299 rupees",B,"SI = (P x R x T) ÷ 100 = (5000 x 8 x 3) ÷ 100 = 1,200."
+MTH-M006,math,mcq,interest,medium,"What amount does 1,000 rupees grow to at 10% compound interest per year for 2 years?",,,"1,100 rupees","1,200 rupees","1,210 rupees","1,221 rupees",C,"1000 x 1.1 x 1.1 = 1,210. Simple interest would give only 1,200."
+MTH-M007,math,mcq,algebra,medium,Solve for x: 2x + 3 = 4x - 7.,,,2,-5,-2,5,D,"Rearranging gives 3 + 7 = 4x - 2x, so 10 = 2x and x = 5."
+MTH-M008,math,mcq,algebra,medium,What are the roots of x² - 5x + 6 = 0?,,,2 and 3,-2 and -3,1 and 6,-1 and -6,A,"The expression factorises as (x-2)(x-3) = 0, so x = 2 or x = 3."
+MTH-M009,math,mcq,algebra,medium,What is the value of (a + b)² when a = 3 and b = 2?,,,13,25,11,36,B,(3+2)² = 5² = 25. Note that a² + b² alone would give 13.
+MTH-M010,math,mcq,algebra,medium,"If 5 pens cost 75 rupees, what do 8 pens cost at the same rate?",,,100 rupees,115 rupees,120 rupees,125 rupees,C,"One pen costs 75 ÷ 5 = 15 rupees, so 8 pens cost 8 x 15 = 120."
+MTH-M011,math,mcq,geometry,medium,A right-angled triangle has legs of 6 cm and 8 cm. What is the hypotenuse?,,,7 cm,12 cm,14 cm,10 cm,D,"By Pythagoras, 6² + 8² = 36 + 64 = 100, and the square root of 100 is 10."
+MTH-M012,math,mcq,geometry,medium,What is the area of a triangle with base 10 cm and height 6 cm?,,,30 square cm,16 square cm,32 square cm,60 square cm,A,Area = ½ x base x height = ½ x 10 x 6 = 30. Forgetting the half gives 60.
+MTH-M013,math,mcq,geometry,medium,What is each interior angle of a regular hexagon?,,,60 degrees,120 degrees,90 degrees,135 degrees,B,"Interior angle sum is (6-2) x 180 = 720 degrees, shared equally across six angles gives 120."
+MTH-M014,math,mcq,mensuration,medium,What is the volume of a cube with a side of 4 cm?,,,12 cubic cm,16 cubic cm,64 cubic cm,96 cubic cm,C,Volume = side³ = 4 x 4 x 4 = 64. 96 would be the total surface area.
+MTH-M015,math,mcq,mensuration,medium,"What is the volume of a cylinder of radius 7 cm and height 10 cm, taking pi as 22/7?",,,220 cubic cm,440 cubic cm,770 cubic cm,"1,540 cubic cm",D,"Volume = pi r² h = (22/7) x 49 x 10 = 1,540."
+MTH-M016,math,mcq,averages,medium,The average of five numbers is 20. What is their total?,,,100,25,50,125,A,Total = average x count = 20 x 5 = 100.
+MTH-M017,math,mcq,averages,medium,"The average of four numbers is 15. If one of them is 12, what is the average of the other three?",,,14,16,15,18,B,"The total is 60; removing 12 leaves 48 across three numbers, so the average is 16."
+MTH-M018,math,mcq,ratio,medium,600 rupees is divided in the ratio 2:3. What is the larger share?,,,300 rupees,240 rupees,360 rupees,400 rupees,C,"The five parts are worth 120 each, so the larger share is 3 x 120 = 360."
+MTH-M019,math,mcq,time and work,medium,A finishes a job in 10 days and B in 15 days. How long do they take working together?,,,5 days,12.5 days,25 days,6 days,D,"Combined rate is 1/10 + 1/15 = 5/30 = 1/6 of the job per day, so six days."
+MTH-M020,math,mcq,speed and distance,medium,What is 72 km/h expressed in metres per second?,,,20 m/s,12 m/s,25 m/s,36 m/s,A,Multiply by 5/18: 72 x 5/18 = 20 m/s.
+MTH-M021,math,mcq,speed and distance,medium,A train 200 m long travels at 20 m/s. How long does it take to pass a stationary pole?,,,4 seconds,10 seconds,20 seconds,40 seconds,B,To pass a pole the train covers its own length: 200 ÷ 20 = 10 seconds.
+MTH-M022,math,mcq,number theory,medium,How many prime numbers are there between 1 and 20?,,,Six,Seven,Eight,Nine,C,"They are 2, 3, 5, 7, 11, 13, 17 and 19. 1 is not prime."
+MTH-M023,math,mcq,number theory,medium,What is the sum of the first ten natural numbers?,,,45,50,100,55,D,Using n(n+1)/2 with n = 10 gives (10 x 11) ÷ 2 = 55.
+MTH-M024,math,mcq,probability,medium,What is the probability of rolling a number greater than 4 on a fair six-sided die?,,,1/3,1/6,1/2,2/3,A,"Only 5 and 6 qualify, so the probability is 2/6 = 1/3."
+MTH-M025,math,mcq,data interpretation,medium,"In a class of 250 students, 40% are girls. How many boys are there?",,,100,150,110,160,B,"Girls number 100, so the remaining 60% are 150 boys."

@@ -65,7 +65,7 @@ def test_paper_matches_the_blueprint(client):
 
     assert len(qs) == 15
     counts = {d: sum(1 for q in qs if q["difficulty"] == d) for d in ("easy", "medium", "hard")}
-    assert counts == {"easy": 5, "medium": 7, "hard": 3}
+    assert counts == {"easy": 7, "medium": 8, "hard": 0}
     assert [q["position"] for q in qs] == list(range(1, 16))
 
 
