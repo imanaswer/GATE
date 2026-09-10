@@ -133,7 +133,7 @@ export default function Complete() {
 /** One burst of brand-coloured confetti over the result. Positions are derived
  *  from the index, not Math.random, so server and client render the same DOM. */
 function Confetti() {
-  const COLOURS = ["#e8000f", "#ffffff", "#7cc4ff"];
+  const COLOURS = ["#e8000f", "#004282", "#febc2e"];
   return (
     <div aria-hidden="true" className="pointer-events-none fixed inset-0 overflow-hidden">
       {Array.from({ length: 28 }, (_, i) => (

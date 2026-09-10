@@ -11,13 +11,13 @@ import { GoogleSignIn } from "@/components/GoogleSignIn";
  */
 export function LandingDesktop({ next }: { next: string }) {
   return (
-    <div className="desk relative flex min-h-svh flex-col overflow-hidden text-[#121212]">
+    <div className="desk relative flex min-h-svh flex-col overflow-hidden text-ink">
       <nav className="relative z-20 flex items-center justify-between px-5 py-4 text-sm sm:px-8">
         <span className="font-semibold">tech arena</span>
         <span aria-hidden="true" className="hidden font-mono text-lg sm:block">
           ^ω^
         </span>
-        <span className="text-[#6b6b68]">by G-TEC Education</span>
+        <span className="text-muted">by G-TEC Education</span>
       </nav>
 
       {/* The scattered desktop. Decorative and draggable, never load-bearing. */}
@@ -36,7 +36,7 @@ export function LandingDesktop({ next }: { next: string }) {
                 <li
                   key={o}
                   className={`flex items-center gap-2 rounded-md px-2 py-1 ${
-                    i === 0 ? "bg-[#004282] text-white" : "bg-[#f7f7f5]"
+                    i === 0 ? "bg-[#004282] text-white" : "bg-surface-2"
                   }`}
                 >
                   <span className="font-mono text-[10px]">{"ABCD"[i]}</span> {o}
@@ -62,10 +62,10 @@ export function LandingDesktop({ next }: { next: string }) {
 
         <Window left="72%" top="14%" width={320} caption="certificate.pdf" bob={8}>
           <div className="p-5">
-            <p className="font-mono text-[10px] tracking-widest text-[#e8000f]">CERTIFICATE</p>
+            <p className="font-mono text-[10px] tracking-widest text-accent-soft">CERTIFICATE</p>
             <p className="mt-1 text-lg font-bold leading-tight">Tech Arena 2026</p>
-            <p className="mt-1 text-xs text-[#6b6b68]">Mathematics · 13 / 15</p>
-            <div className="mt-4 flex items-center justify-between border-t border-dashed border-[#d9d9d6] pt-3">
+            <p className="mt-1 text-xs text-muted">Mathematics · 13 / 15</p>
+            <div className="mt-4 flex items-center justify-between border-t border-dashed border-line pt-3">
               <span className="font-mono text-[10px] text-[#8a8a86]">TA26-8F3K-2Q</span>
               <span className="rounded-full bg-[#e6f7ec] px-2 py-0.5 text-[10px] font-medium text-[#137a3a]">
                 ✓ verified
@@ -74,7 +74,7 @@ export function LandingDesktop({ next }: { next: string }) {
           </div>
         </Window>
 
-        <Window left="6%" top="62%" width={270} caption="arenas.txt" bob={6}>
+        <Window left="6%" top="54%" width={270} caption="arenas.txt" bob={6}>
           <ul className="grid grid-cols-2 gap-1.5 p-3 text-xs">
             {[
               ["🧭", "General"],
@@ -85,7 +85,7 @@ export function LandingDesktop({ next }: { next: string }) {
               ["📊", "Data"],
               ["🎯", "Combined"],
             ].map(([icon, name]) => (
-              <li key={name} className="flex items-center gap-2 rounded-md bg-[#f7f7f5] px-2 py-1.5">
+              <li key={name} className="flex items-center gap-2 rounded-md bg-surface-2 px-2 py-1.5">
                 <span>{icon}</span> {name}
               </li>
             ))}
@@ -115,7 +115,7 @@ export function LandingDesktop({ next }: { next: string }) {
         ].map(([face, left, top]) => (
           <span
             key={face}
-            className="absolute font-mono text-lg text-[#333]"
+            className="absolute font-mono text-lg text-ink"
             style={{ left, top }}
           >
             {face}
@@ -135,11 +135,11 @@ export function LandingDesktop({ next }: { next: string }) {
       </div>
 
       <main className="relative z-10 flex flex-1 flex-col items-center justify-center px-6 pt-20 pb-16 text-center">
-        <p className="mb-4 font-mono text-sm text-[#6b6b68] md:hidden" aria-hidden="true">
+        <p className="mb-4 font-mono text-sm text-muted md:hidden" aria-hidden="true">
           ^ω^ &nbsp; ¯\_(ツ)_/¯
         </p>
         <h1 className="rise text-6xl font-bold tracking-[-0.05em] sm:text-8xl">tech arena</h1>
-        <p className="rise mt-3 text-lg text-[#333] sm:text-2xl" style={{ animationDelay: "80ms" }}>
+        <p className="rise mt-3 text-lg text-ink sm:text-2xl" style={{ animationDelay: "80ms" }}>
           15 challenges. 20 minutes. a certificate anyone can verify.
         </p>
 
@@ -161,17 +161,17 @@ export function LandingDesktop({ next }: { next: string }) {
         id="how"
         className="relative z-10 mx-auto mb-16 w-full max-w-3xl px-6"
       >
-        <ol className="grid gap-3 rounded-3xl border border-[#e2e2df] bg-white p-4 shadow-[0_24px_60px_-30px_#00000040] sm:grid-cols-4">
+        <ol className="grid gap-3 rounded-3xl border border-line bg-surface p-4 shadow-[0_24px_60px_-30px_#00000040] sm:grid-cols-4">
           {[
             ["01", "sign in", "Google, one tap"],
             ["02", "pick an arena", "the domain you know best"],
             ["03", "15 challenges", "server timer, autosave"],
             ["04", "certificate", "issued the moment you finish"],
           ].map(([n, title, sub]) => (
-            <li key={n} className="rounded-2xl bg-[#f7f7f5] p-4 transition-transform duration-200 hover:-translate-y-1">
-              <span className="font-mono text-[10px] text-[#e8000f]">{n}</span>
+            <li key={n} className="rounded-2xl bg-surface-2 p-4 transition-transform duration-200 hover:-translate-y-1">
+              <span className="font-mono text-[10px] text-accent-soft">{n}</span>
               <p className="mt-1 font-semibold">{title}</p>
-              <p className="text-xs text-[#6b6b68]">{sub}</p>
+              <p className="text-xs text-muted">{sub}</p>
             </li>
           ))}
         </ol>
@@ -219,7 +219,7 @@ function Window({
       onPointerCancel={() => setDragging(false)}
     >
       <div
-        className={`bob rounded-xl border border-[#d9d9d6] bg-white shadow-[0_20px_50px_-24px_#00000066] transition-[transform,box-shadow] duration-200 ${
+        className={`bob rounded-xl border border-line bg-surface shadow-[0_20px_50px_-24px_#00000066] transition-[transform,box-shadow] duration-200 ${
           dragging
             ? "cursor-grabbing scale-[1.03] shadow-[0_30px_60px_-20px_#00000080]"
             : "cursor-grab hover:scale-[1.02]"
@@ -253,7 +253,7 @@ function Sticker({
   const bg = navy ? "#004282" : "#e8000f";
   return (
     <div
-      className="absolute w-28 overflow-hidden rounded-md bg-white text-center shadow-[0_10px_24px_-12px_#00000066]"
+      className="absolute w-28 overflow-hidden rounded-md bg-surface text-center shadow-[0_10px_24px_-12px_#00000066]"
       style={{ left, top, rotate: `${rotate}deg` }}
     >
       <div className="px-2 pt-1.5 pb-1 text-[9px] font-bold tracking-wide text-white" style={{ background: bg }}>

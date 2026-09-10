@@ -1,32 +1,40 @@
 @import "tailwindcss";
 
-/* Dark-only by design: this is an event product used in one sitting, and a single
-   committed palette is easier to keep AA-contrast-correct than two half-tuned ones.
+/* Light by design, matching the landing page: this is one committed palette for
+   the whole product, easier to keep AA-contrast-correct than two half-tuned ones.
 
-   Brand palette (G-TEC): navy #004282, red #ff0000, white. The navy is the
-   surface, not the background — the background sits a few steps darker so the
-   brand navy still reads as a colour on top of it. Red is for fills and display
-   sizes only; small red text on navy fails AA, so `accent-soft` exists for that. */
+   Brand palette (G-TEC): navy #004282, red #e8000f, white. Off-white is the
+   background and white is the surface, so a card reads as raised paper on a
+   desk — the same relationship the landing page's windows have.
+
+   Every value below clears 4.5:1 on white, off-white AND the panel grey, with
+   one deliberate exception: `accent` is 4.7:1 on white, which is display and
+   fill only. Small red text needs `accent-soft`, which is why that token
+   exists. Reuse these exact hexes rather than near-misses.
+
+   Note the ramp direction inverted with the palette. On dark, surface-2 was the
+   LIGHTEST step; on light, a more prominent panel is a DARKER one. Making
+   surface-2 lighter than base here would leave 4px meter tracks invisible. */
 @theme {
-  --color-base: #021736;
-  --color-surface: #04275a;
-  --color-surface-2: #0a3a7c;
-  --color-line: #1f5299;
-  --color-ink: #ffffff;
-  --color-muted: #a8c1e6;
+  --color-base: #f5f5f3;
+  --color-surface: #ffffff;
+  --color-surface-2: #ececea;
+  --color-line: #d9d9d6;
+  --color-ink: #121212;
+  --color-muted: #6b6b68;
   --color-accent: #e8000f;
-  --color-accent-soft: #ff7070;
+  --color-accent-soft: #c1000c;
   --color-accent-ink: #ffffff;
-  --color-sky: #7cc4ff;
-  --color-ok: #4ade80;
-  --color-warn: #fbbf24;
-  --color-danger: #ff7070;
+  --color-sky: #004282;
+  --color-ok: #137a3a;
+  --color-warn: #8a5200;
+  --color-danger: #c1000c;
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
 
 html {
-  color-scheme: dark;
+  color-scheme: light;
 }
 
 /* One hue per stage of the paper, so a student always knows how deep in they are
@@ -34,16 +42,15 @@ html {
    Declared on :root rather than in @theme because these are only ever read
    through var() — Tailwind drops @theme entries no utility class references. */
 :root {
-  --color-stage-1: #7cc4ff;
-  --color-stage-2: #ffffff;
-  --color-stage-3: #ff4d4d;
+  --color-stage-1: #004282;
+  --color-stage-2: #b45309;
+  --color-stage-3: #e8000f;
 }
 
 body {
-  /* One soft navy glow at the top: depth without a decorative texture. */
-  background:
-    radial-gradient(120% 60% at 50% -10%, #0a3a7c 0%, transparent 60%),
-    var(--color-base);
+  /* Flat off-white. The dotted grid stays on .desk: it is a decorative layer
+     that belongs on a marketing surface, not behind 15 questions of exam text. */
+  background: var(--color-base);
   color: var(--color-ink);
   font-family: var(--font-sans), system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
@@ -118,7 +125,7 @@ body {
   content: "";
   position: absolute;
   inset: 0;
-  background: linear-gradient(90deg, transparent, #ffffff1f, transparent);
+  background: linear-gradient(90deg, transparent, #00000014, transparent);
   animation: sweep 1.4s ease-in-out infinite;
 }
 
@@ -177,10 +184,8 @@ body {
    brand navy and red as the only colours. Scoped to .desk so the rest of the
    product stays on the dark palette. */
 .desk {
-  background-color: #f5f5f3;
   background-image: radial-gradient(#cfcfcb 1px, transparent 1px);
   background-size: 24px 24px;
-  color-scheme: light;
 }
 
 @keyframes bob {
