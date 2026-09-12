@@ -9,5 +9,5 @@ insert into domains (slug, name, icon, description, position) values
 on conflict (slug) do nothing;
 
 insert into exam_events (name, slug, duration_seconds, blueprint)
-values ('Tech Arena 2026', 'tech-arena-2026', 1200, '{"easy":5,"medium":7,"hard":3}'::jsonb)
+values ('GATE 2026', 'tech-arena-2026', 1200, '{"easy":5,"medium":7,"hard":3}'::jsonb)
 on conflict (slug) do nothing;

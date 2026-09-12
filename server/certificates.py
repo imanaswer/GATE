@@ -6,6 +6,7 @@ is drawn on demand from that row, because most students never download theirs
 and provisioning a render fleet for the ones who don't is how event day breaks.
 """
 import hashlib
+import os
 import re
 import secrets
 from datetime import date
@@ -185,14 +186,15 @@ def render(cert: dict, verify_url: str) -> bytes:
         pdf.set_xy(20, y)
         pdf.cell(w - 40, size * 0.4, text, align="C")
 
-    centred("TECH ARENA", 30, 14, "B", (140, 115, 40))
-    centred("CERTIFICATE OF PARTICIPATION", 42, 26, "B")
+    # 50mm wide keeps the tagline legible in print; the file is bundled with server/**.
+    pdf.image(os.path.join(os.path.dirname(__file__), "gate-logo.png"), x=w / 2 - 25, y=18, w=50)
+    centred("CERTIFICATE OF PARTICIPATION", 48, 26, "B")
     centred("This is to certify that", 62, 11, "", (110, 110, 110))
     centred(cert["student_name"], 74, 30, "B")
     pdf.set_draw_color(140, 115, 40)
     pdf.line(w / 2 - 60, 88, w / 2 + 60, 88)
     centred(cert["college_name"] or "", 95, 12, "", (90, 90, 90))
-    centred("participated in the Tech Arena examination in", 112, 11, "", (110, 110, 110))
+    centred("participated in the GATE examination in", 112, 11, "", (110, 110, 110))
     centred(cert["domain_name"], 124, 18, "B")
 
     _qr(pdf, verify_url, x=w - 62, y=pdf.h - 62, size=34)

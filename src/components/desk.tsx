@@ -9,7 +9,13 @@
  * pick them up; anywhere else a card that slides out from under the cursor is a
  * defect, so `drag` is opt-in and only the landing passes it.
  */
+import Image from "next/image";
 import type { ReactNode } from "react";
+
+/** The GATE wordmark, sized by the caller. Menu bars want it small; the hero wants it huge. */
+export function Wordmark({ className = "h-5 w-auto" }: { className?: string }) {
+  return <Image src="/gate-wordmark.png" alt="GATE" width={904} height={293} priority className={className} />;
+}
 
 /** macOS menu bar. Functional pages put their own controls in `right`. */
 export function MenuBar({
@@ -96,13 +102,13 @@ export function Desk({
   return (
     <>
       <MenuBar
-        left={<span className="font-semibold text-ink">tech arena</span>}
+        left={<Wordmark />}
         center={
           <span aria-hidden="true" className="font-mono text-base text-muted">
             ^ω^
           </span>
         }
-        right={right ?? <span className="hidden sm:inline">by G-TEC Education</span>}
+        right={right ?? <span className="hidden sm:inline">by G-TEC EDUCATION</span>}
       />
       <main className="flex flex-1 justify-center px-4 py-10 sm:px-6 sm:py-14">
         <div className={`w-full ${width}`}>{children}</div>

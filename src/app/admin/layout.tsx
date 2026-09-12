@@ -51,7 +51,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             <span className="size-2.5 rounded-full bg-[#febc2e]" />
             <span className="size-2.5 rounded-full bg-[#28c840]" />
           </span>
-          <span className="font-mono text-xs tracking-widest text-accent-soft">TECH ARENA ADMIN</span>
+          <span className="font-mono text-xs tracking-widest text-accent-soft">GATE ADMIN</span>
           <nav className="flex gap-4 text-sm">
             {TABS.map(([href, label]) => (
               <Link

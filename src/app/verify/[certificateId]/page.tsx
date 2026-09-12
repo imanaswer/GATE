@@ -27,7 +27,7 @@ export default function Verify({ params }: PageProps<"/verify/[certificateId]">)
     <Desk width="max-w-md">
       <div className="rise">
         <p className="mb-8 text-center font-mono text-xs tracking-widest text-muted">
-          TECH ARENA · CERTIFICATE VERIFICATION
+          GATE · CERTIFICATE VERIFICATION
         </p>
 
         {!cert && state === "loading" && (
@@ -61,7 +61,7 @@ export default function Verify({ params }: PageProps<"/verify/[certificateId]">)
               {cert.college_name && (
                 <p className="mt-1 text-sm text-muted">{cert.college_name}</p>
               )}
-              <p className="mt-6 text-xs text-muted">participated in Tech Arena 2026 in</p>
+              <p className="mt-6 text-xs text-muted">participated in GATE 2026 in</p>
               <p className="mt-1 text-lg font-semibold text-accent-soft">{cert.domain_name}</p>
             </div>
             <dl className="grid grid-cols-2 gap-px border-t border-line bg-line text-center">
@@ -83,7 +83,7 @@ export default function Verify({ params }: PageProps<"/verify/[certificateId]">)
             page keyed on an ID someone may have been handed is not the place to
             publish how well they did. */}
         <p className="mt-8 text-center text-xs text-muted">
-          Certificates are issued by Tech Arena and verified against our records
+          Certificates are issued by GATE and verified against our records
           in real time.
         </p>
       </div>

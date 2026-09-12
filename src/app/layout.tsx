@@ -6,8 +6,8 @@ const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
 const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Tech Arena",
-  description: "A 20-challenge technical aptitude arena.",
+  title: "GATE",
+  description: "G-TEC Aptitude Test for Excellence. 20 challenges, 20 minutes, a certificate anyone can verify.",
 };
 
 export const viewport: Viewport = {

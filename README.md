@@ -1,4 +1,6 @@
-# Tech Arena
+# GATE
+
+G-TEC Aptitude Test for Excellence.
 
 A technical aptitude exam platform. Design and rationale live in
 [`docs/superpowers/specs/2026-09-07-tech-arena-exam-platform-design.md`](docs/superpowers/specs/2026-09-07-tech-arena-exam-platform-design.md).
@@ -122,18 +124,13 @@ already exists.
 ### 4. Seed the question bank
 
 ```bash
-pnpm bank:import          # all of data/questions/*.csv — 350 questions, 7 domains
+pnpm bank:import          # all of data/questions/*.csv — 1,000 questions
 pnpm bank:check           # can every domain serve the blueprint?
 ```
 
-Every domain must come back ✓. If one doesn't, exam start fails for it with a
-503, by design — silent degradation here means an unfair exam.
-
-The bank is 50 questions per domain, 25 easy and 25 medium, and the blueprint
-is **10 easy + 10 medium** (20 per paper, still 20 minutes — 60s a question).
-At that size two students share about **8 of 20** questions; `bank:check` flags
-it as *thin*, and `test_papers_differ_between_students` is xfailed against a
-4.0 budget. Growing each domain to roughly 160 questions clears both.
+`bank:check` must end with *"every domain can serve the blueprint with room to
+randomise"*. If it doesn't, exam start will fail for that domain with a 503, by
+design — silent degradation here means an unfair exam.
 
 ⚠️ These seed questions are **public in this repository, answers included**.
 Replace them with reviewed questions before a real event: put your CSV in
@@ -210,7 +207,7 @@ done
 ## Tests
 
 ```bash
-pnpm api:test     # 154 tests: exam engine, certificates, admin, hardening
+pnpm api:test     # 144 tests: exam engine, certificates, admin, hardening
 pnpm db:test      # constraints and RLS, asserted against real Postgres
 pnpm lint && pnpm exec tsc --noEmit && pnpm build
 ```
@@ -312,16 +309,6 @@ HttpOnly, SameSite=Lax cookie issued by FastAPI, so no token is readable from
 JavaScript and enforcement stays in one place — the Next middleware deliberately
 does **not** gate `/admin`, because that would mean putting `ADMIN_SECRET` into
 the Next runtime too.
-
-Two deletions live on the student detail page, both writer-only and both
-logged with the admin's email. **Delete attempt** clears one student's exam so
-they can re-sit — one attempt per student is `unique (user_id, event_id)`, a
-database constraint, so removing the row is the only way to reopen it. It
-cascades away their answers *and their certificate*, so a verification link
-already in someone's hands stops working; the panel names the certificate
-before you confirm. **Delete student** additionally removes the profile, but
-not their Supabase auth account — they can sign in and register again, because
-this undoes a mistaken registration rather than banning anyone.
 
 `admin` can write, `viewer` can only read. Questions are **retired, never
 deleted** — deleting one would cascade away the `attempt_questions` rows that
@@ -498,3 +485,6 @@ scripts/loadtest/   k6 load tests
 data/questions/     the seed question bank (CSV)
 docs/               design spec
 ```
+
+gtm@gteceducation.com
+GtecArena@2026!

@@ -45,7 +45,7 @@ async def lifespan(_: FastAPI):
 
 
 app = FastAPI(
-    title="Tech Arena API",
+    title="GATE API",
     lifespan=lifespan,
     # No public schema. The API surface is documented in docs/, not served to
     # anyone who wants to enumerate it.
